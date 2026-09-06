@@ -1,0 +1,54 @@
+{
+  "info": {
+    "name": "MERN Blog Platform API Collection",
+    "description": "Production-ready API collection for all 33 modules",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Demo User\",\n  \"username\": \"demouser\",\n  \"email\": \"demo@blog.com\",\n  \"password\": \"Password123!\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "register"] }
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"author@blog.com\",\n  \"password\": \"Password123!\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "login"] }
+      }
+    },
+    {
+      "name": "Posts - Get All",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/v1/posts", "host": ["{{baseUrl}}"], "path": ["api", "v1", "posts"] }
+      }
+    },
+    {
+      "name": "Categories - Get All",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/v1/categories", "host": ["{{baseUrl}}"], "path": ["api", "v1", "categories"] }
+      }
+    },
+    {
+      "name": "Search - Unified Search",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/v1/search?q=MERN", "host": ["{{baseUrl}}"], "path": ["api", "v1", "search"], "query": [{ "key": "q", "value": "MERN" }] }
+      }
+    }
+  ]
+}
