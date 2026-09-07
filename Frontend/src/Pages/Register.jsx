@@ -1,125 +1,133 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserPlus, Mail, Lock, User, AtSign, Sparkles } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
-import validemail from "../lib/regixs";
-const API = import.meta.env.VITE_API;
+import GoogleSignInButton from "../components/GoogleSignInButton";
 
+const Register = () => {
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-function Register() {
+  const { register } = useAuth();
   const navigate = useNavigate();
-  const [userName, setUsername] = useState("");
-  const [userEmail, setUseremail] = useState("");
-  const [userPassword, setUserpassword] = useState("");
 
-  const HandleRegister = async (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    try {
-      if (!userName || !userEmail || !userPassword) {
-         toast.error("Please fill all the fields", {
-         position: "top-right",
-          autoClose: 3000,
-        });
-        return;
-      }
-      if (userName.length < 3) {
-        toast.error("Username must be at least 3 characters", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-        return;
-      }
-      if (userPassword.length < 6) {
-        toast.error("Password must be at least 6 characters", {
-        position: "top-right",
-        autoClose: 3000,
-        });
-        return;
-      }
-      if (!validemail(userEmail)) {
-        toast.error("Please enter a valid email", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-        return;
-      }
+    if (!name || !username || !email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
 
-      const response = await fetch(`${API}/register`, {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({
-          user: userName,
-          password: userPassword,
-          email: userEmail,
-        }),
-      });
-      const data = await response.json();
-      toast.success(data.message, {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      navigate("/login")
-    } catch (error) {
-      toast.error("An error occurred during registration", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      console.log("error while connect with profile ",error);
+    setLoading(true);
+    try {
+      const res = await register({ name, username, email, password });
+      toast.success(res.message || "Account created successfully!");
+      navigate("/");
+    } catch (err) {
+      toast.error(err.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
-    <>
-      <div className="registaion">
-        <form
-          onSubmit={HandleRegister}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "20px",
-            marginTop: "15px",
-          }}
-        >
-          <input
-            style={{ padding: "10px 15px" }}
-            type="text"
-            value={userName}
-            onChange={(e) => {
-              setUsername(e.target.value);
-            }}
-            placeholder="enter your username"
-          />
-          <input
-            style={{ padding: "10px 15px" }}
-            type="email"
-            value={userEmail}
-            onChange={(e) => {
-              setUseremail(e.target.value);
-            }}
-            placeholder="enter your email"
-          />
-          <input
-            style={{ padding: "10px 15px" }}
-            type="password"
-            value={userPassword}
-            onChange={(e) => {
-              setUserpassword(e.target.value);
-            }}
-            placeholder="enter your password"
-          />
-          <input
-            style={{ padding: "10px 15px" }}
-            type="reset"
-            onClick={() => {
-              (setUseremail(""), setUsername(""), setUserpassword(""));
-            }}
-          />
-          <input style={{ padding: "10px 15px" }} type="submit" />
+    <div className="container" style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "2rem" }}>
+      <div className="glass-card" style={{ width: "100%", maxWidth: "460px", padding: "2.5rem", background: "var(--bg-card)" }}>
+        <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+          <div style={{ width: "48px", height: "48px", borderRadius: "12px", background: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem auto" }}>
+            <Sparkles size={24} color="var(--text-inverse)" />
+          </div>
+          <h2 style={{ fontSize: "1.75rem", color: "var(--text-primary)" }}>Create Account</h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", marginTop: "0.25rem" }}>Join our community of authors and readers</p>
+        </div>
+
+        {/* Continue with Google Button */}
+        <div style={{ marginBottom: "1.25rem" }}>
+          <GoogleSignInButton text="Sign up with Google" />
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", margin: "1.25rem 0", gap: "0.75rem" }}>
+          <div style={{ flex: 1, height: "1px", backgroundColor: "var(--border-color, #334155)" }}></div>
+          <span style={{ fontSize: "0.78rem", color: "var(--text-muted, #94a3b8)", textTransform: "uppercase" }}>OR</span>
+          <div style={{ flex: 1, height: "1px", backgroundColor: "var(--border-color, #334155)" }}></div>
+        </div>
+
+        <form onSubmit={handleRegisterSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.15rem" }}>
+          <div>
+            <label style={{ display: "block", fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.35rem" }}>Full Name</label>
+            <div style={{ position: "relative" }}>
+              <User size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+              <input
+                type="text"
+                placeholder="Ravi Mishra"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.4rem", borderRadius: "var(--radius-md)", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", color: "var(--text-primary)", outline: "none" }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label style={{ display: "block", fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.35rem" }}>Username</label>
+            <div style={{ position: "relative" }}>
+              <AtSign size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+              <input
+                type="text"
+                placeholder="ravimishra"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.4rem", borderRadius: "var(--radius-md)", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", color: "var(--text-primary)", outline: "none" }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label style={{ display: "block", fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.35rem" }}>Email Address</label>
+            <div style={{ position: "relative" }}>
+              <Mail size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+              <input
+                type="email"
+                placeholder="ravi@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.4rem", borderRadius: "var(--radius-md)", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", color: "var(--text-primary)", outline: "none" }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label style={{ display: "block", fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.35rem" }}>Password</label>
+            <div style={{ position: "relative" }}>
+              <Lock size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+              <input
+                type="password"
+                placeholder="At least 6 characters"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.4rem", borderRadius: "var(--radius-md)", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", color: "var(--text-primary)", outline: "none" }}
+              />
+            </div>
+          </div>
+
+          <button type="submit" className="btn-primary" disabled={loading} style={{ width: "100%", justifyContent: "center", padding: "0.75rem", marginTop: "0.5rem" }}>
+            <UserPlus size={18} /> {loading ? "Creating Account..." : "Create Account"}
+          </button>
         </form>
+
+        <p style={{ textAlign: "center", marginTop: "1.75rem", fontSize: "0.88rem", color: "var(--text-secondary)" }}>
+          Already have an account? <Link to="/login" style={{ color: "var(--accent-secondary)", fontWeight: 600 }}>Log in</Link>
+        </p>
       </div>
-    </>
+    </div>
   );
-}
+};
 
 export default Register;
