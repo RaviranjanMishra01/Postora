@@ -94,9 +94,29 @@ const getSavedPosts = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { posts }, "Saved posts fetched successfully"));
 });
 
+// @desc Get user liked posts
+// @route GET /api/v1/interactions/liked
+const getLikedPosts = asyncHandler(async (req, res) => {
+  const likes = await Like.find({ user: req.user.id })
+    .populate({
+      path: "post",
+      populate: [
+        { path: "author", select: "name username avatar" },
+        { path: "category", select: "name slug" },
+        { path: "tags", select: "name slug" },
+      ],
+    })
+    .sort({ createdAt: -1 });
+
+  const posts = likes.map((l) => l.post).filter(Boolean);
+
+  res.status(200).json(new ApiResponse(200, { posts }, "Liked posts fetched successfully"));
+});
+
 module.exports = {
   toggleLike,
   toggleBookmark,
   getInteractionStatus,
   getSavedPosts,
+  getLikedPosts,
 };

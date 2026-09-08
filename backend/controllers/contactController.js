@@ -3,6 +3,8 @@ const ApiResponse = require("../utils/ApiResponse");
 const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 
+const { isValidEmail } = require("../middleware/validate");
+
 // @desc Submit Contact Message
 // @route POST /api/v1/contact
 const sendMessage = asyncHandler(async (req, res) => {
@@ -12,7 +14,24 @@ const sendMessage = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Please fill out all contact fields");
   }
 
-  const contact = await Contact.create({ name, email, subject, message });
+  if (!isValidEmail(email)) {
+    throw new ApiError(400, "Please enter a valid email address");
+  }
+
+  const cleanName = String(name).trim().slice(0, 100);
+  const cleanSubject = String(subject).trim().slice(0, 200);
+  const cleanMessage = String(message).trim().slice(0, 5000);
+
+  if (!cleanName || !cleanSubject || !cleanMessage) {
+    throw new ApiError(400, "Contact form fields cannot be blank");
+  }
+
+  const contact = await Contact.create({
+    name: cleanName,
+    email: email.trim().toLowerCase(),
+    subject: cleanSubject,
+    message: cleanMessage,
+  });
 
   res.status(201).json(new ApiResponse(201, { contact }, "Your message has been sent successfully!"));
 });

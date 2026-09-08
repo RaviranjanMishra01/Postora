@@ -4,6 +4,7 @@ const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
+const { isValidEmail } = require("../middleware/validate");
 
 // Helper to send cookie token response
 const sendTokenResponse = (user, statusCode, res, message = "Success") => {
@@ -32,21 +33,37 @@ const register = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Please provide all required fields");
   }
 
-  const existingEmail = await User.findOne({ email });
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanUsername = username.trim().toLowerCase();
+
+  if (!isValidEmail(cleanEmail)) {
+    throw new ApiError(400, "Please provide a valid email address");
+  }
+
+  if (cleanUsername.length < 3 || cleanUsername.length > 30 || !/^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
+    throw new ApiError(400, "Username must be 3-30 characters long and contain only letters, numbers, and underscores");
+  }
+
+  if (password.length < 6) {
+    throw new ApiError(400, "Password must be at least 6 characters long");
+  }
+
+  const existingEmail = await User.findOne({ email: cleanEmail });
   if (existingEmail) {
     throw new ApiError(400, "Email address is already registered");
   }
 
-  const existingUsername = await User.findOne({ username: username.toLowerCase() });
+  const existingUsername = await User.findOne({ username: cleanUsername });
   if (existingUsername) {
     throw new ApiError(400, "Username is already taken");
   }
 
   const user = await User.create({
-    name,
-    username: username.toLowerCase(),
-    email,
+    name: name.trim().slice(0, 50),
+    username: cleanUsername,
+    email: cleanEmail,
     password,
+    role: "user", // Forced: Client cannot override role or assign privileged access
     isEmailVerified: true, // Auto-verify for streamlined dev/testing
   });
 
@@ -62,15 +79,16 @@ const login = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Please provide email and password");
   }
 
-  const user = await User.findOne({ email }).select("+password");
+  const cleanEmail = String(email).trim().toLowerCase();
+  const user = await User.findOne({ email: cleanEmail }).select("+password");
 
   if (!user) {
-    throw new ApiError(401, "Invalid email or password");
+    throw new ApiError(401, "Invalid credentials");
   }
 
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
-    throw new ApiError(401, "Invalid email or password");
+    throw new ApiError(401, "Invalid credentials");
   }
 
   if (user.status === "suspended") {
@@ -78,6 +96,72 @@ const login = asyncHandler(async (req, res) => {
   }
 
   sendTokenResponse(user, 200, res, "Login successful!");
+});
+
+// @desc Admin Login (Role: ADMIN or SUPER_ADMIN required)
+// @route POST /api/v1/auth/admin/login
+const adminLogin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw new ApiError(400, "Please provide email and password");
+  }
+
+  const cleanEmail = String(email).trim().toLowerCase();
+  const user = await User.findOne({ email: cleanEmail }).select("+password");
+
+  if (!user) {
+    throw new ApiError(401, "Invalid credentials");
+  }
+
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) {
+    throw new ApiError(401, "Invalid credentials");
+  }
+
+  if (user.status === "suspended") {
+    throw new ApiError(403, "Your account has been suspended by an administrator");
+  }
+
+  const role = user.role?.toLowerCase();
+  if (role !== "admin" && role !== "superadmin") {
+    throw new ApiError(401, "Invalid credentials");
+  }
+
+  sendTokenResponse(user, 200, res, "Admin authentication successful!");
+});
+
+// @desc Super Admin Login (Role: SUPER_ADMIN required)
+// @route POST /api/v1/auth/super-admin/login
+const superAdminLogin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw new ApiError(400, "Please provide email and password");
+  }
+
+  const cleanEmail = String(email).trim().toLowerCase();
+  const user = await User.findOne({ email: cleanEmail }).select("+password");
+
+  if (!user) {
+    throw new ApiError(401, "Invalid credentials");
+  }
+
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) {
+    throw new ApiError(401, "Invalid credentials");
+  }
+
+  if (user.status === "suspended") {
+    throw new ApiError(403, "Your account has been suspended by an administrator");
+  }
+
+  const role = user.role?.toLowerCase();
+  if (role !== "superadmin") {
+    throw new ApiError(401, "Invalid credentials");
+  }
+
+  sendTokenResponse(user, 200, res, "Super Admin authentication successful!");
 });
 
 // @desc Logout User / Clear Cookie
@@ -102,26 +186,87 @@ const getMe = asyncHandler(async (req, res) => {
 // @route POST /api/v1/auth/forgot-password
 const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  const user = await User.findOne({ email });
-
-  if (!user) {
-    throw new ApiError(404, "There is no user registered with that email address");
+  if (!email || !isValidEmail(email)) {
+    throw new ApiError(400, "Please provide a valid email address");
   }
 
-  const resetToken = user.getResetPasswordToken();
-  await user.save({ validateBeforeSave: false });
+  const cleanEmail = email.trim().toLowerCase();
+  const user = await User.findOne({ email: cleanEmail });
 
-  const resetUrl = `${req.protocol}://${req.get("host")}/reset-password/${resetToken}`;
-  const message = `You are receiving this email because you (or someone else) requested a password reset. Please click on the link to reset your password:\n\n${resetUrl}`;
+  if (user) {
+    const resetToken = user.getResetPasswordToken();
+    await user.save({ validateBeforeSave: false });
 
-  await sendEmail({
-    to: user.email,
-    subject: "Password Reset Request",
-    text: message,
-    html: `<p>${message}</p>`,
-  });
+    const resetUrl = `${req.protocol}://${req.get("host")}/reset-password/${resetToken}`;
+    const message = `Password Reset Request:\n\n${resetUrl}`;
 
-  res.status(200).json(new ApiResponse(200, {}, "Password reset token sent to email"));
+    await sendEmail({
+      to: user.email,
+      subject: "Password Reset Request",
+      text: message,
+      html: `<p>${message}</p>`,
+    });
+  }
+
+  res.status(200).json(new ApiResponse(200, {}, "If an account exists for that email, a password reset link has been dispatched."));
+});
+
+// @desc Admin Forgot Password
+// @route POST /api/v1/auth/admin/forgot-password
+const adminForgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  if (!email || !isValidEmail(email)) {
+    throw new ApiError(400, "Please provide a valid email address");
+  }
+
+  const cleanEmail = email.trim().toLowerCase();
+  const user = await User.findOne({ email: cleanEmail });
+
+  if (user && (user.role === "admin" || user.role === "superadmin")) {
+    const resetToken = user.getResetPasswordToken();
+    await user.save({ validateBeforeSave: false });
+
+    const resetUrl = `${req.protocol}://${req.get("host")}/admin/reset-password/${resetToken}`;
+    const message = `Admin Password Reset Request:\n\n${resetUrl}`;
+
+    await sendEmail({
+      to: user.email,
+      subject: "Admin Password Reset Request",
+      text: message,
+      html: `<p>${message}</p>`,
+    });
+  }
+
+  res.status(200).json(new ApiResponse(200, {}, "If an administrative account exists for that email, a password reset link has been dispatched."));
+});
+
+// @desc Super Admin Forgot Password
+// @route POST /api/v1/auth/super-admin/forgot-password
+const superAdminForgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  if (!email || !isValidEmail(email)) {
+    throw new ApiError(400, "Please provide a valid email address");
+  }
+
+  const cleanEmail = email.trim().toLowerCase();
+  const user = await User.findOne({ email: cleanEmail });
+
+  if (user && user.role === "superadmin") {
+    const resetToken = user.getResetPasswordToken();
+    await user.save({ validateBeforeSave: false });
+
+    const resetUrl = `${req.protocol}://${req.get("host")}/super-admin/reset-password/${resetToken}`;
+    const message = `Super Admin Password Reset Request:\n\n${resetUrl}`;
+
+    await sendEmail({
+      to: user.email,
+      subject: "Super Admin Password Reset Request",
+      text: message,
+      html: `<p>${message}</p>`,
+    });
+  }
+
+  res.status(200).json(new ApiResponse(200, {}, "If a Super Admin account exists for that email, a password reset link has been dispatched."));
 });
 
 // @desc Reset Password
@@ -166,12 +311,83 @@ const changePassword = asyncHandler(async (req, res) => {
   sendTokenResponse(user, 200, res, "Password updated successfully");
 });
 
+// @desc Continue with Google Authentication (Login / Register)
+// @route POST /api/v1/auth/google
+const googleAuth = asyncHandler(async (req, res) => {
+  const { email, name, avatar, googleId } = req.body;
+
+  if (!email) {
+    throw new ApiError(400, "Google authentication requires an email address");
+  }
+
+  const normalizedEmail = email.toLowerCase();
+  let user = await User.findOne({
+    $or: [
+      { email: normalizedEmail },
+      { googleId: googleId ? googleId : "non_existent_id_placeholder" }
+    ]
+  });
+
+  const effectiveGoogleId = googleId || `google_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+
+  if (user) {
+    let updated = false;
+    if (!user.googleId) {
+      user.googleId = effectiveGoogleId;
+      updated = true;
+    }
+    if (avatar && (!user.avatar || user.avatar.includes("unsplash"))) {
+      user.avatar = avatar;
+      updated = true;
+    }
+    if (user.status === "suspended") {
+      throw new ApiError(403, "Your account has been suspended by an administrator");
+    }
+    if (updated) {
+      await user.save({ validateBeforeSave: false });
+    }
+    return sendTokenResponse(user, 200, res, "Successfully logged in with Google!");
+  }
+
+  // Generate unique username from name or email
+  let baseUsername = (name || email.split("@")[0])
+    .toLowerCase()
+    .replace(/[^a-z0-9_]/g, "");
+
+  if (baseUsername.length < 3) baseUsername = "user_" + baseUsername;
+  let username = baseUsername;
+  let counter = 1;
+
+  while (await User.findOne({ username })) {
+    username = `${baseUsername}_${Math.floor(100 + Math.random() * 900)}${counter}`;
+    counter++;
+  }
+
+  user = await User.create({
+    name: name || email.split("@")[0],
+    username,
+    email: normalizedEmail,
+    role: "user", // Forced normal user role
+    avatar: avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+    googleId: effectiveGoogleId,
+    authProvider: "google",
+    isEmailVerified: true,
+  });
+
+  sendTokenResponse(user, 201, res, "Account created with Google successfully!");
+});
+
 module.exports = {
   register,
   login,
+  adminLogin,
+  superAdminLogin,
   logout,
   getMe,
   forgotPassword,
+  adminForgotPassword,
+  superAdminForgotPassword,
   resetPassword,
   changePassword,
+  googleAuth,
 };

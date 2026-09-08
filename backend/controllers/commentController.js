@@ -4,6 +4,7 @@ const Notification = require("../models/Notification");
 const ApiResponse = require("../utils/ApiResponse");
 const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
+const { isValidObjectId } = require("../middleware/validate");
 
 const PROFANITY_LIST = ["badword1", "spamword", "scamlink", "fakeoffer"];
 
@@ -17,8 +18,29 @@ const hasProfanity = (text) => {
 const createComment = asyncHandler(async (req, res) => {
   const { post: postId, content, parentComment } = req.body;
 
-  if (!postId || !content) {
-    throw new ApiError(400, "Post ID and content are required");
+  if (!postId || !content || !content.trim()) {
+    throw new ApiError(400, "Post ID and non-empty content are required");
+  }
+
+  if (!isValidObjectId(postId)) {
+    throw new ApiError(400, "Invalid post ID format");
+  }
+
+  if (content.trim().length > 2000) {
+    throw new ApiError(400, "Comment cannot exceed 2000 characters");
+  }
+
+  if (parentComment) {
+    if (!isValidObjectId(parentComment)) {
+      throw new ApiError(400, "Invalid parent comment ID format");
+    }
+    const parent = await Comment.findById(parentComment);
+    if (!parent) {
+      throw new ApiError(404, "Parent comment not found");
+    }
+    if (parent.post.toString() !== postId) {
+      throw new ApiError(400, "Parent comment does not belong to this post");
+    }
   }
 
   const post = await Post.findById(postId);

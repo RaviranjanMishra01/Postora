@@ -5,6 +5,8 @@ const ApiResponse = require("../utils/ApiResponse");
 const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 
+const { isValidObjectId } = require("../middleware/validate");
+
 // @desc Submit a report for post/comment/user
 // @route POST /api/v1/reports
 const submitReport = asyncHandler(async (req, res) => {
@@ -14,12 +16,36 @@ const submitReport = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Target type, target ID, and reason are required");
   }
 
+  const allowedTargetTypes = ["post", "comment", "user"];
+  if (!allowedTargetTypes.includes(targetType.toLowerCase())) {
+    throw new ApiError(400, "Invalid report target type. Must be 'post', 'comment', or 'user'");
+  }
+
+  if (!isValidObjectId(targetId)) {
+    throw new ApiError(400, "Invalid target ID format");
+  }
+
+  // Business validation: verify target exists in database
+  let targetExists = false;
+  if (targetType.toLowerCase() === "post") {
+    targetExists = await Post.exists({ _id: targetId });
+  } else if (targetType.toLowerCase() === "comment") {
+    targetExists = await Comment.exists({ _id: targetId });
+  } else if (targetType.toLowerCase() === "user") {
+    const User = require("../models/User");
+    targetExists = await User.exists({ _id: targetId });
+  }
+
+  if (!targetExists) {
+    throw new ApiError(404, "Reported target resource does not exist");
+  }
+
   const report = await Report.create({
     reporter: req.user.id,
-    targetType,
+    targetType: targetType.toLowerCase(),
     targetId,
-    reason,
-    description: description || "",
+    reason: String(reason).trim().slice(0, 200),
+    description: description ? String(description).trim().slice(0, 1000) : "",
   });
 
   res.status(201).json(new ApiResponse(201, { report }, "Report submitted for admin review"));

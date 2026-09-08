@@ -4,17 +4,25 @@ const Category = require("../models/Category");
 const Tag = require("../models/Tag");
 const ApiResponse = require("../utils/ApiResponse");
 const asyncHandler = require("../utils/asyncHandler");
+const { escapeRegex } = require("../middleware/validate");
 
 // @desc Unified Search API for posts, authors, categories, and tags
 // @route GET /api/v1/search
 const searchAll = asyncHandler(async (req, res) => {
-  const { q, category, tag, author, sort } = req.query;
+  let { q, category, tag, author, sort } = req.query;
+
+  if (q && typeof q === "string") {
+    q = q.trim().slice(0, 100);
+  } else {
+    q = null;
+  }
 
   if (!q && !category && !tag && !author) {
     return res.status(200).json(new ApiResponse(200, { posts: [], authors: [], categories: [], tags: [] }));
   }
 
-  const searchRegex = q ? new RegExp(q, "i") : null;
+  const safeQ = q ? escapeRegex(q) : null;
+  const searchRegex = safeQ ? new RegExp(safeQ, "i") : null;
 
   // Search Posts
   const postQuery = { status: "published" };
@@ -49,7 +57,7 @@ const searchAll = asyncHandler(async (req, res) => {
   let categories = [];
   let tags = [];
 
-  if (q) {
+  if (searchRegex) {
     authors = await User.find({
       role: { $in: ["author", "admin", "superadmin"] },
       $or: [{ name: searchRegex }, { username: searchRegex }],
@@ -69,12 +77,13 @@ const searchAll = asyncHandler(async (req, res) => {
 // @desc Auto-complete suggestions for debounced search bar
 // @route GET /api/v1/search/suggestions
 const getSuggestions = asyncHandler(async (req, res) => {
-  const { q } = req.query;
-  if (!q || q.length < 2) {
+  let { q } = req.query;
+  if (!q || typeof q !== "string" || q.trim().length < 2) {
     return res.status(200).json(new ApiResponse(200, { suggestions: [] }));
   }
 
-  const regex = new RegExp(q, "i");
+  const cleanQ = q.trim().slice(0, 100);
+  const regex = new RegExp(escapeRegex(cleanQ), "i");
   const posts = await Post.find({ title: regex, status: "published" }).select("title slug").limit(5);
   const tags = await Tag.find({ name: regex }).select("name slug").limit(3);
 

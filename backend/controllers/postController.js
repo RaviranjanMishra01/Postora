@@ -7,6 +7,7 @@ const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 const calculateReadingTime = require("../utils/readingTime");
 const slugify = require("slugify");
+const { isValidObjectId, sanitizeRichText } = require("../middleware/validate");
 
 // @desc Create a Post
 // @route POST /api/v1/posts
@@ -17,22 +18,41 @@ const createPost = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Please provide title, content, and category");
   }
 
+  if (title.trim().length > 200) {
+    throw new ApiError(400, "Post title cannot exceed 200 characters");
+  }
+
+  if (!isValidObjectId(category)) {
+    throw new ApiError(400, "Invalid category ID format");
+  }
+
+  const categoryExists = await Category.findById(category);
+  if (!categoryExists) {
+    throw new ApiError(404, "Category not found");
+  }
+
+  let cleanTags = [];
+  if (Array.isArray(tags)) {
+    cleanTags = tags.filter((t) => isValidObjectId(t));
+  }
+
+  const cleanContent = sanitizeRichText(content);
   const generatedSlug = slugify(title, { lower: true, strict: true }) + "-" + Date.now().toString().slice(-4);
-  const calculatedReadingTime = calculateReadingTime(content);
+  const calculatedReadingTime = calculateReadingTime(cleanContent || content);
 
   const post = await Post.create({
-    title,
+    title: title.trim(),
     slug: generatedSlug,
-    excerpt: excerpt || title,
-    content,
+    excerpt: excerpt ? excerpt.trim().slice(0, 500) : title.trim(),
+    content: cleanContent || content,
     featuredImage: featuredImage || (req.file ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}` : undefined),
     readingTime: calculatedReadingTime,
     author: req.user.id,
     category,
-    tags: tags || [],
-    status: status || "draft",
-    seoTitle: seoTitle || title,
-    seoDescription: seoDescription || excerpt,
+    tags: cleanTags,
+    status: ["published", "draft", "scheduled"].includes(status) ? status : "draft",
+    seoTitle: seoTitle ? seoTitle.trim().slice(0, 100) : title.trim(),
+    seoDescription: seoDescription ? seoDescription.trim().slice(0, 200) : (excerpt || title).trim(),
     canonicalUrl,
     scheduledAt,
     publishedAt: status === "published" ? new Date() : null,
@@ -158,6 +178,10 @@ const getPostBySlug = asyncHandler(async (req, res) => {
 // @desc Update Post
 // @route PUT /api/v1/posts/:id
 const updatePost = asyncHandler(async (req, res) => {
+  if (!isValidObjectId(req.params.id)) {
+    throw new ApiError(400, "Invalid post ID format");
+  }
+
   let post = await Post.findById(req.params.id);
 
   if (!post) {
@@ -172,29 +196,44 @@ const updatePost = asyncHandler(async (req, res) => {
   const { title, excerpt, content, featuredImage, category, tags, status, seoTitle, seoDescription, canonicalUrl, isFeatured } = req.body;
 
   if (title && title !== post.title) {
-    post.title = title;
+    if (title.trim().length > 200) {
+      throw new ApiError(400, "Post title cannot exceed 200 characters");
+    }
+    post.title = title.trim();
     post.slug = slugify(title, { lower: true, strict: true }) + "-" + Date.now().toString().slice(-4);
   }
 
   if (content) {
-    post.content = content;
-    post.readingTime = calculateReadingTime(content);
+    const cleanContent = sanitizeRichText(content);
+    post.content = cleanContent || content;
+    post.readingTime = calculateReadingTime(post.content);
   }
 
-  if (excerpt !== undefined) post.excerpt = excerpt;
+  if (category) {
+    if (!isValidObjectId(category)) {
+      throw new ApiError(400, "Invalid category ID format");
+    }
+    const catObj = await Category.findById(category);
+    if (!catObj) throw new ApiError(404, "Category not found");
+    post.category = category;
+  }
+
+  if (Array.isArray(tags)) {
+    post.tags = tags.filter((t) => isValidObjectId(t));
+  }
+
+  if (excerpt !== undefined) post.excerpt = String(excerpt).trim().slice(0, 500);
   if (featuredImage) post.featuredImage = featuredImage;
   if (req.file) post.featuredImage = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
-  if (category) post.category = category;
-  if (tags) post.tags = tags;
-  if (status) {
+  if (status && ["published", "draft", "scheduled", "trash"].includes(status)) {
     post.status = status;
     if (status === "published" && !post.publishedAt) {
       post.publishedAt = new Date();
     }
   }
-  if (isFeatured !== undefined) post.isFeatured = isFeatured;
-  if (seoTitle !== undefined) post.seoTitle = seoTitle;
-  if (seoDescription !== undefined) post.seoDescription = seoDescription;
+  if (isFeatured !== undefined) post.isFeatured = Boolean(isFeatured);
+  if (seoTitle !== undefined) post.seoTitle = String(seoTitle).trim().slice(0, 100);
+  if (seoDescription !== undefined) post.seoDescription = String(seoDescription).trim().slice(0, 200);
   if (canonicalUrl !== undefined) post.canonicalUrl = canonicalUrl;
 
   await post.save();

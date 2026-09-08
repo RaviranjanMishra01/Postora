@@ -3,14 +3,18 @@ const ApiResponse = require("../utils/ApiResponse");
 const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 const sendEmail = require("../utils/sendEmail");
+const { isValidEmail } = require("../middleware/validate");
 
 // @desc Subscribe to newsletter
 // @route POST /api/v1/newsletter/subscribe
 const subscribe = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  if (!email) throw new ApiError(400, "Email address is required");
+  if (!email || !isValidEmail(email)) {
+    throw new ApiError(400, "Please provide a valid email address");
+  }
 
-  let subscriber = await Newsletter.findOne({ email: email.toLowerCase() });
+  const cleanEmail = email.trim().toLowerCase();
+  let subscriber = await Newsletter.findOne({ email: cleanEmail });
 
   if (subscriber) {
     if (subscriber.active) {
@@ -35,7 +39,10 @@ const subscribe = asyncHandler(async (req, res) => {
 // @route POST /api/v1/newsletter/unsubscribe
 const unsubscribe = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  await Newsletter.findOneAndUpdate({ email: email.toLowerCase() }, { active: false });
+  if (!email || !isValidEmail(email)) {
+    throw new ApiError(400, "Please provide a valid email address");
+  }
+  await Newsletter.findOneAndUpdate({ email: email.trim().toLowerCase() }, { active: false });
   res.status(200).json(new ApiResponse(200, {}, "Unsubscribed successfully"));
 });
 
