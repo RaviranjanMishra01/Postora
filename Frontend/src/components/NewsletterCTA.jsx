@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Send } from "lucide-react";
 import { newsletterApi } from "../api/commentInteractionApi";
-import { toast } from "react-toastify";
+import { toast } from "../context/ToastContext";
 
 const NewsletterCTA = () => {
   const [email, setEmail] = useState("");

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Camera, Globe, MapPin, ExternalLink, UserCheck, PenTool } from "lucide-react";
 import { authApi } from "../../api/authApi";
-import { toast } from "react-toastify";
+import { toast } from "../../context/ToastContext";
 
 const ProfileHero = ({ user, updateUserState }) => {
   const [avatarLoading, setAvatarLoading] = useState(false);

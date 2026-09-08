@@ -1,65 +1,59 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
-:root {
+:root, html.light, [data-theme="light"] {
   --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* BRAND PALETTE OFFICIAL 8 COLORS */
-  --brand-navy-dark: #213448;
-  --brand-slate-blue: #547792;
-  --brand-accent-soft: #94B4C1;
-  --brand-cream-warm: #EAE0CF;
-  --brand-bg-light: #F9F8F6;
-  --brand-surface-light: #EFE9E3;
-  --brand-border-light: #D9CFC7;
-  --brand-warm-accent: #C9B59C;
+  /* BRAND ACCENT COLOR */
+  --carrino-pink: #FF3F7F;
+  --carrino-pink-hover: #E6356F;
+  --brand-pink: #FF3F7F;
+  --brand-soft: #FFF0F5;
 
-  /* CARRINO ACCENT COLORS */
-  --carrino-pink: #FF497C;
-  --carrino-pink-hover: #E03E6B;
-  --carrino-purple: #8B5CF6;
-  --carrino-orange: #F97316;
+  /* ACCENT PALETTE */
+  --accent-blue: #4C8DFF;
+  --accent-purple: #8B6CFF;
+  --accent-green: #19B88A;
 
   /* LIGHT THEME TOKENS */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F9F8F6;
-  --bg-card: #FFFFFF;
-  --bg-surface: #EFE9E3;
-  --bg-surface-secondary: #F9F8F6;
+  --bg-primary: #F7F8F6;              /* Warm off-white page background */
+  --bg-secondary: #F1F3F1;            /* Secondary container background */
+  --bg-card: #FFFFFF;                 /* White card / primary surface */
+  --bg-surface: #FFFFFF;              /* Primary surface */
+  --bg-surface-secondary: #F1F3F1;    /* Secondary surface */
+  --bg-surface-elevated: #FFFFFF;     /* Elevated surface */
   --bg-overlay: rgba(0, 0, 0, 0.45);
 
-  --border-color: #EFE9E3;
-  --border-glow: #FF497C;
+  --border-color: #E3E7E4;
+  --border-glow: #FF3F7F;
 
-  --text-primary: #213448;
-  --text-secondary: #547792;
-  --text-muted: #94B4C1;
+  --text-primary: #17202A;
+  --text-secondary: #64707D;
+  --text-muted: #94A0AA;
   --text-inverse: #FFFFFF;
 
-  --accent-primary: #FF497C;
-  --accent-primary-hover: #E03E6B;
-  --accent-secondary: #547792;
-  --accent-warm: #FF497C;
-  --accent-highlight: #EAE0CF;
+  --accent-primary: #FF3F7F;
+  --accent-primary-hover: #E6356F;
+  --accent-secondary: #64707D;
 
-  --btn-primary-bg: #FF497C;
+  --btn-primary-bg: #FF3F7F;
   --btn-primary-text: #FFFFFF;
-  --btn-primary-hover: #E03E6B;
+  --btn-primary-hover: #E6356F;
 
-  --btn-secondary-bg: #F9F8F6;
-  --btn-secondary-text: #213448;
-  --btn-secondary-border: #D9CFC7;
-  --btn-secondary-hover: #EFE9E3;
+  --btn-secondary-bg: #F1F3F1;
+  --btn-secondary-text: #17202A;
+  --btn-secondary-border: #E3E7E4;
+  --btn-secondary-hover: #E5E8E5;
 
-  --badge-cat-bg: #FF497C;
+  --badge-cat-bg: #FF3F7F;
   --badge-cat-text: #FFFFFF;
-  --badge-cat-border: #FF497C;
+  --badge-cat-border: #FF3F7F;
 
-  --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.06);
-  --shadow-glow: 0 6px 24px rgba(255, 73, 124, 0.15);
+  --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 6px 24px rgba(255, 63, 127, 0.15);
 
-  --skeleton-base: #EFE9E3;
-  --skeleton-highlight: #F9F8F6;
+  --skeleton-base: #E8EBE8;
+  --skeleton-highlight: #F5F7F5;
 
   /* Carrino Style Rounded Corners */
   --radius-sm: 6px;
@@ -68,47 +62,76 @@
   --radius-full: 9999px;
 }
 
-html.dark {
+html.dark, [data-theme="dark"] {
   /* DARK THEME TOKENS */
-  --bg-primary: #213448;
-  --bg-secondary: #192B3C;
-  --bg-card: #1C2D40;
-  --bg-surface: #274055;
-  --bg-surface-secondary: #192B3C;
-  --bg-overlay: rgba(0, 0, 0, 0.65);
+  --carrino-pink: #FF3F7F;
+  --carrino-pink-hover: #E6356F;
+  --brand-pink: #FF3F7F;
+  --brand-soft: #351D2A;
 
-  --border-color: rgba(84, 119, 146, 0.4);
-  --border-glow: #FF497C;
+  /* ACCENT PALETTE */
+  --accent-blue: #55A9FF;
+  --accent-purple: #9B7CFF;
+  --accent-green: #25C79A;
 
-  --text-primary: #F9F8F6;
-  --text-secondary: #EAE0CF;
-  --text-muted: #94B4C1;
+  --bg-primary: #101A26;              /* Deep navy page background */
+  --bg-secondary: #142235;            /* Sidebar / Secondary background */
+  --bg-card: #182A3D;                 /* Surface / Card deep navy surface */
+  --bg-surface: #182A3D;              /* Surface */
+  --bg-surface-secondary: #142235;    /* Secondary surface / sidebar */
+  --bg-surface-elevated: #1D3045;     /* Elevated surface */
+  --bg-overlay: rgba(0, 0, 0, 0.70);
+
+  --border-color: #2D465D;
+  --border-glow: #FF3F7F;
+
+  --text-primary: #F7F8FA;
+  --text-secondary: #B5C1CD;
+  --text-muted: #7F91A3;
   --text-inverse: #FFFFFF;
 
-  --accent-primary: #FF497C;
-  --accent-primary-hover: #E03E6B;
-  --accent-secondary: #547792;
-  --accent-warm: #FF497C;
-  --accent-highlight: #EAE0CF;
+  --accent-primary: #FF3F7F;
+  --accent-primary-hover: #E6356F;
+  --accent-secondary: #B5C1CD;
 
-  --btn-primary-bg: #FF497C;
+  --btn-primary-bg: #FF3F7F;
   --btn-primary-text: #FFFFFF;
-  --btn-primary-hover: #E03E6B;
+  --btn-primary-hover: #E6356F;
 
-  --btn-secondary-bg: rgba(84, 119, 146, 0.3);
-  --btn-secondary-text: #F9F8F6;
-  --btn-secondary-border: #547792;
-  --btn-secondary-hover: rgba(84, 119, 146, 0.5);
+  --btn-secondary-bg: #1D3045;
+  --btn-secondary-text: #F7F8FA;
+  --btn-secondary-border: #2D465D;
+  --btn-secondary-hover: #263F5B;
 
-  --badge-cat-bg: #FF497C;
+  --badge-cat-bg: #FF3F7F;
   --badge-cat-text: #FFFFFF;
-  --badge-cat-border: #FF497C;
+  --badge-cat-border: #FF3F7F;
 
-  --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.25);
-  --shadow-glow: 0 0 20px rgba(255, 73, 124, 0.2);
+  --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 20px rgba(255, 63, 127, 0.25);
 
-  --skeleton-base: #192B3C;
-  --skeleton-highlight: #274055;
+  --skeleton-base: #142235;
+  --skeleton-highlight: #1D3045;
+}
+
+/* Glassmorphism & Ambient Glow Utilities for Admin Control Center */
+.glass-card-admin {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-subtle);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.glass-card-admin:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25), 0 0 15px rgba(76, 141, 255, 0.1);
+  border-color: rgba(120, 160, 255, 0.25);
+}
+
+.ambient-glow-blue {
+  box-shadow: 0 0 25px rgba(76, 141, 255, 0.12);
 }
 
 * {

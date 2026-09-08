@@ -18,6 +18,10 @@ import SearchPage from "../pages/SearchPage";
 import AdminDashboard from "../pages/AdminDashboard";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import AdminLogin from "../pages/AdminLogin";
+import SuperAdminLogin from "../pages/SuperAdminLogin";
+import AdminForgotPassword from "../pages/AdminForgotPassword";
+import SuperAdminForgotPassword from "../pages/SuperAdminForgotPassword";
 import {
   AboutPage,
   ContactPage,
@@ -43,8 +47,17 @@ const AuthorRoute = ({ children }) => {
 const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return null;
-  if (!user) return <Navigate to="/login" replace />;
-  return ["admin", "superadmin"].includes(user.role) ? children : <Navigate to="/" replace />;
+  if (!user) return <Navigate to="/admin/login" replace />;
+  const role = user.role?.toLowerCase();
+  return (role === "admin" || role === "superadmin") ? children : <Navigate to="/admin/login" replace />;
+};
+
+const SuperAdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/super-admin/login" replace />;
+  const role = user.role?.toLowerCase();
+  return role === "superadmin" ? children : <Navigate to="/super-admin/login" replace />;
 };
 
 const AppRoutes = () => {
@@ -59,9 +72,15 @@ const AppRoutes = () => {
       <Route path="/author/:username" element={<AuthorProfile />} />
       <Route path="/search" element={<SearchPage />} />
 
-      {/* Auth Routes */}
+      {/* User Auth Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+
+      {/* Dedicated Admin & Super Admin Auth Routes */}
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
+      <Route path="/super-admin/login" element={<SuperAdminLogin />} />
+      <Route path="/super-admin/forgot-password" element={<SuperAdminForgotPassword />} />
 
       {/* Static Pages */}
       <Route path="/about" element={<AboutPage />} />
@@ -81,8 +100,13 @@ const AppRoutes = () => {
       <Route path="/create-post" element={<AuthorRoute><CreateEditPost /></AuthorRoute>} />
       <Route path="/edit-post/:id" element={<AuthorRoute><CreateEditPost /></AuthorRoute>} />
 
-      {/* Admin Protected Routes */}
+      {/* Admin Console Protected Routes */}
       <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+
+      {/* Super Admin Console Protected Routes */}
+      <Route path="/super-admin" element={<SuperAdminRoute><AdminDashboard /></SuperAdminRoute>} />
+      <Route path="/super-admin/dashboard" element={<SuperAdminRoute><AdminDashboard /></SuperAdminRoute>} />
 
       {/* Catch-all fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

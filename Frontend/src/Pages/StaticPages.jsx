@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Send, CheckCircle } from "lucide-react";
 import { contactApi } from "../api/commentInteractionApi";
-import { toast } from "react-toastify";
+import { toast } from "../context/ToastContext";
 
 export const AboutPage = () => (
   <div className="container" style={{ maxWidth: "800px", paddingTop: "3rem" }}>

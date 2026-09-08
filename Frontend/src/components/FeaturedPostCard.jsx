@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Clock, Bookmark } from "lucide-react";
 import { interactionApi } from "../api/commentInteractionApi";
 import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
+import { toast } from "../context/ToastContext";
 
 const FeaturedPostCard = ({ post }) => {
   const { user } = useAuth();
@@ -83,14 +83,14 @@ const FeaturedPostCard = ({ post }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: isBookmarked ? "var(--accent-warm)" : "var(--text-inverse)",
+            color: isBookmarked ? "var(--carrino-pink)" : "var(--text-inverse)",
             cursor: "pointer",
             backdropFilter: "blur(6px)",
             zIndex: 2,
           }}
           title="Save story"
         >
-          <Bookmark size={16} fill={isBookmarked ? "var(--accent-warm)" : "none"} />
+          <Bookmark size={16} fill={isBookmarked ? "var(--carrino-pink)" : "none"} />
         </button>
       </Link>
 
@@ -118,7 +118,7 @@ const FeaturedPostCard = ({ post }) => {
           <Link
             to={`/post/${post.slug}`}
             style={{ color: "inherit", transition: "color 150ms ease" }}
-            onMouseOver={(e) => (e.currentTarget.style.color = "var(--brand-slate-blue)")}
+            onMouseOver={(e) => (e.currentTarget.style.color = "var(--carrino-pink)")}
             onMouseOut={(e) => (e.currentTarget.style.color = "inherit")}
           >
             {post.title}

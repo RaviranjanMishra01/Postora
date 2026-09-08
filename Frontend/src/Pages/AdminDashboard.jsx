@@ -1,16 +1,43 @@
 import React, { useState, useEffect } from "react";
-import { LayoutDashboard, Users, FileText, AlertTriangle, Eye, Heart, Shield, CheckCircle, XCircle, Trash2, Star } from "lucide-react";
-import { adminApi, reportApi, contactApi } from "../api/commentInteractionApi";
-import { toast } from "react-toastify";
+import { toast } from "../context/ToastContext";
+import { adminApi, reportApi, contactApi, notificationApi } from "../api/commentInteractionApi";
+import { categoryApi, tagApi } from "../api/categoryTagApi";
+
+import AdminSidebar from "../components/admin/AdminSidebar";
+import AdminHeader from "../components/admin/AdminHeader";
+import AdminOverview from "../components/admin/AdminOverview";
+import AdminAnalytics from "../components/admin/AdminAnalytics";
+import AdminPosts from "../components/admin/AdminPosts";
+import AdminCategories from "../components/admin/AdminCategories";
+import AdminTags from "../components/admin/AdminTags";
+import AdminFeatured from "../components/admin/AdminFeatured";
+import AdminUsers from "../components/admin/AdminUsers";
+import AdminComments from "../components/admin/AdminComments";
+import AdminReports from "../components/admin/AdminReports";
+import AdminSupport from "../components/admin/AdminSupport";
+import AdminNewsletter from "../components/admin/AdminNewsletter";
+import AdminProfile from "../components/admin/AdminProfile";
+import AdminSuperAdminManagement from "../components/admin/AdminSuperAdminManagement";
+import AdminSystemSettings from "../components/admin/AdminSystemSettings";
+import AdminSystemHealth from "../components/admin/AdminSystemHealth";
+import NotificationDrawer from "../components/NotificationDrawer";
+import { CardSkeleton } from "../components/SkeletonLoader";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
   const [reports, setReports] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [subscribers, setSubscribers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchStats = async () => {
@@ -40,6 +67,24 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const res = await categoryApi.getCategories();
+      setCategories(res.data.categories || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchTags = async () => {
+    try {
+      const res = await tagApi.getTags();
+      setTags(res.data.tags || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const fetchReports = async () => {
     try {
       const res = await reportApi.getReports();
@@ -58,15 +103,35 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchNotifications = async () => {
+    try {
+      const res = await notificationApi.getNotifications();
+      setNotifications(res.data.notifications || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const loadAll = async () => {
+    setLoading(true);
+    await Promise.all([
+      fetchStats(),
+      fetchUsers(),
+      fetchPosts(),
+      fetchCategories(),
+      fetchTags(),
+      fetchReports(),
+      fetchMessages(),
+      fetchNotifications(),
+    ]);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const loadAll = async () => {
-      setLoading(true);
-      await Promise.all([fetchStats(), fetchUsers(), fetchPosts(), fetchReports(), fetchMessages()]);
-      setLoading(false);
-    };
     loadAll();
   }, []);
 
+  // Action Handlers
   const handleRoleChange = async (userId, newRole) => {
     try {
       await adminApi.updateUserRole(userId, { role: newRole });
@@ -87,6 +152,18 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteUser = async (userId) => {
+    if (window.confirm("Are you sure you want to delete this user account?")) {
+      try {
+        await adminApi.deleteUser(userId);
+        toast.success("User deleted successfully");
+        fetchUsers();
+      } catch (err) {
+        toast.error(err.message);
+      }
+    }
+  };
+
   const handleToggleFeature = async (postId) => {
     try {
       const res = await adminApi.toggleFeaturedPost(postId);
@@ -97,191 +174,163 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleResolveReport = async (reportId, action) => {
-    try {
-      await reportApi.resolveReport(reportId, { action });
-      toast.success("Report processed successfully");
-      fetchReports();
-    } catch (err) {
-      toast.error(err.message);
+  const handleDeletePost = async (postId) => {
+    if (window.confirm("Are you sure you want to delete this publication?")) {
+      try {
+        await adminApi.deletePost(postId);
+        toast.success("Post deleted");
+        fetchPosts();
+      } catch (err) {
+        toast.error(err.message || "Failed to delete post");
+      }
     }
   };
 
+  const tabTitles = {
+    overview: { title: "Dashboard Overview", subtitle: "Manage and monitor your publishing platform health" },
+    analytics: { title: "Analytics & Performance", subtitle: "In-depth traffic, engagement, and readership statistics" },
+    posts: { title: "Article Content Moderation", subtitle: "Review, edit, feature, or remove platform posts" },
+    categories: { title: "Taxonomy & Categories", subtitle: "Manage topic hierarchy and category branding" },
+    tags: { title: "Tag Taxonomy", subtitle: "Manage story tags and article topics" },
+    featured: { title: "Featured Content Manager", subtitle: "Manage homepage hero slider and highlight stories" },
+    users: { title: "User Account Management", subtitle: "Manage registered members, authors, and account roles" },
+    comments: { title: "Comment Moderation", subtitle: "Review and moderate user discussion comments" },
+    reports: { title: "Moderation Reports Queue", subtitle: "Resolve user flag reports on posts and comments" },
+    support: { title: "Support & Contact Inbox", subtitle: "Respond to user contact form inquiries" },
+    newsletter: { title: "Newsletter Subscribers", subtitle: "Manage platform newsletter readership list" },
+    profile: { title: "Admin Account & Security", subtitle: "Manage your admin profile settings and security" },
+    admins: { title: "Administrator Roster", subtitle: "Manage system administrators and account privileges" },
+    roles: { title: "Roles & Permissions", subtitle: "Inspect platform role-based access control matrix" },
+    "audit-logs": { title: "Audit Trail & System Logs", subtitle: "Track administrator activities and system events" },
+    "system-settings": { title: "Global Site Settings", subtitle: "Configure platform behavior and general options" },
+    "security-settings": { title: "System Security Policies", subtitle: "Manage authentication and system security" },
+    "system-health": { title: "System Health & Infrastructure", subtitle: "Monitor core database, storage, auth, and API health status" },
+    maintenance: { title: "Platform Maintenance Control", subtitle: "Manage platform maintenance status and banners" },
+  };
+
+  const currentTabInfo = tabTitles[activeTab] || tabTitles.overview;
+  const unreadNotificationsCount = notifications.filter((n) => !n.isRead).length;
+
   return (
-    <div className="container" style={{ paddingTop: "2.5rem" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "2rem", display: "flex", alignItems: "center", gap: "0.6rem" }}>
-        <LayoutDashboard className="gradient-text" size={28} /> Admin Control Panel
-      </h1>
+    <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg-primary)" }}>
+      {/* 1. LEFT SIDEBAR NAVIGATION */}
+      <AdminSidebar
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
+        isMobileOpen={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
+      />
 
-      {/* Stats Cards Row */}
-      {stats && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1.25rem", marginBottom: "2.5rem" }}>
-          <div className="glass-card" style={{ padding: "1.25rem" }}>
-            <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Total Users</span>
-            <h2 style={{ fontSize: "1.8rem", marginTop: "0.25rem" }}>{stats.totalUsers}</h2>
-          </div>
-          <div className="glass-card" style={{ padding: "1.25rem" }}>
-            <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Published Articles</span>
-            <h2 style={{ fontSize: "1.8rem", marginTop: "0.25rem", color: "#10b981" }}>{stats.publishedPosts}</h2>
-          </div>
-          <div className="glass-card" style={{ padding: "1.25rem" }}>
-            <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Total Page Views</span>
-            <h2 style={{ fontSize: "1.8rem", marginTop: "0.25rem", color: "#6366f1" }}>{stats.totalViews}</h2>
-          </div>
-          <div className="glass-card" style={{ padding: "1.25rem" }}>
-            <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Pending Moderation</span>
-            <h2 style={{ fontSize: "1.8rem", marginTop: "0.25rem", color: "#f87171" }}>{stats.pendingReports}</h2>
-          </div>
-        </div>
-      )}
+      {/* 2. MAIN ADMIN WORKSPACE */}
+      <div style={{ flexGrow: 1, marginLeft: "250px", display: "flex", flexDirection: "column", minWidth: 0 }}>
+        {/* TOP HEADER */}
+        <AdminHeader
+          title={currentTabInfo.title}
+          subtitle={currentTabInfo.subtitle}
+          onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+          unreadNotificationsCount={unreadNotificationsCount}
+          onOpenNotifications={() => setIsNotificationsOpen(true)}
+        />
 
-      {/* Tabs */}
-      <div style={{ display: "flex", gap: "0.75rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem", marginBottom: "2rem" }}>
-        {["overview", "users", "posts", "reports", "messages"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={activeTab === tab ? "btn-primary" : "btn-secondary"}
-            style={{ padding: "0.45rem 1rem", fontSize: "0.88rem", textTransform: "capitalize" }}
-          >
-            {tab}
-          </button>
-        ))}
+        {/* WORKSPACE CONTENT AREA */}
+        <main style={{ padding: "2rem", flexGrow: 1 }}>
+          {loading ? (
+            <CardSkeleton />
+          ) : (
+            <>
+              {activeTab === "overview" && (
+                <AdminOverview
+                  stats={stats}
+                  recentPosts={posts}
+                  reports={reports}
+                  users={users}
+                  onSelectTab={setActiveTab}
+                  onToggleFeature={handleToggleFeature}
+                />
+              )}
+
+              {activeTab === "analytics" && <AdminAnalytics stats={stats} posts={posts} />}
+
+              {activeTab === "posts" && (
+                <AdminPosts
+                  posts={posts}
+                  onToggleFeature={handleToggleFeature}
+                  onDeletePost={handleDeletePost}
+                />
+              )}
+
+              {activeTab === "categories" && (
+                <AdminCategories categories={categories} onRefresh={fetchCategories} />
+              )}
+
+              {activeTab === "tags" && (
+                <AdminTags tags={tags} onRefresh={fetchTags} />
+              )}
+
+              {activeTab === "featured" && (
+                <AdminFeatured posts={posts} onToggleFeature={handleToggleFeature} />
+              )}
+
+              {activeTab === "users" && (
+                <AdminUsers
+                  users={users}
+                  onRoleChange={handleRoleChange}
+                  onToggleStatus={handleToggleStatus}
+                  onDeleteUser={handleDeleteUser}
+                  onRefresh={fetchUsers}
+                />
+              )}
+
+              {activeTab === "comments" && (
+                <AdminComments comments={comments} onDeleteComment={() => {}} />
+              )}
+
+              {activeTab === "reports" && (
+                <AdminReports reports={reports} onRefresh={fetchReports} />
+              )}
+
+              {activeTab === "support" && (
+                <AdminSupport messages={messages} onRefresh={fetchMessages} />
+              )}
+
+              {activeTab === "newsletter" && (
+                <AdminNewsletter subscribers={subscribers} />
+              )}
+
+              {["admins", "roles", "audit-logs"].includes(activeTab) && (
+                <AdminSuperAdminManagement activeSubTab={activeTab} users={users} onRefresh={fetchUsers} />
+              )}
+
+              {["system-settings", "security-settings", "maintenance"].includes(activeTab) && (
+                <AdminSystemSettings activeSubTab={activeTab} />
+              )}
+
+              {activeTab === "system-health" && <AdminSystemHealth />}
+
+              {activeTab === "profile" && <AdminProfile />}
+            </>
+          )}
+        </main>
       </div>
 
-      {/* Tab: Users Management */}
-      {activeTab === "users" && (
-        <div className="glass-card" style={{ padding: "1.5rem", overflowX: "auto" }}>
-          <h3 style={{ marginBottom: "1.25rem", fontSize: "1.2rem" }}>User Account Management</h3>
-          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.9rem" }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid var(--border-color)", color: "var(--text-secondary)" }}>
-                <th style={{ padding: "0.75rem" }}>User</th>
-                <th style={{ padding: "0.75rem" }}>Email</th>
-                <th style={{ padding: "0.75rem" }}>Role</th>
-                <th style={{ padding: "0.75rem" }}>Status</th>
-                <th style={{ padding: "0.75rem" }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u) => (
-                <tr key={u._id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                  <td style={{ padding: "0.75rem", display: "flex", alignItems: "center", gap: "0.6rem" }}>
-                    <img src={u.avatar} alt={u.name} style={{ width: "32px", height: "32px", borderRadius: "50%" }} />
-                    <span>{u.name}</span>
-                  </td>
-                  <td style={{ padding: "0.75rem", color: "var(--text-secondary)" }}>{u.email}</td>
-                  <td style={{ padding: "0.75rem" }}>
-                    <select
-                      value={u.role}
-                      onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                      style={{ background: "#1e293b", color: "#fff", border: "1px solid var(--border-color)", padding: "0.3rem", borderRadius: "4px" }}
-                    >
-                      <option value="user">User</option>
-                      <option value="author">Author</option>
-                      <option value="admin">Admin</option>
-                      <option value="superadmin">SuperAdmin</option>
-                    </select>
-                  </td>
-                  <td style={{ padding: "0.75rem" }}>
-                    <span style={{ color: u.status === "suspended" ? "#f87171" : "#10b981", fontWeight: 600 }}>{u.status}</span>
-                  </td>
-                  <td style={{ padding: "0.75rem" }}>
-                    <button
-                      onClick={() => handleToggleStatus(u._id)}
-                      className="btn-secondary"
-                      style={{ padding: "0.25rem 0.6rem", fontSize: "0.75rem" }}
-                    >
-                      {u.status === "suspended" ? "Activate" : "Suspend"}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* NOTIFICATIONS DRAWER */}
+      <NotificationDrawer
+        notifications={notifications}
+        isOpen={isNotificationsOpen}
+        onClose={() => setIsNotificationsOpen(false)}
+        onRefresh={fetchNotifications}
+      />
 
-      {/* Tab: Posts Management */}
-      {activeTab === "posts" && (
-        <div className="glass-card" style={{ padding: "1.5rem", overflowX: "auto" }}>
-          <h3 style={{ marginBottom: "1.25rem", fontSize: "1.2rem" }}>Post Content Moderation</h3>
-          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.9rem" }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid var(--border-color)", color: "var(--text-secondary)" }}>
-                <th style={{ padding: "0.75rem" }}>Article Title</th>
-                <th style={{ padding: "0.75rem" }}>Author</th>
-                <th style={{ padding: "0.75rem" }}>Status</th>
-                <th style={{ padding: "0.75rem" }}>Views</th>
-                <th style={{ padding: "0.75rem" }}>Featured</th>
-              </tr>
-            </thead>
-            <tbody>
-              {posts.map((p) => (
-                <tr key={p._id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                  <td style={{ padding: "0.75rem", fontWeight: 500 }}>{p.title}</td>
-                  <td style={{ padding: "0.75rem", color: "var(--text-secondary)" }}>{p.author?.name}</td>
-                  <td style={{ padding: "0.75rem" }}>
-                    <span className="badge-category">{p.status}</span>
-                  </td>
-                  <td style={{ padding: "0.75rem" }}>{p.views}</td>
-                  <td style={{ padding: "0.75rem" }}>
-                    <button
-                      onClick={() => handleToggleFeature(p._id)}
-                      style={{ background: "none", border: "none", cursor: "pointer", color: p.isFeatured ? "#f59e0b" : "#6b7280" }}
-                    >
-                      <Star size={18} fill={p.isFeatured ? "#f59e0b" : "none"} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Tab: Moderation Reports */}
-      {activeTab === "reports" && (
-        <div className="glass-card" style={{ padding: "1.5rem" }}>
-          <h3 style={{ marginBottom: "1.25rem", fontSize: "1.2rem" }}>Report Moderation Queue</h3>
-          {reports.length === 0 ? (
-            <p style={{ color: "var(--text-secondary)" }}>No pending reports.</p>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              {reports.map((r) => (
-                <div key={r._id} style={{ padding: "1rem", background: "rgba(255,255,255,0.02)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
-                  <p><strong>Reason:</strong> {r.reason} | <strong>Target:</strong> {r.targetType}</p>
-                  <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>Reported by: {r.reporter?.name}</p>
-                  <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.75rem" }}>
-                    <button onClick={() => handleResolveReport(r._id, "remove_content")} className="btn-danger" style={{ padding: "0.3rem 0.65rem", fontSize: "0.78rem" }}>
-                      Remove Content
-                    </button>
-                    <button onClick={() => handleResolveReport(r._id, "dismiss")} className="btn-secondary" style={{ padding: "0.3rem 0.65rem", fontSize: "0.78rem" }}>
-                      Dismiss
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Tab: Inbox */}
-      {activeTab === "messages" && (
-        <div className="glass-card" style={{ padding: "1.5rem" }}>
-          <h3 style={{ marginBottom: "1.25rem", fontSize: "1.2rem" }}>Contact Form Inbox</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            {messages.map((m) => (
-              <div key={m._id} style={{ padding: "1rem", background: "rgba(255,255,255,0.02)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
-                <h4>{m.subject}</h4>
-                <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "0.5rem" }}>From: {m.name} ({m.email})</p>
-                <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)" }}>{m.message}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <style>{`
+        @media (max-width: 991px) {
+          main {
+            padding: 1.25rem !important;
+          }
+          div[style*="marginLeft: 250px"] {
+            margin-left: 0 !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

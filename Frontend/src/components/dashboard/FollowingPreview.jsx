@@ -1,90 +1,129 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Users, ArrowRight } from "lucide-react";
+import { Users, UserPlus } from "lucide-react";
+import ArticleCard from "../profile/ArticleCard";
+import { CardSkeleton } from "../SkeletonLoader";
 
-const FollowingPreview = ({ feedPosts = [], loading = false }) => {
+const FollowingPreview = ({ feedPosts = [], loading = false, onDiscoverClick }) => {
   return (
-    <div
-      style={{
-        background: "var(--bg-secondary)",
-        border: "1px solid var(--border-color)",
-        borderRadius: "var(--radius-lg)",
-        padding: "1.75rem",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
-        <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--text-primary)", fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <Users size={18} color="#FF497C" /> Following Feed
-        </h3>
-        <Link
-          to="/feed"
-          style={{ fontSize: "0.8rem", fontWeight: 700, color: "#FF497C", display: "inline-flex", alignItems: "center", gap: "0.2rem" }}
+    <section style={{ marginBottom: "2.5rem" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          marginBottom: "1.25rem",
+        }}
+      >
+        <Users size={18} color="#8b5cf6" />
+        <h2
+          style={{
+            fontSize: "1.25rem",
+            fontWeight: 800,
+            color: "var(--text-primary, #f8fafc)",
+            margin: 0,
+          }}
         >
-          View feed <ArrowRight size={13} />
-        </Link>
+          Following Feed
+        </h2>
       </div>
 
       {loading ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-          <div className="skeleton" style={{ height: "48px" }} />
-          <div className="skeleton" style={{ height: "48px" }} />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: "1.5rem" }}>
+          <CardSkeleton />
         </div>
       ) : feedPosts.length === 0 ? (
         <div
           style={{
-            padding: "2.5rem 1rem",
+            padding: "2.5rem 1.75rem",
             textAlign: "center",
-            color: "var(--text-muted)",
-            fontSize: "0.88rem",
-            margin: "auto 0",
+            borderRadius: "var(--radius-lg, 16px)",
+            background: "rgba(30, 41, 59, 0.3)",
+            border: "1px dashed var(--border-color, rgba(255, 255, 255, 0.1))",
           }}
         >
-          <p style={{ color: "var(--text-secondary)", fontWeight: 600 }}>You're not following any authors yet.</p>
-          <span style={{ fontSize: "0.78rem" }}>Follow creators to see their latest publications here.</span>
-          <div style={{ marginTop: "1rem" }}>
-            <Link to="/" className="btn-secondary" style={{ padding: "0.45rem 0.9rem", fontSize: "0.78rem" }}>
-              Discover Authors
-            </Link>
+          <div
+            style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "50%",
+              background: "rgba(139, 92, 246, 0.12)",
+              color: "#8b5cf6",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 1rem auto",
+            }}
+          >
+            <Users size={22} />
           </div>
-        </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {feedPosts.slice(0, 4).map((post) => (
-            <div
-              key={post._id}
+
+          <h3
+            style={{
+              fontSize: "1.05rem",
+              fontWeight: 700,
+              color: "var(--text-primary, #f8fafc)",
+              margin: "0 0 0.35rem 0",
+            }}
+          >
+            Build your reading circle
+          </h3>
+
+          <p
+            style={{
+              fontSize: "0.85rem",
+              color: "var(--text-secondary, #94a3b8)",
+              maxWidth: "380px",
+              margin: "0 auto 1.25rem auto",
+              lineHeight: 1.5,
+            }}
+          >
+            Follow writers you enjoy and their latest stories will appear here.
+          </p>
+
+          {onDiscoverClick ? (
+            <button
+              type="button"
+              onClick={onDiscoverClick}
+              className="btn-secondary"
               style={{
-                display: "grid",
-                gridTemplateColumns: "36px 1fr",
-                gap: "0.75rem",
+                display: "inline-flex",
                 alignItems: "center",
-                paddingBottom: "0.85rem",
-                borderBottom: "1px solid var(--border-color)",
+                gap: "0.45rem",
+                padding: "0.55rem 1.1rem",
+                fontSize: "0.85rem",
+                borderRadius: "var(--radius-md, 8px)",
+                cursor: "pointer",
               }}
             >
-              {post.author?.avatar ? (
-                <img src={post.author.avatar} alt={post.author.name} style={{ width: "36px", height: "36px", borderRadius: "50%", objectFit: "cover" }} />
-              ) : (
-                <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#FF497C", color: "#FFF", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "0.85rem" }}>
-                  {post.author?.name?.charAt(0) || "A"}
-                </div>
-              )}
-
-              <div>
-                <h4 style={{ fontSize: "0.86rem", fontWeight: 700, color: "var(--text-primary)", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                  <Link to={`/post/${post.slug}`}>{post.title}</Link>
-                </h4>
-                <span style={{ fontSize: "0.74rem", color: "var(--text-muted)" }}>
-                  by {post.author?.name || "Author"}
-                </span>
-              </div>
-            </div>
+              <UserPlus size={15} /> Discover Authors →
+            </button>
+          ) : (
+            <Link
+              to="/categories"
+              className="btn-secondary"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.45rem",
+                padding: "0.55rem 1.1rem",
+                fontSize: "0.85rem",
+                borderRadius: "var(--radius-md, 8px)",
+                textDecoration: "none",
+              }}
+            >
+              <UserPlus size={15} /> Discover Authors →
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: "1.5rem" }}>
+          {feedPosts.slice(0, 3).map((post) => (
+            <ArticleCard key={post._id} post={post} />
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

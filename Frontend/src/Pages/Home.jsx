@@ -47,11 +47,17 @@ const Home = () => {
     : posts.slice(0, 3);
 
   const heroRightPosts = posts.filter((p) => !featuredPosts.includes(p)).slice(0, 2);
-  const remainingPosts = posts.filter((p) => !featuredPosts.includes(p) && !heroRightPosts.includes(p));
 
-  const editorsPicksPosts = remainingPosts.slice(0, 3);
-  const latestGridPosts = remainingPosts.slice(3, 9);
-  const sidebarCompactPosts = remainingPosts.slice(9, 13);
+  // Editors Picks Section
+  const editorsPicksPosts = posts.filter((p) => p.isFeatured).length > 0
+    ? posts.filter((p) => p.isFeatured).slice(0, 3)
+    : (posts.length > 3 ? posts.slice(3, 6) : posts.slice(0, 3));
+
+  // Latest Posts Grid: Always renders the latest posts (starts from posts[0])
+  const latestGridPosts = posts.length > 0 ? posts.slice(0, 8) : [];
+
+  // Sidebar Compact List
+  const sidebarCompactPosts = posts.length > 0 ? posts.slice(0, 4) : [];
 
   return (
     <main className="container" style={{ paddingBottom: "2rem" }}>

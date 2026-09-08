@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
+import { toast } from "../context/ToastContext";
 
 const GoogleSignInButton = ({ text = "Continue with Google", onSuccess }) => {
   const [loading, setLoading] = useState(false);
@@ -36,7 +36,13 @@ const GoogleSignInButton = ({ text = "Continue with Google", onSuccess }) => {
       if (onSuccess) {
         onSuccess();
       } else {
-        navigate("/");
+        const loggedUser = res.user || res.data?.user;
+        const role = loggedUser?.role?.toLowerCase();
+        if (loggedUser && (role === "admin" || role === "superadmin")) {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+        }
       }
     } catch (err) {
       toast.error(err.response?.data?.message || err.message || "Google sign-in failed");

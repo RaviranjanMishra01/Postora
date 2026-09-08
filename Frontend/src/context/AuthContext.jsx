@@ -32,6 +32,22 @@ export const AuthProvider = ({ children }) => {
     return res;
   };
 
+  const adminLogin = async (credentials) => {
+    const res = await authApi.adminLogin(credentials);
+    if (res.data && res.data.user) {
+      setUser(res.data.user);
+    }
+    return res;
+  };
+
+  const superAdminLogin = async (credentials) => {
+    const res = await authApi.superAdminLogin(credentials);
+    if (res.data && res.data.user) {
+      setUser(res.data.user);
+    }
+    return res;
+  };
+
   const register = async (userData) => {
     const res = await authApi.register(userData);
     if (res.data && res.data.user) {
@@ -68,6 +84,8 @@ export const AuthProvider = ({ children }) => {
         user,
         loading,
         login,
+        adminLogin,
+        superAdminLogin,
         register,
         googleLogin,
         logout,

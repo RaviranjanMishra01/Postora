@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserPlus, Mail, Lock, User, AtSign, Sparkles } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
+import { toast } from "../context/ToastContext";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 
 const Register = () => {
@@ -17,14 +17,30 @@ const Register = () => {
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !username || !email || !password) {
+    if (!name.trim() || !username.trim() || !email.trim() || !password) {
       toast.error("Please fill in all fields");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_]{3,30}$/.test(username.trim())) {
+      toast.error("Username must be 3-30 characters long and contain only letters, numbers, and underscores");
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await register({ name, username, email, password });
+      const res = await register({ name: name.trim(), username: username.trim(), email: email.trim(), password });
       toast.success(res.message || "Account created successfully!");
       navigate("/");
     } catch (err) {

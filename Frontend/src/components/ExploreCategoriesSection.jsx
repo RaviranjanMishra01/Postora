@@ -76,7 +76,7 @@ export const CategoryCard = ({ category, index = 0 }) => {
           ? "0 20px 40px -16px rgba(15, 15, 20, 0.28), 0 2px 8px rgba(15, 15, 20, 0.06)"
           : "0 1px 2px rgba(15, 15, 20, 0.04)",
         transform: isHovered ? "translateY(-4px)" : "translateY(0)",
-        borderColor: isHovered ? "var(--brand-warm-accent)" : "var(--border-color)",
+        borderColor: isHovered ? "var(--carrino-pink)" : "var(--border-color)",
         transition: "transform 320ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1), border-color 320ms ease",
         animation: `card-rise 480ms cubic-bezier(0.16, 1, 0.3, 1) both`,
         animationDelay: `${Math.min(index, 6) * 55}ms`,
@@ -154,7 +154,7 @@ export const CategoryCard = ({ category, index = 0 }) => {
                 transform: isHovered ? "scale(1.08)" : "scale(1)",
               }}
             >
-              <IconComponent size={24} strokeWidth={1.5} color="var(--brand-slate-blue)" />
+              <IconComponent size={24} strokeWidth={1.5} color="var(--carrino-pink)" />
             </div>
             <span
               style={{
@@ -227,7 +227,7 @@ export const CategoryCard = ({ category, index = 0 }) => {
               width: "28px",
               height: "28px",
               borderRadius: "50%",
-              background: isHovered ? "var(--brand-warm-accent)" : "transparent",
+              background: isHovered ? "var(--carrino-pink)" : "transparent",
               transition: "background 280ms ease",
             }}
           >
@@ -284,11 +284,11 @@ const ExploreCategoriesSection = ({
           }
         }
         .category-card:focus-visible {
-          outline: 2px solid var(--brand-warm-accent);
+          outline: 2px solid var(--carrino-pink);
           outline-offset: 3px;
         }
         .view-all-link:focus-visible {
-          outline: 2px solid var(--brand-warm-accent);
+          outline: 2px solid var(--carrino-pink);
           outline-offset: 3px;
           border-radius: 4px;
         }

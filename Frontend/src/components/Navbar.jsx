@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Search, Bell, PenTool, LayoutDashboard, User, Bookmark, LogOut, X, ChevronDown, Sun, Moon, Menu } from "lucide-react";
+import { Search, Bell, PenTool, LayoutDashboard, User, Bookmark, LogOut, X, Sun, Moon, Menu, ExternalLink } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { notificationApi, searchApi } from "../api/commentInteractionApi";
-import { categoryApi } from "../api/categoryTagApi";
 import NotificationDrawer from "./NotificationDrawer";
 
 const Navbar = () => {
@@ -13,7 +12,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [categories, setCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -26,19 +24,19 @@ const Navbar = () => {
 
   const searchContainerRef = useRef(null);
 
-  // Fetch real database categories
+  // Body scroll lock when mobile drawer is open
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await categoryApi.getCategories();
-        setCategories(res.data?.categories || []);
-      } catch (err) {
-        console.error("Error fetching categories for navbar:", err);
-      }
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
     };
-    fetchCategories();
-  }, []);
+  }, [isMobileMenuOpen]);
 
+  // Notifications polling
   const fetchNotifications = async () => {
     if (!user) return;
     try {
@@ -58,9 +56,11 @@ const Navbar = () => {
     }
   }, [user]);
 
+  // Close menus on location/route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsSearchModalOpen(false);
+    setIsDropdownOpen(false);
   }, [location.pathname]);
 
   // Debounced search logic
@@ -93,119 +93,54 @@ const Navbar = () => {
   };
 
   const navLinkStyle = (path) => ({
-    fontSize: "0.78rem",
+    fontSize: "0.82rem",
     fontWeight: 700,
     letterSpacing: "0.06em",
     textTransform: "uppercase",
     color: location.pathname === path ? "#FF497C" : "var(--text-primary)",
+    textDecoration: "none",
     transition: "color 150ms ease",
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "0.25rem",
   });
-
-  const leftNavCategories = categories.slice(0, 3);
-  const rightNavCategories = categories.slice(3, 6);
 
   return (
     <>
-      <header
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 900,
-          background: "var(--bg-primary)",
-          borderBottom: "1px solid var(--border-color)",
-        }}
-      >
-        <div
-          className="container"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            height: "76px",
-          }}
-        >
-          {/* LEFT GROUP: Hamburger Menu Icon + Dynamic Category Links */}
-          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+      <header className="site-header">
+        <div className="container header-container">
+          
+          {/* LEFT GROUP (Desktop Essential Links + Mobile Hamburger Icon) */}
+          <div className="header-left-group">
+            {/* Mobile Hamburger Button - HIDDEN ON DESKTOP VIA CSS */}
             <button
+              type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "50%",
-                background: "#FF497C",
-                color: "#FFFFFF",
-                border: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                boxShadow: "0 2px 8px rgba(255, 73, 124, 0.25)",
-              }}
-              title="Toggle menu"
+              className="mobile-hamburger-btn"
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             >
-              {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
 
-            <nav className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+            {/* Desktop Navigation Links */}
+            <nav className="desktop-nav-links">
               <Link to="/" style={navLinkStyle("/")}>HOME</Link>
-              {leftNavCategories.map((cat) => (
-                <Link key={cat._id} to={`/category/${cat.slug}`} style={navLinkStyle(`/category/${cat.slug}`)}>
-                  {cat.name}
-                </Link>
-              ))}
-              {categories.length > 6 && (
-                <Link to="/categories" style={navLinkStyle("/categories")}>
-                  MORE <ChevronDown size={12} />
-                </Link>
+              {user && (
+                <Link to="/feed" style={navLinkStyle("/feed")}>FOLLOWING FEED</Link>
               )}
+              <Link to="/contact" style={navLinkStyle("/contact")}>CONTACT</Link>
             </nav>
           </div>
 
-          {/* CENTER: Vibrant Carrino Brand Logo */}
-          <Link
-            to="/"
-            style={{
-              fontSize: "2.1rem",
-              fontWeight: 900,
-              fontFamily: "var(--font-heading)",
-              letterSpacing: "-0.04em",
-              color: "#FF497C",
-              lineHeight: 1,
-            }}
-          >
+          {/* CENTER: Brand Logo */}
+          <Link to="/" className="header-brand-logo">
             carrino
           </Link>
 
-          {/* RIGHT GROUP: Dynamic Category Links + Search Button + Actions */}
-          <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-            <nav className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-              {rightNavCategories.map((cat) => (
-                <Link key={cat._id} to={`/category/${cat.slug}`} style={navLinkStyle(`/category/${cat.slug}`)}>
-                  {cat.name}
-                </Link>
-              ))}
-              <Link to="/tags" style={navLinkStyle("/tags")}>TAGS</Link>
-            </nav>
-
-            {/* Circular Search Icon Button */}
+          {/* RIGHT GROUP: Header Controls */}
+          <div className="header-right-group">
+            {/* Search Icon Button */}
             <button
+              type="button"
               onClick={() => setIsSearchModalOpen(!isSearchModalOpen)}
-              style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "50%",
-                background: "#FF497C",
-                color: "#FFFFFF",
-                border: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                boxShadow: "0 2px 8px rgba(255, 73, 124, 0.25)",
-              }}
+              className="header-action-circle-btn"
               title="Search publication"
             >
               <Search size={18} />
@@ -213,16 +148,9 @@ const Navbar = () => {
 
             {/* Theme Toggle Button */}
             <button
+              type="button"
               onClick={toggleTheme}
-              style={{
-                background: "none",
-                border: "none",
-                color: "var(--text-primary)",
-                cursor: "pointer",
-                padding: "0.25rem",
-                display: "flex",
-                alignItems: "center",
-              }}
+              className="header-icon-btn"
               title={`Switch to ${theme === "light" ? "Dark" : "Light"} Mode`}
             >
               {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
@@ -230,131 +158,88 @@ const Navbar = () => {
 
             {user ? (
               <>
-                {/* Author Create Post */}
-                <Link to="/create-post" className="btn-primary" style={{ padding: "0.4rem 0.85rem", fontSize: "0.75rem" }}>
+                {/* Author Write Button */}
+                <Link to="/create-post" className="btn-primary write-post-btn">
                   <PenTool size={13} /> WRITE
                 </Link>
 
                 {/* Notification Bell */}
                 <button
+                  type="button"
                   onClick={() => setIsNotifOpen(true)}
-                  style={{
-                    position: "relative",
-                    background: "none",
-                    border: "none",
-                    color: "var(--text-primary)",
-                    cursor: "pointer",
-                    padding: "0.25rem",
-                  }}
+                  className="header-icon-btn notif-btn"
+                  title="Notifications"
                 >
                   <Bell size={18} />
                   {unreadCount > 0 && (
-                    <span
-                      style={{
-                        position: "absolute",
-                        top: "-2px",
-                        right: "-2px",
-                        background: "#FF497C",
-                        color: "#FFFFFF",
-                        fontSize: "0.65rem",
-                        fontWeight: 800,
-                        width: "15px",
-                        height: "15px",
-                        borderRadius: "50%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {unreadCount}
-                    </span>
+                    <span className="notif-badge">{unreadCount}</span>
                   )}
                 </button>
 
                 {/* Profile Dropdown */}
                 <div style={{ position: "relative" }}>
                   <button
+                    type="button"
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.3rem",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
+                    className="avatar-dropdown-btn"
                   >
                     {user.avatar ? (
                       <img
                         src={user.avatar}
                         alt={user.name}
-                        style={{ width: "32px", height: "32px", borderRadius: "50%", objectFit: "cover", border: "1.5px solid #FF497C" }}
+                        className="nav-avatar-img"
                       />
                     ) : (
-                      <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#FF497C", color: "#FFF", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "0.85rem" }}>
+                      <div className="nav-avatar-fallback">
                         {user.name?.charAt(0).toUpperCase()}
                       </div>
                     )}
                   </button>
 
                   {isDropdownOpen && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "120%",
-                        right: 0,
-                        width: "190px",
-                        background: "var(--bg-card)",
-                        border: "1px solid var(--border-color)",
-                        borderRadius: "12px",
-                        padding: "0.4rem 0",
-                        zIndex: 1000,
-                        boxShadow: "var(--shadow-subtle)",
-                      }}
-                    >
-                      <div style={{ padding: "0.4rem 0.85rem", borderBottom: "1px solid var(--border-color)", marginBottom: "0.2rem" }}>
-                        <p style={{ fontWeight: 700, fontSize: "0.85rem", color: "var(--text-primary)" }}>{user.name}</p>
-                        <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", textTransform: "capitalize" }}>Role: {user.role}</span>
+                    <div className="nav-dropdown-menu">
+                      <div className="dropdown-user-header">
+                        <p className="dropdown-user-name">{user.name}</p>
+                        <span className="dropdown-user-role">Role: {user.role}</span>
                       </div>
 
-                      <Link to="/dashboard" onClick={() => setIsDropdownOpen(false)} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.45rem 0.85rem", fontSize: "0.82rem", color: "var(--text-primary)" }}>
-                        <LayoutDashboard size={14} color="#FF497C" /> Dashboard
-                      </Link>
+                      {["admin", "superadmin"].includes(user.role) ? (
+                        <>
+                          <Link to="/admin/dashboard" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>
+                            <LayoutDashboard size={14} color="var(--carrino-pink)" /> {user.role === "superadmin" ? "Super Admin Dashboard" : "Admin Dashboard"}
+                          </Link>
 
-                      <Link to="/profile" onClick={() => setIsDropdownOpen(false)} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.45rem 0.85rem", fontSize: "0.82rem", color: "var(--text-primary)" }}>
-                        <User size={14} /> Profile Settings
-                      </Link>
+                          <Link to="/profile" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>
+                            <User size={14} /> Profile Settings
+                          </Link>
 
-                      <Link to="/bookmarks" onClick={() => setIsDropdownOpen(false)} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.45rem 0.85rem", fontSize: "0.82rem", color: "var(--text-primary)" }}>
-                        <Bookmark size={14} /> Saved Bookmarks
-                      </Link>
+                          <Link to="/" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>
+                            <ExternalLink size={14} /> View Public Website ↗
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          <Link to="/dashboard" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>
+                            <LayoutDashboard size={14} color="var(--carrino-pink)" /> Dashboard
+                          </Link>
 
-                      {["admin", "superadmin"].includes(user.role) && (
-                        <Link to="/admin" onClick={() => setIsDropdownOpen(false)} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.45rem 0.85rem", fontSize: "0.82rem", color: "var(--text-primary)" }}>
-                          <LayoutDashboard size={14} /> Admin Dashboard
-                        </Link>
+                          <Link to="/profile" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>
+                            <User size={14} /> Profile Settings
+                          </Link>
+
+                          <Link to="/bookmarks" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>
+                            <Bookmark size={14} /> Saved Bookmarks
+                          </Link>
+                        </>
                       )}
 
                       <button
+                        type="button"
                         onClick={() => {
                           setIsDropdownOpen(false);
                           logout();
                         }}
-                        style={{
-                          width: "100%",
-                          textAlign: "left",
-                          background: "none",
-                          border: "none",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                          padding: "0.45rem 0.85rem",
-                          fontSize: "0.82rem",
-                          color: "#f87171",
-                          cursor: "pointer",
-                          borderTop: "1px solid var(--border-color)",
-                          marginTop: "0.2rem",
-                        }}
+                        className="dropdown-item dropdown-logout-btn"
                       >
                         <LogOut size={14} /> Sign Out
                       </button>
@@ -363,7 +248,7 @@ const Navbar = () => {
                 </div>
               </>
             ) : (
-              <Link to="/login" className="btn-secondary" style={{ padding: "0.4rem 0.85rem", fontSize: "0.75rem" }}>
+              <Link to="/login" className="btn-secondary nav-login-btn">
                 LOG IN
               </Link>
             )}
@@ -372,60 +257,30 @@ const Navbar = () => {
 
         {/* Modal Search Popup Bar */}
         {isSearchModalOpen && (
-          <div
-            ref={searchContainerRef}
-            style={{
-              background: "var(--bg-secondary)",
-              borderBottom: "1px solid var(--border-color)",
-              padding: "0.85rem 1.5rem",
-              position: "relative",
-            }}
-          >
+          <div ref={searchContainerRef} className="nav-search-bar-modal">
             <div className="container" style={{ position: "relative" }}>
               <form onSubmit={handleSearchSubmit}>
-                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                  <Search size={18} style={{ position: "absolute", left: "14px", color: "var(--text-muted)" }} />
+                <div className="search-input-wrapper">
+                  <Search size={18} className="search-input-icon" />
                   <input
                     type="text"
                     placeholder="Search articles, categories, authors..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     autoFocus
-                    style={{
-                      width: "100%",
-                      padding: "0.7rem 2.5rem 0.7rem 2.6rem",
-                      borderRadius: "var(--radius-sm)",
-                      background: "var(--bg-primary)",
-                      border: "1px solid var(--border-color)",
-                      color: "var(--text-primary)",
-                      fontSize: "0.95rem",
-                      outline: "none",
-                    }}
+                    className="search-modal-input"
                   />
                   <X
                     size={18}
                     onClick={() => setIsSearchModalOpen(false)}
-                    style={{ position: "absolute", right: "14px", color: "var(--text-muted)", cursor: "pointer" }}
+                    className="search-close-icon"
                   />
                 </div>
               </form>
 
               {/* Suggestions Popup */}
               {showSuggestions && suggestions.length > 0 && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "115%",
-                    left: 0,
-                    right: 0,
-                    background: "var(--bg-card)",
-                    border: "1px solid var(--border-color)",
-                    borderRadius: "12px",
-                    padding: "0.5rem 0",
-                    zIndex: 999,
-                    boxShadow: "var(--shadow-subtle)",
-                  }}
-                >
+                <div className="search-suggestions-box">
                   {suggestions.map((item, index) => (
                     <div
                       key={index}
@@ -435,18 +290,10 @@ const Navbar = () => {
                         setShowSuggestions(false);
                         setIsSearchModalOpen(false);
                       }}
-                      style={{
-                        padding: "0.5rem 1rem",
-                        cursor: "pointer",
-                        fontSize: "0.85rem",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        color: "var(--text-primary)",
-                        borderBottom: index < suggestions.length - 1 ? "1px solid var(--border-color)" : "none",
-                      }}
+                      className="suggestion-row-item"
                     >
                       <span>{item.title}</span>
-                      <span style={{ fontSize: "0.68rem", color: "#FF497C", textTransform: "uppercase", fontWeight: 700 }}>{item.type}</span>
+                      <span className="suggestion-type-tag">{item.type}</span>
                     </div>
                   ))}
                 </div>
@@ -455,37 +302,458 @@ const Navbar = () => {
           </div>
         )}
 
-        {/* Mobile Slide-Out Drawer */}
+        {/* MOBILE SLIDE-OUT MENU DRAWER */}
         {isMobileMenuOpen && (
-          <div
-            style={{
-              background: "var(--bg-primary)",
-              borderBottom: "1px solid var(--border-color)",
-              padding: "1rem 1.5rem",
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.85rem",
-            }}
-          >
-            <Link to="/" style={navLinkStyle("/")}>Home</Link>
-            {categories.map((cat) => (
-              <Link key={cat._id} to={`/category/${cat.slug}`} style={navLinkStyle(`/category/${cat.slug}`)}>
-                {cat.name}
-              </Link>
-            ))}
-            <Link to="/tags" style={navLinkStyle("/tags")}>Tags</Link>
-            {user && <Link to="/feed" style={navLinkStyle("/feed")}>Following Feed</Link>}
-            {user && (
-              <Link to="/create-post" style={navLinkStyle("/create-post")}>Create Post</Link>
-            )}
-            <Link to="/contact" style={navLinkStyle("/contact")}>Contact</Link>
+          <div className="mobile-drawer-overlay" onClick={() => setIsMobileMenuOpen(false)}>
+            <div className="mobile-drawer-content" onClick={(e) => e.stopPropagation()}>
+              <div className="mobile-drawer-header">
+                <span className="drawer-title">Navigation</span>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="mobile-drawer-close-btn"
+                  aria-label="Close menu"
+                >
+                  <X size={22} />
+                </button>
+              </div>
+
+              <div className="mobile-drawer-links">
+                <Link
+                  to="/"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`mobile-menu-item ${location.pathname === "/" ? "active" : ""}`}
+                >
+                  HOME
+                </Link>
+
+                {user && (
+                  <Link
+                    to="/feed"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`mobile-menu-item ${location.pathname === "/feed" ? "active" : ""}`}
+                  >
+                    FOLLOWING FEED
+                  </Link>
+                )}
+
+                {user && (
+                  <Link
+                    to="/create-post"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`mobile-menu-item ${location.pathname === "/create-post" ? "active" : ""}`}
+                  >
+                    CREATE POST
+                  </Link>
+                )}
+
+                <Link
+                  to="/contact"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`mobile-menu-item ${location.pathname === "/contact" ? "active" : ""}`}
+                >
+                  CONTACT
+                </Link>
+
+                {!user && (
+                  <div className="mobile-auth-buttons">
+                    <Link
+                      to="/login"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="btn-secondary mobile-auth-btn"
+                    >
+                      LOG IN
+                    </Link>
+                    <Link
+                      to="/register"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="btn-primary mobile-auth-btn"
+                    >
+                      REGISTER
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </header>
 
+      {/* STYLES (Enforcing Responsive Navigation, Mobile Drawer & No Desktop Hamburger) */}
       <style>{`
-        @media (max-width: 992px) {
-          .desktop-nav {
+        .site-header {
+          position: sticky;
+          top: 0;
+          z-index: 900;
+          background: var(--bg-primary);
+          border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-container {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 76px;
+        }
+
+        .header-left-group {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+        }
+
+        .desktop-nav-links {
+          display: flex;
+          align-items: center;
+          gap: 1.75rem;
+        }
+
+        .header-brand-logo {
+          font-size: 2.1rem;
+          font-weight: 900;
+          font-family: var(--font-heading);
+          letter-spacing: -0.04em;
+          color: #FF497C;
+          line-height: 1;
+          text-decoration: none;
+        }
+
+        .header-right-group {
+          display: flex;
+          align-items: center;
+          gap: 1.25rem;
+        }
+
+        .mobile-hamburger-btn {
+          display: none; /* Default hidden on Desktop */
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: #FF497C;
+          color: #FFFFFF;
+          border: none;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(255, 73, 124, 0.25);
+          transition: transform 0.15s ease;
+        }
+
+        .mobile-hamburger-btn:active {
+          transform: scale(0.95);
+        }
+
+        .header-action-circle-btn {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: #FF497C;
+          color: #FFFFFF;
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(255, 73, 124, 0.25);
+        }
+
+        .header-icon-btn {
+          background: none;
+          border: none;
+          color: var(--text-primary);
+          cursor: pointer;
+          padding: 0.25rem;
+          display: flex;
+          align-items: center;
+          position: relative;
+        }
+
+        .notif-badge {
+          position: absolute;
+          top: -2px;
+          right: -2px;
+          background: #FF497C;
+          color: #FFFFFF;
+          font-size: 0.65rem;
+          font-weight: 800;
+          width: 15px;
+          height: 15px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .write-post-btn {
+          padding: 0.4rem 0.85rem;
+          font-size: 0.75rem;
+        }
+
+        .nav-login-btn {
+          padding: 0.4rem 0.85rem;
+          font-size: 0.75rem;
+        }
+
+        .avatar-dropdown-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+          background: none;
+          border: none;
+          cursor: pointer;
+        }
+
+        .nav-avatar-img {
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 1.5px solid #FF497C;
+        }
+
+        .nav-avatar-fallback {
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background: #FF497C;
+          color: #FFF;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 0.85rem;
+        }
+
+        .nav-dropdown-menu {
+          position: absolute;
+          top: 120%;
+          right: 0;
+          width: 190px;
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          padding: 0.4rem 0;
+          z-index: 1000;
+          box-shadow: var(--shadow-subtle);
+        }
+
+        .dropdown-user-header {
+          padding: 0.4rem 0.85rem;
+          border-bottom: 1px solid var(--border-color);
+          margin-bottom: 0.2rem;
+        }
+
+        .dropdown-user-name {
+          font-weight: 700;
+          font-size: 0.85rem;
+          color: var(--text-primary);
+          margin: 0;
+        }
+
+        .dropdown-user-role {
+          font-size: 0.72rem;
+          color: var(--text-muted);
+          text-transform: capitalize;
+        }
+
+        .dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.45rem 0.85rem;
+          font-size: 0.82rem;
+          color: var(--text-primary);
+          text-decoration: none;
+          transition: background 0.15s ease;
+        }
+
+        .dropdown-item:hover {
+          background: var(--bg-secondary);
+        }
+
+        .dropdown-logout-btn {
+          width: 100%;
+          text-align: left;
+          background: none;
+          border: none;
+          color: #f87171;
+          cursor: pointer;
+          border-top: 1px solid var(--border-color);
+          margin-top: 0.2rem;
+        }
+
+        /* SEARCH MODAL */
+        .nav-search-bar-modal {
+          background: var(--bg-secondary);
+          border-bottom: 1px solid var(--border-color);
+          padding: 0.85rem 1.5rem;
+          position: relative;
+        }
+
+        .search-input-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+
+        .search-input-icon {
+          position: absolute;
+          left: 14px;
+          color: var(--text-muted);
+        }
+
+        .search-close-icon {
+          position: absolute;
+          right: 14px;
+          color: var(--text-muted);
+          cursor: pointer;
+        }
+
+        .search-modal-input {
+          width: 100%;
+          padding: 0.7rem 2.5rem 0.7rem 2.6rem;
+          border-radius: var(--radius-sm);
+          background: var(--bg-primary);
+          border: 1px solid var(--border-color);
+          color: var(--text-primary);
+          font-size: 0.95rem;
+          outline: none;
+        }
+
+        .search-suggestions-box {
+          position: absolute;
+          top: 115%;
+          left: 0;
+          right: 0;
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          padding: 0.5rem 0;
+          z-index: 999;
+          box-shadow: var(--shadow-subtle);
+        }
+
+        .suggestion-row-item {
+          padding: 0.5rem 1rem;
+          cursor: pointer;
+          font-size: 0.85rem;
+          display: flex;
+          justify-content: space-between;
+          color: var(--text-primary);
+        }
+
+        .suggestion-type-tag {
+          font-size: 0.68rem;
+          color: #FF497C;
+          text-transform: uppercase;
+          font-weight: 700;
+        }
+
+        /* MOBILE DRAWER OVERLAY */
+        .mobile-drawer-overlay {
+          position: fixed;
+          top: 76px;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(4px);
+          z-index: 999;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .mobile-drawer-content {
+          background: var(--bg-primary);
+          border-bottom: 1px solid var(--border-color);
+          padding: 1.25rem 1.5rem 2rem 1.5rem;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+          animation: drawerSlideDown 0.2s ease-out;
+        }
+
+        @keyframes drawerSlideDown {
+          from { transform: translateY(-10px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+
+        .mobile-drawer-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 1.25rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid var(--border-color);
+        }
+
+        .drawer-title {
+          font-size: 0.75rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          color: var(--text-muted);
+          text-transform: uppercase;
+        }
+
+        .mobile-drawer-close-btn {
+          background: transparent;
+          border: none;
+          color: var(--text-primary);
+          cursor: pointer;
+        }
+
+        .mobile-drawer-links {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .mobile-menu-item {
+          display: flex;
+          align-items: center;
+          min-height: 48px;
+          padding: 0 0.85rem;
+          font-size: 0.9rem;
+          font-weight: 700;
+          letter-spacing: 0.06em;
+          color: var(--text-primary);
+          text-decoration: none;
+          border-radius: 8px;
+          transition: background 0.15s ease, color 0.15s ease;
+        }
+
+        .mobile-menu-item:hover, .mobile-menu-item.active {
+          background: var(--bg-secondary);
+          color: #FF497C;
+        }
+
+        .mobile-auth-buttons {
+          display: flex;
+          gap: 0.75rem;
+          margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid var(--border-color);
+        }
+
+        .mobile-auth-btn {
+          flex: 1;
+          text-align: center;
+          justify-content: center;
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+        }
+
+        /* MEDIA QUERIES: DESKTOP VS MOBILE */
+        @media (max-width: 991px) {
+          .desktop-nav-links {
+            display: none !important;
+          }
+          .mobile-hamburger-btn {
+            display: flex !important;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .write-post-btn {
             display: none !important;
           }
         }

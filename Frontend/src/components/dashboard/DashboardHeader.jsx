@@ -1,68 +1,74 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Sparkles, PenTool, User, ShieldCheck } from "lucide-react";
+import { PenTool } from "lucide-react";
+
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+};
 
 const DashboardHeader = ({ user }) => {
-  if (!user) return null;
-
-  const firstName = user.name ? user.name.split(" ")[0] : "Creator";
-  const isAuthor = !!user;
+  const firstName = user?.name ? user.name.split(" ")[0] : "Creator";
+  const greeting = getGreeting();
 
   return (
     <header
       style={{
-        background: "var(--bg-secondary)",
-        border: "1px solid var(--border-color)",
-        borderRadius: "var(--radius-lg)",
-        padding: "1.75rem 2rem",
-        marginBottom: "1.75rem",
+        padding: "1.75rem 0",
+        marginBottom: "2rem",
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "space-between",
         gap: "1.25rem",
+        borderBottom: "1px solid var(--border-color, rgba(255, 255, 255, 0.08))",
       }}
     >
       <div>
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.35rem",
-            fontSize: "0.72rem",
-            fontWeight: 800,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            color: "#FF497C",
-            marginBottom: "0.35rem",
-          }}
-        >
-          <Sparkles size={13} /> USER DASHBOARD
-        </div>
         <h1
           style={{
-            fontSize: "1.75rem",
+            fontSize: "clamp(1.75rem, 3.5vw, 2.25rem)",
             fontWeight: 900,
-            color: "var(--text-primary)",
+            color: "var(--text-primary, #f8fafc)",
             lineHeight: 1.2,
-            fontFamily: "var(--font-heading)",
+            fontFamily: "var(--font-heading, sans-serif)",
+            letterSpacing: "-0.02em",
+            marginBottom: "0.4rem",
           }}
         >
-          Welcome back, {firstName}
+          {greeting}, {firstName} 👋
         </h1>
-        <p style={{ fontSize: "0.88rem", color: "var(--text-secondary)", marginTop: "0.25rem" }}>
-          Here's an overview of your publication activity, saved stories, and account status.
+        <p
+          style={{
+            fontSize: "1rem",
+            color: "var(--text-secondary, #94a3b8)",
+            fontWeight: 400,
+            margin: 0,
+          }}
+        >
+          Ready to share something interesting today?
         </p>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-        {isAuthor && (
-          <Link to="/create-post" className="btn-primary" style={{ padding: "0.55rem 1.1rem", fontSize: "0.82rem" }}>
-            <PenTool size={15} /> Write New Article
-          </Link>
-        )}
-        <Link to="/profile" className="btn-secondary" style={{ padding: "0.55rem 1.1rem", fontSize: "0.82rem" }}>
-          <User size={14} /> Profile Settings
+        <Link
+          to="/create-post"
+          className="btn-primary"
+          style={{
+            padding: "0.7rem 1.4rem",
+            fontSize: "0.92rem",
+            fontWeight: 700,
+            borderRadius: "var(--radius-md, 10px)",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            boxShadow: "0 4px 14px rgba(236, 72, 153, 0.35)",
+            textDecoration: "none",
+          }}
+        >
+          <PenTool size={16} /> Write a Story
         </Link>
       </div>
     </header>

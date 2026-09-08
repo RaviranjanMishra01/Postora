@@ -5,15 +5,14 @@ import {
   Eye,
   Heart,
   Bookmark,
-  Copy,
-  Printer,
-  UserPlus,
-  UserCheck,
+  Share2,
   Check,
   List,
   Sparkles,
+  UserPlus,
+  UserCheck,
+  MessageSquare,
   ArrowRight,
-  Share2,
 } from "lucide-react";
 import { postApi } from "../api/postApi";
 import { interactionApi, followApi, analyticsApi } from "../api/commentInteractionApi";
@@ -22,7 +21,10 @@ import CommentSection from "../components/CommentSection";
 import PostCard from "../components/PostCard";
 import { PostDetailSkeleton } from "../components/SkeletonLoader";
 import DOMPurify from "dompurify";
-import { toast } from "react-toastify";
+import { toast } from "../context/ToastContext";
+
+const defaultAvatar =
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80";
 
 const PostDetail = () => {
   const { slug } = useParams();
@@ -41,8 +43,9 @@ const PostDetail = () => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
-  const [heroImgError, setHeroImgError] = useState(false);
+  const [heartAnim, setHeartAnim] = useState(false);
   const [authorAvatarError, setAuthorAvatarError] = useState(false);
+  const [heroImgError, setHeroImgError] = useState(false);
 
   // Fetch Post Details
   useEffect(() => {
@@ -70,8 +73,11 @@ const PostDetail = () => {
           setIsLiked(statusRes.data.isLiked);
           setIsBookmarked(statusRes.data.isBookmarked);
           if (postData.author?._id) {
-            const authorStatus = await followApi.getFollowStatus(postData.author._id);
-            setIsFollowing(authorStatus.data?.isFollowing || false);
+            const authorStatus = await followApi.getFollowers(postData.author._id);
+            // Check if current user is in author's followers
+            const followersList = authorStatus.data?.followers || [];
+            const userFollows = followersList.some((f) => f._id === user._id);
+            setIsFollowing(userFollows);
           }
         }
 
@@ -137,6 +143,10 @@ const PostDetail = () => {
       const res = await interactionApi.toggleLike(post._id);
       setIsLiked(res.data.isLiked);
       setLikesCount((prev) => (res.data.isLiked ? prev + 1 : prev - 1));
+      if (res.data.isLiked) {
+        setHeartAnim(true);
+        setTimeout(() => setHeartAnim(false), 600);
+      }
     } catch (err) {
       toast.error(err.message);
     }
@@ -150,7 +160,7 @@ const PostDetail = () => {
     try {
       const res = await interactionApi.toggleBookmark(post._id);
       setIsBookmarked(res.data.isBookmarked);
-      toast.success(res.message || (res.data.isBookmarked ? "Article saved!" : "Article removed from saved"));
+      toast.success(res.message || (res.data.isBookmarked ? "Article saved to bookmarks!" : "Article removed from saved"));
     } catch (err) {
       toast.error(err.message);
     }
@@ -179,27 +189,27 @@ const PostDetail = () => {
         });
         return;
       } catch (err) {
-        // Fallback to clipboard if share was cancelled or unsupported
+        // Fallback to clipboard if share was cancelled
       }
     }
     navigator.clipboard.writeText(window.location.href);
     setCopiedLink(true);
-    toast.success("Article link copied to clipboard!");
+    toast.success("Article link copied!");
     setTimeout(() => setCopiedLink(false), 3000);
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const getInitials = (name) => {
-    if (!name) return "U";
-    const parts = name.trim().split(" ");
-    return parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : name.slice(0, 2).toUpperCase();
+  const scrollToComments = () => {
+    const el = document.getElementById("comments") || document.querySelector(".discussion-section");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
   if (loading) return <PostDetailSkeleton />;
-  if (!post) return <div style={{ textAlign: "center", padding: "5rem", color: "var(--text-primary)" }}>Article not found</div>;
+  if (!post)
+    return (
+      <div style={{ textAlign: "center", padding: "5rem", color: "var(--text-primary)" }}>
+        Article not found
+      </div>
+    );
 
   const formattedDate = post.publishedAt || post.createdAt
     ? new Date(post.publishedAt || post.createdAt).toLocaleDateString("en-US", {
@@ -209,671 +219,257 @@ const PostDetail = () => {
       })
     : "";
 
+  const authorAvatar =
+    post.author?.avatar && !authorAvatarError ? post.author.avatar : defaultAvatar;
+
+  const hasMultipleSections = toc.length >= 2;
+
   return (
     <>
-      {/* 1. Thin Reading Progress Indicator */}
+      {/* 1. THIN READING PROGRESS BAR */}
       <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          height: "3px",
-          background: "var(--brand-slate-blue)",
-          width: `${readingProgress}%`,
-          zIndex: 10000,
-          transition: "width 100ms ease-out",
-        }}
+        className="reading-progress-bar"
+        style={{ width: `${readingProgress}%` }}
       />
 
-      {/* Prose & Layout Styles */}
-      <style>{`
-        .editorial-prose {
-          font-size: 1.12rem;
-          line-height: 1.8;
-          color: var(--text-primary);
-          font-family: var(--font-body);
-        }
-        .editorial-prose p {
-          margin-top: 0;
-          margin-bottom: 1.6em;
-          font-size: 1.12rem;
-          line-height: 1.8;
-          color: var(--text-primary);
-        }
-        .editorial-prose h1, .editorial-prose h2 {
-          font-size: 1.95rem;
-          font-weight: 800;
-          font-family: var(--font-heading);
-          color: var(--text-primary);
-          margin-top: 2.2em;
-          margin-bottom: 0.75em;
-          line-height: 1.25;
-          letter-spacing: -0.01em;
-        }
-        .editorial-prose h3 {
-          font-size: 1.45rem;
-          font-weight: 700;
-          font-family: var(--font-heading);
-          color: var(--text-primary);
-          margin-top: 1.8em;
-          margin-bottom: 0.6em;
-          line-height: 1.3;
-        }
-        .editorial-prose h4 {
-          font-size: 1.2rem;
-          font-weight: 700;
-          font-family: var(--font-heading);
-          color: var(--text-primary);
-          margin-top: 1.5em;
-          margin-bottom: 0.5em;
-        }
-        .editorial-prose a {
-          color: var(--brand-slate-blue);
-          text-decoration: underline;
-          text-decoration-thickness: 1px;
-          text-underline-offset: 3px;
-          transition: color 150ms ease;
-        }
-        .editorial-prose a:hover {
-          color: var(--brand-warm-accent);
-        }
-        .editorial-prose blockquote {
-          border-left: 3px solid var(--brand-warm-accent);
-          background: var(--bg-secondary);
-          padding: 1.25rem 1.5rem;
-          margin: 1.8em 0;
-          border-radius: 0 8px 8px 0;
-          font-style: italic;
-          font-size: 1.12rem;
-          line-height: 1.7;
-          color: var(--text-primary);
-        }
-        .editorial-prose blockquote p:last-child {
-          margin-bottom: 0;
-        }
-        .editorial-prose pre {
-          background: var(--bg-secondary);
-          border: 1px solid var(--border-color);
-          border-radius: 8px;
-          padding: 1.15rem 1.35rem;
-          margin: 1.8em 0;
-          overflow-x: auto;
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          font-size: 0.92rem;
-          line-height: 1.6;
-          color: var(--text-primary);
-        }
-        .editorial-prose code {
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          font-size: 0.88em;
-          background: var(--bg-secondary);
-          padding: 0.2em 0.4em;
-          border-radius: 4px;
-          border: 1px solid var(--border-color);
-        }
-        .editorial-prose pre code {
-          background: transparent;
-          padding: 0;
-          border: none;
-          font-size: 1em;
-        }
-        .editorial-prose img {
-          max-width: 100%;
-          height: auto;
-          border-radius: 8px;
-          margin: 1.75em 0;
-          display: block;
-        }
-        .editorial-prose ul, .editorial-prose ol {
-          padding-left: 1.5rem;
-          margin-bottom: 1.5em;
-        }
-        .editorial-prose li {
-          margin-bottom: 0.5em;
-          line-height: 1.7;
-        }
+      <article className="editorial-article-page">
+        <div className="editorial-master-container">
+          <div className={`article-layout-grid ${hasMultipleSections ? "has-toc" : "no-toc"}`}>
+            
+            {/* MAIN ARTICLE COLUMN — SINGLE MASTER SOURCE OF TRUTH FOR ALIGNMENT */}
+            <main className="main-article-column">
+              {/* Category Pill */}
+              {post.category && (
+                <div className="article-category-wrapper">
+                  <Link to={`/category/${post.category.slug}`} className="article-category-badge">
+                    {post.category.name}
+                  </Link>
+                </div>
+              )}
 
-        @media (max-width: 992px) {
-          .desktop-toc-sidebar {
-            display: none !important;
-          }
-        }
-        @media (max-width: 768px) {
-          .editorial-prose {
-            font-size: 1.05rem;
-          }
-          .editorial-prose p {
-            font-size: 1.05rem;
-          }
-          .editorial-prose h1, .editorial-prose h2 {
-            font-size: 1.6rem;
-          }
-          .editorial-prose h3 {
-            font-size: 1.3rem;
-          }
-        }
-        @media print {
-          header, footer, .desktop-toc-sidebar, .article-action-bar, .article-tags-section, .about-author-section, .related-stories-section, .comments-wrapper-section {
-            display: none !important;
-          }
-          article {
-            max-width: 100% !important;
-            padding: 0 !important;
-          }
-        }
-      `}</style>
+              {/* Large Powerful Editorial Headline */}
+              <h1 className="article-headline">{post.title}</h1>
 
-      <main className="container" style={{ maxWidth: "1200px", paddingTop: "2.5rem", paddingBottom: "5rem" }}>
-        {/* 2. ARTICLE HEADER (Max-width: 900px, Centered) */}
-        <header style={{ maxWidth: "900px", margin: "0 auto 2.5rem" }}>
-          {/* Category */}
-          {post.category && (
-            <div style={{ marginBottom: "0.75rem" }}>
-              <Link
-                to={`/category/${post.category.slug}`}
-                style={{
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                  color: "var(--text-secondary)",
-                  textDecoration: "none",
-                  transition: "color 150ms ease",
-                }}
-                onMouseOver={(e) => (e.currentTarget.style.color = "var(--brand-warm-accent)")}
-                onMouseOut={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
-              >
-                {post.category.name}
-              </Link>
-            </div>
-          )}
+              {/* Subtitle / Deck */}
+              {post.excerpt && <p className="article-subtitle">{post.excerpt}</p>}
 
-          {/* Article Title */}
-          <h1
-            style={{
-              fontSize: "clamp(2.1rem, 4.5vw, 3.4rem)",
-              fontWeight: 800,
-              lineHeight: 1.12,
-              color: "var(--text-primary)",
-              fontFamily: "var(--font-heading)",
-              marginBottom: "1.25rem",
-              letterSpacing: "-0.015em",
-            }}
-          >
-            {post.title}
-          </h1>
-
-          {/* Short Excerpt */}
-          {post.excerpt && (
-            <p
-              style={{
-                fontSize: "1.12rem",
-                color: "var(--text-secondary)",
-                lineHeight: 1.6,
-                marginBottom: "1.75rem",
-              }}
-            >
-              {post.excerpt}
-            </p>
-          )}
-
-          {/* Author & Reading Metadata Row */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "1.2rem 0",
-              borderTop: "1px solid var(--border-color)",
-              borderBottom: "1px solid var(--border-color)",
-              flexWrap: "wrap",
-              gap: "1.25rem",
-            }}
-          >
-            {/* Author Left Info */}
-            {post.author && (
-              <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
-                <Link to={`/author/${post.author.username}`} style={{ textDecoration: "none" }}>
-                  <div
-                    style={{
-                      width: "44px",
-                      height: "44px",
-                      borderRadius: "50%",
-                      overflow: "hidden",
-                      border: "1px solid var(--border-color)",
-                      background: "var(--bg-secondary)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: 700,
-                      color: "var(--text-primary)",
-                      fontSize: "0.9rem",
-                    }}
-                  >
-                    {post.author.avatar && !authorAvatarError ? (
+              {/* Author Byline Row */}
+              {post.author && (
+                <div className="author-byline-card">
+                  <div className="author-byline-info">
+                    <Link to={`/author/${post.author.username}`}>
                       <img
-                        src={post.author.avatar}
+                        src={authorAvatar}
                         alt={post.author.name}
                         onError={() => setAuthorAvatarError(true)}
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        className="author-byline-avatar"
                       />
-                    ) : (
-                      getInitials(post.author.name)
-                    )}
-                  </div>
-                </Link>
-
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <Link
-                      to={`/author/${post.author.username}`}
-                      style={{
-                        fontSize: "0.98rem",
-                        fontWeight: 700,
-                        color: "var(--text-primary)",
-                        textDecoration: "none",
-                      }}
-                    >
-                      {post.author.name}
                     </Link>
-                  </div>
-                  <span style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>
-                    @{post.author.username}
-                  </span>
-                </div>
 
-                {user && user._id !== post.author._id && (
-                  <button
-                    onClick={handleFollowToggle}
-                    className={isFollowing ? "btn-secondary" : "btn-primary"}
-                    style={{ padding: "0.3rem 0.75rem", fontSize: "0.75rem", marginLeft: "0.5rem" }}
-                  >
-                    {isFollowing ? <><UserCheck size={13} /> Following</> : <><UserPlus size={13} /> Follow</>}
-                  </button>
+                    <div className="author-byline-meta">
+                      <div className="author-name-row">
+                        <Link to={`/author/${post.author.username}`} className="author-byline-name">
+                          {post.author.name}
+                        </Link>
+                        <span className="author-byline-handle">@{post.author.username}</span>
+                      </div>
+
+                      <div className="article-meta-line">
+                        {formattedDate && <span>Published {formattedDate}</span>}
+                        {formattedDate && <span className="meta-dot">·</span>}
+                        <span className="meta-item">
+                          <Clock size={13} /> {post.readingTime || 1} min read
+                        </span>
+                        <span className="meta-dot">·</span>
+                        <span className="meta-item">
+                          <Eye size={13} /> {post.views || 0} views
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Follow Button */}
+                  {user && user._id !== post.author._id && (
+                    <button
+                      type="button"
+                      onClick={handleFollowToggle}
+                      className={`btn-author-follow ${isFollowing ? "is-following" : ""}`}
+                    >
+                      {isFollowing ? (
+                        <>
+                          <UserCheck size={14} /> Following
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus size={14} /> Follow
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* HERO FEATURED IMAGE */}
+              <div className="article-hero-wrapper">
+                {post.featuredImage && !heroImgError ? (
+                  <img
+                    src={post.featuredImage}
+                    alt={post.title}
+                    loading="lazy"
+                    onError={() => setHeroImgError(true)}
+                    className="article-hero-img"
+                  />
+                ) : (
+                  <div className="article-hero-fallback">
+                    <Sparkles size={40} strokeWidth={1.5} color="var(--brand-slate-blue)" />
+                    <span className="hero-fallback-title">{post.title}</span>
+                  </div>
                 )}
               </div>
-            )}
 
-            {/* Reading Metadata Right Info */}
-            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-              {formattedDate && <span>{formattedDate}</span>}
-              {formattedDate && <span>·</span>}
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
-                <Clock size={14} /> {post.readingTime || 1} min read
-              </span>
-              <span>·</span>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
-                <Eye size={14} /> {post.views || 0} views
-              </span>
-            </div>
-          </div>
-        </header>
-
-        {/* 3. HERO COVER IMAGE */}
-        <div
-          style={{
-            maxWidth: "1100px",
-            width: "100%",
-            aspectRatio: "16 / 9",
-            borderRadius: "10px",
-            overflow: "hidden",
-            margin: "0 auto 3.5rem",
-            background: "var(--bg-secondary)",
-            border: "1px solid var(--border-color)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {post.featuredImage && !heroImgError ? (
-            <img
-              src={post.featuredImage}
-              alt={post.title}
-              loading="lazy"
-              onError={() => setHeroImgError(true)}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          ) : (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "0.75rem",
-                color: "var(--text-secondary)",
-                padding: "2rem",
-                textAlign: "center",
-              }}
-            >
-              <Sparkles size={42} strokeWidth={1.5} color="var(--brand-slate-blue)" />
-              <span style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)" }}>
-                {post.title}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* 4. MAIN BODY CONTENT + STICKY TABLE OF CONTENTS SIDEBAR */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: toc.length > 0 ? "minmax(0, 760px) 240px" : "minmax(0, 760px)",
-            gap: "52px",
-            justifyContent: "center",
-            alignItems: "flex-start",
-          }}
-        >
-          {/* Article Main Body Column (Max 760px) */}
-          <div style={{ width: "100%", minWidth: 0 }}>
-            {/* Mobile Collapsible TOC if headings exist */}
-            {toc.length > 0 && (
-              <details
-                style={{
-                  marginBottom: "2rem",
-                  padding: "1rem 1.25rem",
-                  background: "var(--bg-secondary)",
-                  border: "1px solid var(--border-color)",
-                  borderRadius: "8px",
-                }}
-                className="mobile-toc-details"
-              >
-                <summary style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-primary)", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <List size={16} /> On this page (Table of Contents)
-                </summary>
-                <ul style={{ listStyle: "none", margin: "0.75rem 0 0", padding: "0", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                  {toc.map((item, idx) => (
-                    <li key={idx} style={{ paddingLeft: item.level === "h3" ? "1rem" : item.level === "h4" ? "1.5rem" : "0" }}>
-                      <a
-                        href={`#${item.id}`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" });
+              {/* Mobile Collapsible Table of Contents (ONLY IF 2+ SECTIONS) */}
+              {hasMultipleSections && (
+                <details className="mobile-toc-box">
+                  <summary className="mobile-toc-summary">
+                    <List size={15} /> Table of Contents ({toc.length} sections)
+                  </summary>
+                  <ul className="mobile-toc-list">
+                    {toc.map((item, idx) => (
+                      <li
+                        key={idx}
+                        style={{
+                          paddingLeft: item.level === "h3" ? "1rem" : item.level === "h4" ? "1.5rem" : "0",
                         }}
-                        style={{ fontSize: "0.85rem", color: "var(--text-secondary)", textDecoration: "none" }}
                       >
-                        • {item.text}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            )}
+                        <a
+                          href={`#${item.id}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" });
+                          }}
+                        >
+                          <span className="mobile-toc-num">{String(idx + 1).padStart(2, "0")}</span> {item.text}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
 
-            {/* Render Article HTML Content */}
-            <div
-              className="editorial-prose"
-              dangerouslySetInnerHTML={{ __html: sanitizedContent || DOMPurify.sanitize(post.content) }}
-            />
-
-            {/* 5. ARTICLE ACTION BAR (Likes, Bookmark, Share, Print) */}
-            <div
-              className="article-action-bar"
-              style={{
-                marginTop: "3.5rem",
-                padding: "1.25rem 0",
-                borderTop: "1px solid var(--border-color)",
-                borderBottom: "1px solid var(--border-color)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                gap: "1rem",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                {/* Like Button */}
-                <button
-                  onClick={handleLikeToggle}
-                  className="btn-secondary"
-                  style={{
-                    borderColor: isLiked ? "var(--brand-warm-accent)" : "var(--btn-secondary-border)",
-                    color: isLiked ? "var(--text-primary)" : "var(--text-secondary)",
-                  }}
-                >
-                  <Heart size={16} fill={isLiked ? "var(--brand-warm-accent)" : "none"} color={isLiked ? "var(--brand-warm-accent)" : "currentColor"} />
-                  <span>{likesCount} {likesCount === 1 ? "Like" : "Likes"}</span>
-                </button>
-
-                {/* Bookmark Button */}
-                <button
-                  onClick={handleBookmarkToggle}
-                  className="btn-secondary"
-                  style={{
-                    borderColor: isBookmarked ? "var(--brand-warm-accent)" : "var(--btn-secondary-border)",
-                    color: isBookmarked ? "var(--text-primary)" : "var(--text-secondary)",
-                  }}
-                >
-                  <Bookmark size={16} fill={isBookmarked ? "var(--brand-warm-accent)" : "none"} color={isBookmarked ? "var(--brand-warm-accent)" : "currentColor"} />
-                  <span>{isBookmarked ? "Saved" : "Save"}</span>
-                </button>
-              </div>
-
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                {/* Share Button */}
-                <button onClick={handleCopyLink} className="btn-secondary" title="Share or Copy Link">
-                  {copiedLink ? <Check size={16} color="#10b981" /> : <Share2 size={16} />}
-                  <span>{copiedLink ? "Copied!" : "Share"}</span>
-                </button>
-
-                {/* Print Button */}
-                <button onClick={handlePrint} className="btn-secondary" title="Print Article">
-                  <Printer size={16} />
-                  <span>Print</span>
-                </button>
-              </div>
-            </div>
-
-            {/* 6. ARTICLE TAGS */}
-            {post.tags && post.tags.length > 0 && (
-              <div className="article-tags-section" style={{ marginTop: "2.25rem", marginBottom: "3rem" }}>
-                <span
-                  style={{
-                    display: "block",
-                    fontSize: "11px",
-                    fontWeight: 800,
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: "var(--text-muted)",
-                    marginBottom: "0.75rem",
-                  }}
-                >
-                  TAGS
-                </span>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                  {post.tags.map((t) => (
-                    <Link
-                      key={t._id || t.slug}
-                      to={`/tag/${t.slug}`}
-                      style={{
-                        fontSize: "0.82rem",
-                        fontWeight: 600,
-                        color: "var(--text-secondary)",
-                        background: "var(--bg-secondary)",
-                        border: "1px solid var(--border-color)",
-                        padding: "0.35rem 0.85rem",
-                        borderRadius: "6px",
-                        textDecoration: "none",
-                        transition: "all 150ms ease",
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.borderColor = "var(--brand-warm-accent)";
-                        e.currentTarget.style.color = "var(--text-primary)";
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.borderColor = "var(--border-color)";
-                        e.currentTarget.style.color = "var(--text-secondary)";
-                      }}
-                    >
-                      #{t.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 7. ABOUT THE AUTHOR CARD */}
-            {post.author && (
+              {/* Sanitized Body HTML Content */}
               <div
-                className="about-author-section"
-                style={{
-                  marginTop: "3rem",
-                  padding: "1.75rem",
-                  background: "var(--bg-secondary)",
-                  border: "1px solid var(--border-color)",
-                  borderRadius: "10px",
+                className="editorial-prose"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizedContent || DOMPurify.sanitize(post.content),
                 }}
-              >
-                <span
-                  style={{
-                    display: "block",
-                    fontSize: "11px",
-                    fontWeight: 800,
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: "var(--text-muted)",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  ABOUT THE AUTHOR
-                </span>
+              />
 
-                <div style={{ display: "flex", gap: "1.25rem", flexWrap: "wrap", alignItems: "flex-start" }}>
-                  <Link to={`/author/${post.author.username}`} style={{ textDecoration: "none" }}>
-                    <div
-                      style={{
-                        width: "56px",
-                        height: "56px",
-                        borderRadius: "50%",
-                        overflow: "hidden",
-                        border: "1px solid var(--border-color)",
-                        background: "var(--bg-primary)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontWeight: 800,
-                        color: "var(--text-primary)",
-                        fontSize: "1.1rem",
-                        flexShrink: 0,
-                      }}
-                    >
-                      {post.author.avatar ? (
-                        <img
-                          src={post.author.avatar}
-                          alt={post.author.name}
-                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                        />
-                      ) : (
-                        getInitials(post.author.name)
-                      )}
-                    </div>
-                  </Link>
-
-                  <div style={{ flexGrow: 1 }}>
-                    <h4 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
-                      <Link to={`/author/${post.author.username}`} style={{ color: "inherit", textDecoration: "none" }}>
-                        {post.author.name}
+              {/* TOPICS / TAGS SECTION */}
+              {post.tags && post.tags.length > 0 && (
+                <div className="article-topics-section">
+                  <span className="topics-label">TOPICS</span>
+                  <div className="topics-pills-row">
+                    {post.tags.map((t) => (
+                      <Link key={t._id || t.slug} to={`/tag/${t.slug}`} className="topic-pill">
+                        #{t.name}
                       </Link>
-                    </h4>
-                    <span style={{ fontSize: "0.82rem", color: "var(--text-muted)", display: "block", marginBottom: "0.5rem" }}>
-                      @{post.author.username}
-                    </span>
-
-                    {post.author.bio && (
-                      <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", lineHeight: 1.6, margin: "0 0 1rem" }}>
-                        {post.author.bio}
-                      </p>
-                    )}
-
-                    <Link
-                      to={`/author/${post.author.username}`}
-                      style={{
-                        fontSize: "0.85rem",
-                        fontWeight: 700,
-                        color: "var(--brand-slate-blue)",
-                        textDecoration: "none",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.25rem",
-                      }}
-                    >
-                      View Profile <ArrowRight size={14} />
-                    </Link>
+                    ))}
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* 8. RELATED STORIES */}
-            {relatedPosts.length > 0 && (
-              <section className="related-stories-section" style={{ marginTop: "4rem" }}>
-                <div style={{ borderTop: "1px solid var(--border-color)", paddingTop: "2.5rem", marginBottom: "1.75rem" }}>
-                  <span
-                    style={{
-                      display: "block",
-                      fontSize: "11px",
-                      fontWeight: 800,
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                      color: "var(--text-muted)",
-                      marginBottom: "0.35rem",
-                    }}
-                  >
-                    RECOMMENDED READING
+              {/* SOLE PRIMARY ENGAGEMENT BAR (LIKE, COMMENTS, SAVE, SHARE) */}
+              <div className="article-bottom-actions-bar">
+                <button
+                  type="button"
+                  onClick={handleLikeToggle}
+                  className={`bottom-action-btn ${isLiked ? "active" : ""} ${heartAnim ? "heart-pop" : ""}`}
+                  aria-label="Like article"
+                >
+                  <Heart
+                    size={18}
+                    fill={isLiked ? "var(--accent-primary, #FF497C)" : "none"}
+                    color={isLiked ? "var(--accent-primary, #FF497C)" : "currentColor"}
+                  />
+                  <span>
+                    {isLiked
+                      ? likesCount > 0
+                        ? `${likesCount} ${likesCount === 1 ? "Like" : "Likes"}`
+                        : "Liked"
+                      : likesCount > 0
+                      ? `${likesCount} ${likesCount === 1 ? "Like" : "Likes"}`
+                      : "Like"}
                   </span>
-                  <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--text-primary)", fontFamily: "var(--font-heading)", margin: 0 }}>
-                    Related Stories
-                  </h3>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={scrollToComments}
+                  className="bottom-action-btn"
+                  aria-label="Comments"
+                >
+                  <MessageSquare size={18} />
+                  <span>Comments</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleBookmarkToggle}
+                  className={`bottom-action-btn ${isBookmarked ? "active" : ""}`}
+                  aria-label="Save bookmark"
+                >
+                  <Bookmark
+                    size={18}
+                    fill={isBookmarked ? "var(--accent-primary, #FF497C)" : "none"}
+                    color={isBookmarked ? "var(--accent-primary, #FF497C)" : "currentColor"}
+                  />
+                  <span>{isBookmarked ? "Saved" : "Save"}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="bottom-action-btn"
+                  aria-label="Share article"
+                >
+                  {copiedLink ? <Check size={18} color="#10b981" /> : <Share2 size={18} />}
+                  <span>{copiedLink ? "Copied" : "Share"}</span>
+                </button>
+              </div>
+
+            {/* COMMENTS SECTION */}
+            <div id="comments" className="discussion-section">
+              <CommentSection postId={post._id} />
+            </div>
+
+            {/* MORE TO READ / RECOMMENDED STORIES */}
+            {relatedPosts.length > 0 && (
+              <section className="more-stories-section">
+                <div className="more-stories-header">
+                  <span className="more-stories-label">MORE TO READ</span>
+                  <h3 className="more-stories-title">Related Stories</h3>
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "1.25rem" }}>
+                <div className="related-cards-grid">
                   {relatedPosts.slice(0, 3).map((rel) => (
                     <PostCard key={rel._id} post={rel} />
                   ))}
                 </div>
               </section>
             )}
+          </main>
 
-            {/* 9. COMMENTS SECTION */}
-            <div className="comments-wrapper-section" style={{ marginTop: "4rem" }}>
-              <CommentSection postId={post._id} />
-            </div>
-          </div>
-
-          {/* Table of Contents Desktop Sticky Sidebar (240px) */}
-          {toc.length > 0 && (
-            <aside
-              className="desktop-toc-sidebar"
-              style={{
-                position: "sticky",
-                top: "100px",
-                width: "240px",
-                flexShrink: 0,
-              }}
-            >
-              <div
-                style={{
-                  background: "var(--bg-card)",
-                  border: "1px solid var(--border-color)",
-                  borderRadius: "10px",
-                  padding: "1.25rem 1rem",
-                }}
-              >
-                <span
-                  style={{
-                    display: "block",
-                    fontSize: "11px",
-                    fontWeight: 800,
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: "var(--text-muted)",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  ON THIS PAGE
-                </span>
-
-                <nav style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-                  {toc.map((item) => {
+          {/* SECONDARY DESKTOP STICKY TOC SIDEBAR (ONLY IF 2+ SECTIONS) */}
+          {hasMultipleSections && (
+            <aside className="sticky-toc-sidebar">
+              <div className="toc-container-box">
+                <div className="toc-header-row">
+                  <span className="toc-header-label">TABLE OF CONTENTS</span>
+                  <span className="toc-count-badge">{toc.length} sections</span>
+                </div>
+                <div className="toc-divider" />
+                <nav className="toc-nav-list">
+                  {toc.map((item, idx) => {
                     const isActive = activeTocId === item.id;
                     return (
                       <a
@@ -884,19 +480,14 @@ const PostDetail = () => {
                           setActiveTocId(item.id);
                           document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" });
                         }}
+                        className={`toc-nav-link ${isActive ? "active" : ""}`}
                         style={{
-                          fontSize: "0.83rem",
-                          fontWeight: isActive ? 700 : 500,
-                          color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-                          textDecoration: "none",
-                          borderLeft: isActive ? "3px solid var(--brand-warm-accent)" : "3px solid transparent",
-                          paddingLeft: item.level === "h3" ? "1.25rem" : item.level === "h4" ? "1.75rem" : "0.6rem",
-                          lineHeight: 1.4,
-                          transition: "all 150ms ease",
-                          display: "block",
+                          paddingLeft:
+                            item.level === "h3" ? "1.4rem" : item.level === "h4" ? "2rem" : "0.5rem",
                         }}
                       >
-                        {item.text}
+                        <span className="toc-item-num">{String(idx + 1).padStart(2, "0")}</span>
+                        <span className="toc-item-text">{item.text}</span>
                       </a>
                     );
                   })}
@@ -905,7 +496,606 @@ const PostDetail = () => {
             </aside>
           )}
         </div>
-      </main>
+      </div>
+    </article>
+
+      {/* STYLES (Enforcing Single Master Alignment Grid for Entire Article) */}
+      <style>{`
+        .reading-progress-bar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 3px;
+          background: var(--accent-primary, #FF497C);
+          z-index: 10000;
+          transition: width 80ms ease-out;
+        }
+
+        .editorial-article-page {
+          width: 100%;
+          padding: 2.5rem 1.25rem 6rem 1.25rem;
+        }
+
+        .editorial-master-container {
+          max-width: 1080px;
+          margin: 0 auto;
+        }
+
+        /* LAYOUT GRID: SINGLE MASTER COLUMN + OPTIONAL TOC SIDEBAR */
+        .article-layout-grid {
+          display: flex;
+          justify-content: center;
+          gap: 3rem;
+          align-items: flex-start;
+          width: 100%;
+        }
+
+        .article-layout-grid.no-toc {
+          justify-content: center;
+        }
+
+        /* MAIN ARTICLE COLUMN: THE SINGLE SOURCE OF TRUTH FOR ALIGNMENT */
+        .main-article-column {
+          width: 100%;
+          max-width: 760px;
+          flex-shrink: 1;
+          min-width: 0;
+          margin: 0 auto;
+        }
+
+        .article-layout-grid.has-toc .main-article-column {
+          margin: 0;
+        }
+
+        /* CATEGORY */
+        .article-category-wrapper {
+          margin-bottom: 0.85rem;
+        }
+
+        .article-category-badge {
+          font-size: 0.72rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--brand-slate-blue, #547792);
+          text-decoration: none;
+          transition: color 0.15s ease;
+        }
+
+        .article-category-badge:hover {
+          color: var(--accent-primary, #FF497C);
+        }
+
+        /* HEADLINE */
+        .article-headline {
+          font-size: clamp(2.3rem, 5vw, 3.6rem);
+          font-weight: 900;
+          line-height: 1.12;
+          color: var(--text-primary, #213448);
+          font-family: var(--font-heading);
+          margin: 0 0 1.15rem 0;
+          letter-spacing: -0.02em;
+        }
+
+        /* SUBTITLE */
+        .article-subtitle {
+          font-size: 1.22rem;
+          color: var(--text-secondary, #547792);
+          line-height: 1.6;
+          margin: 0 0 1.85rem 0;
+        }
+
+        /* AUTHOR BYLINE CARD */
+        .author-byline-card {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 1.15rem 0;
+          border-top: 1px solid var(--border-color, #EFE9E3);
+          border-bottom: 1px solid var(--border-color, #EFE9E3);
+          margin-bottom: 2.5rem;
+          flex-wrap: wrap;
+          gap: 1rem;
+          width: 100%;
+        }
+
+        .author-byline-info {
+          display: flex;
+          align-items: center;
+          gap: 0.85rem;
+        }
+
+        .author-byline-avatar {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 1px solid var(--border-color, #EFE9E3);
+          flex-shrink: 0;
+        }
+
+        .author-byline-meta {
+          display: flex;
+          flex-direction: column;
+          gap: 0.15rem;
+        }
+
+        .author-name-row {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+        }
+
+        .author-byline-name {
+          font-size: 0.98rem;
+          font-weight: 800;
+          color: var(--text-primary, #213448);
+          text-decoration: none;
+        }
+
+        .author-byline-name:hover {
+          color: var(--brand-slate-blue, #547792);
+        }
+
+        .author-byline-handle {
+          font-size: 0.8rem;
+          color: var(--text-muted, #94B4C1);
+        }
+
+        .article-meta-line {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          font-size: 0.82rem;
+          color: var(--text-secondary, #547792);
+          flex-wrap: wrap;
+        }
+
+        .meta-dot {
+          color: var(--text-muted, #94B4C1);
+        }
+
+        .meta-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.2rem;
+        }
+
+        .btn-author-follow {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.3rem;
+          padding: 0.35rem 0.85rem;
+          font-size: 0.78rem;
+          font-weight: 700;
+          color: #FFFFFF;
+          background: var(--accent-primary, #FF497C);
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+
+        .btn-author-follow.is-following {
+          background: var(--bg-surface, #EFE9E3);
+          color: var(--text-secondary, #547792);
+          border: 1px solid var(--border-color, #D9CFC7);
+        }
+
+        /* HERO FEATURED IMAGE */
+        .article-hero-wrapper {
+          width: 100%;
+          margin: 0 0 3rem 0;
+          border-radius: 14px;
+          overflow: hidden;
+          background: var(--bg-secondary, #F9F8F6);
+          border: 1px solid var(--border-color, #EFE9E3);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .article-hero-img {
+          width: 100%;
+          aspect-ratio: 16 / 9;
+          object-fit: cover;
+          display: block;
+        }
+
+        .article-hero-fallback {
+          padding: 4rem 2rem;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .hero-fallback-title {
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: var(--text-primary);
+        }
+
+        /* EDITORIAL PROSE TYPOGRAPHY */
+        .editorial-prose {
+          width: 100%;
+          font-size: 1.18rem;
+          line-height: 1.85;
+          color: var(--text-primary, #213448);
+          font-family: var(--font-body);
+        }
+
+        .editorial-prose p {
+          margin: 0 0 1.8em 0;
+          font-size: 1.18rem;
+          line-height: 1.85;
+          color: var(--text-primary, #213448);
+        }
+
+        .editorial-prose h1, .editorial-prose h2 {
+          font-size: 1.85rem;
+          font-weight: 800;
+          font-family: var(--font-heading);
+          color: var(--text-primary, #213448);
+          margin: 2.2em 0 0.75em 0;
+          line-height: 1.25;
+          letter-spacing: -0.015em;
+        }
+
+        .editorial-prose h3 {
+          font-size: 1.4rem;
+          font-weight: 800;
+          font-family: var(--font-heading);
+          color: var(--text-primary, #213448);
+          margin: 1.8em 0 0.6em 0;
+          line-height: 1.3;
+        }
+
+        .editorial-prose a {
+          color: var(--brand-slate-blue, #547792);
+          text-decoration: underline;
+          text-decoration-thickness: 1px;
+          text-underline-offset: 3px;
+        }
+
+        .editorial-prose blockquote {
+          border-left: 3px solid var(--accent-primary, #FF497C);
+          background: var(--bg-secondary, #F9F8F6);
+          padding: 1.25rem 1.5rem;
+          margin: 2em 0;
+          border-radius: 0 8px 8px 0;
+          font-style: italic;
+          font-size: 1.1rem;
+          line-height: 1.7;
+        }
+
+        .editorial-prose pre {
+          background: var(--bg-secondary, #F9F8F6);
+          border: 1px solid var(--border-color, #EFE9E3);
+          border-radius: 10px;
+          padding: 1.25rem;
+          margin: 2em 0;
+          overflow-x: auto;
+          font-family: monospace;
+          font-size: 0.9rem;
+        }
+
+        .editorial-prose img {
+          max-width: 100%;
+          border-radius: 10px;
+          margin: 2em 0;
+        }
+
+        /* TOPICS SECTION */
+        .article-topics-section {
+          width: 100%;
+          margin-top: 2.5rem;
+          margin-bottom: 2rem;
+        }
+
+        .topics-label {
+          display: block;
+          font-size: 0.72rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          color: var(--brand-slate-blue, #547792);
+          margin-bottom: 0.65rem;
+        }
+
+        .topics-pills-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .topic-pill {
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: var(--text-secondary, #547792);
+          background: var(--bg-secondary, #F9F8F6);
+          border: 1px solid var(--border-color, #EFE9E3);
+          padding: 0.35rem 0.75rem;
+          border-radius: 6px;
+          text-decoration: none;
+          transition: all 0.15s ease;
+        }
+
+        .topic-pill:hover {
+          border-color: var(--brand-slate-blue, #547792);
+          color: var(--text-primary, #213448);
+        }
+
+        /* SOLE PRIMARY ENGAGEMENT BAR */
+        .article-bottom-actions-bar {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          padding: 0.85rem 1.25rem;
+          background: var(--bg-card, #FFFFFF);
+          border: 1px solid var(--border-color, #EFE9E3);
+          border-radius: 12px;
+          margin: 2.5rem 0 0 0;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+          gap: 0.5rem;
+        }
+
+        .bottom-action-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          min-height: 44px;
+          padding: 0.5rem 1.1rem;
+          font-size: 0.88rem;
+          font-weight: 700;
+          color: var(--text-secondary, #547792);
+          background: transparent;
+          border: 1px solid transparent;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          flex: 1;
+        }
+
+        .bottom-action-btn:hover {
+          background: var(--bg-secondary, #F9F8F6);
+          color: var(--text-primary, #213448);
+          border-color: var(--border-color, #EFE9E3);
+        }
+
+        .bottom-action-btn.active {
+          border-color: var(--accent-primary, #FF497C);
+          color: var(--accent-primary, #FF497C);
+          background: rgba(255, 73, 124, 0.06);
+        }
+
+        @keyframes heartPopAnim {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.25); }
+          100% { transform: scale(1); }
+        }
+
+        .bottom-action-btn.heart-pop svg {
+          animation: heartPopAnim 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* MORE STORIES SECTION */
+        .more-stories-section {
+          width: 100%;
+          margin-top: 4rem;
+          padding-top: 2.5rem;
+          border-top: 1px solid var(--border-color, #EFE9E3);
+        }
+
+        .more-stories-label {
+          font-size: 0.72rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          color: var(--brand-slate-blue, #547792);
+          display: block;
+          margin-bottom: 0.2rem;
+        }
+
+        .more-stories-title {
+          font-size: 1.4rem;
+          font-weight: 900;
+          color: var(--text-primary, #213448);
+          font-family: var(--font-heading);
+          margin: 0 0 1.5rem 0;
+        }
+
+        .related-cards-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+          gap: 1.25rem;
+        }
+
+        /* STICKY TOC SIDEBAR (Desktop) */
+        .sticky-toc-sidebar {
+          position: sticky;
+          top: 100px;
+          width: 240px;
+          flex-shrink: 0;
+        }
+
+        .toc-container-box {
+          background: var(--bg-card, #FFFFFF);
+          border: 1px solid var(--border-color, #EFE9E3);
+          border-radius: 12px;
+          padding: 1.15rem;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+        }
+
+        .toc-header-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem;
+          margin-bottom: 0.65rem;
+        }
+
+        .toc-header-label {
+          font-size: 0.7rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          color: var(--brand-slate-blue, #547792);
+        }
+
+        .toc-count-badge {
+          font-size: 0.68rem;
+          font-weight: 700;
+          padding: 0.15rem 0.45rem;
+          background: var(--bg-secondary, #F9F8F6);
+          border: 1px solid var(--border-color, #EFE9E3);
+          border-radius: 12px;
+          color: var(--text-secondary, #547792);
+        }
+
+        .toc-divider {
+          height: 1px;
+          background: var(--border-color, #EFE9E3);
+          margin-bottom: 0.75rem;
+        }
+
+        .toc-nav-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.45rem;
+        }
+
+        .toc-nav-link {
+          font-size: 0.82rem;
+          font-weight: 500;
+          color: var(--text-secondary, #547792);
+          text-decoration: none;
+          line-height: 1.35;
+          display: flex;
+          align-items: baseline;
+          gap: 0.45rem;
+          padding: 0.35rem 0.4rem;
+          border-radius: 6px;
+          border-left: 2px solid transparent;
+          transition: all 0.15s ease;
+        }
+
+        .toc-item-num {
+          font-size: 0.72rem;
+          font-weight: 800;
+          color: var(--text-muted, #94B4C1);
+          font-family: monospace;
+          flex-shrink: 0;
+        }
+
+        .toc-item-text {
+          flex-grow: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .toc-nav-link:hover {
+          color: var(--text-primary, #213448);
+          background: var(--bg-secondary, #F9F8F6);
+        }
+
+        .toc-nav-link.active {
+          font-weight: 700;
+          color: var(--accent-primary, #FF497C);
+          border-left-color: var(--accent-primary, #FF497C);
+          background: rgba(255, 73, 124, 0.04);
+        }
+
+        .toc-nav-link.active .toc-item-num {
+          color: var(--accent-primary, #FF497C);
+        }
+
+        /* MOBILE TOC BOX */
+        .mobile-toc-box {
+          width: 100%;
+          margin-bottom: 2rem;
+          padding: 0.85rem 1rem;
+          background: var(--bg-secondary, #F9F8F6);
+          border: 1px solid var(--border-color, #EFE9E3);
+          border-radius: 8px;
+        }
+
+        .mobile-toc-summary {
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: var(--text-primary);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+        }
+
+        .mobile-toc-list {
+          list-style: none;
+          margin: 0.65rem 0 0 0;
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 0.4rem;
+        }
+
+        .mobile-toc-list a {
+          font-size: 0.82rem;
+          color: var(--text-secondary);
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+        }
+
+        .mobile-toc-num {
+          font-size: 0.72rem;
+          font-weight: 800;
+          color: var(--text-muted, #94B4C1);
+          font-family: monospace;
+        }
+
+        /* RESPONSIVE LAYOUT */
+        @media (max-width: 1024px) {
+          .sticky-toc-sidebar {
+            display: none;
+          }
+          .article-layout-grid {
+            gap: 0;
+          }
+          .main-article-column {
+            margin: 0 auto;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .editorial-article-page {
+            padding: 1.5rem 1rem 4rem 1rem;
+          }
+          .editorial-prose {
+            font-size: 1.05rem;
+          }
+          .editorial-prose p {
+            font-size: 1.05rem;
+          }
+          .author-byline-card {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          .author-profile-row {
+            flex-direction: column;
+          }
+          .article-bottom-actions-bar {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            padding: 0.75rem;
+          }
+          .bottom-action-btn {
+            width: 100%;
+            justify-content: center;
+          }
+        }
+      `}</style>
     </>
   );
 };

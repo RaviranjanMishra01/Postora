@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { AlertTriangle, X } from "lucide-react";
 import { reportApi } from "../api/commentInteractionApi";
-import { toast } from "react-toastify";
+import { toast } from "../context/ToastContext";
 
 const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
   const [reason, setReason] = useState("spam");

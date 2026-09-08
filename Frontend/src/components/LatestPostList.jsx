@@ -61,7 +61,7 @@ const LatestPostList = ({ posts = [] }) => {
                   <Link
                     to={`/post/${post.slug}`}
                     style={{ color: "inherit", transition: "color 150ms ease" }}
-                    onMouseOver={(e) => (e.currentTarget.style.color = "var(--brand-slate-blue)")}
+                    onMouseOver={(e) => (e.currentTarget.style.color = "var(--carrino-pink)")}
                     onMouseOut={(e) => (e.currentTarget.style.color = "inherit")}
                   >
                     {post.title}

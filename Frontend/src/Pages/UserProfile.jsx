@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Save, Key, Trash2, Eye, EyeOff, AlertTriangle, User, Shield, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Save, Key, Trash2, Eye, EyeOff, AlertTriangle, ArrowLeft } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { authApi } from "../api/authApi";
-import { toast } from "react-toastify";
+import { toast } from "../context/ToastContext";
 
 import ProfileHero from "../components/profile/ProfileHero";
 import ProfileTabs from "../components/profile/ProfileTabs";
@@ -104,24 +105,34 @@ const UserProfile = () => {
 
   return (
     <div className="container" style={{ maxWidth: "1140px", paddingTop: "2.5rem", paddingBottom: "5rem" }}>
-      {/* PAGE HEADER */}
-      <div style={{ marginBottom: "2rem" }}>
-        <h1
-          style={{
-            fontSize: "clamp(1.8rem, 3vw, 2.3rem)",
-            fontWeight: 900,
-            color: "var(--text-primary)",
-            lineHeight: 1.2,
-            fontFamily: "var(--font-heading)",
-            letterSpacing: "-0.03em",
-            marginBottom: "0.35rem",
-          }}
+      {/* PAGE HEADER & BACK TO DASHBOARD LINK */}
+      <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
+        <div>
+          <h1
+            style={{
+              fontSize: "clamp(1.8rem, 3vw, 2.3rem)",
+              fontWeight: 900,
+              color: "var(--text-primary)",
+              lineHeight: 1.2,
+              fontFamily: "var(--font-heading)",
+              letterSpacing: "-0.03em",
+              marginBottom: "0.35rem",
+            }}
+          >
+            Account & Profile Settings
+          </h1>
+          <p style={{ fontSize: "0.92rem", color: "var(--text-secondary)" }}>
+            Manage your profile, security, and account preferences.
+          </p>
+        </div>
+
+        <Link
+          to="/dashboard"
+          className="btn-secondary"
+          style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.6rem 1rem", fontSize: "0.85rem" }}
         >
-          Account & Profile Settings
-        </h1>
-        <p style={{ fontSize: "0.92rem", color: "var(--text-secondary)" }}>
-          Manage your profile, security, and account preferences.
-        </p>
+          <ArrowLeft size={16} /> Back to Dashboard
+        </Link>
       </div>
 
       {/* PROFILE IDENTITY HEADER HERO */}

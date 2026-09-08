@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Bookmark, Image as ImageIcon } from "lucide-react";
 import { interactionApi } from "../api/commentInteractionApi";
 import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
+import { toast } from "../context/ToastContext";
 
 const OverlayPostCard = ({ post, height = "280px", showBadgeIcon = false }) => {
   const { user } = useAuth();
@@ -73,7 +73,7 @@ const OverlayPostCard = ({ post, height = "280px", showBadgeIcon = false }) => {
               <span
                 style={{
                   background: "rgba(255, 255, 255, 0.85)",
-                  color: "#213448",
+                  color: "var(--text-primary)",
                   padding: "0.3rem",
                   borderRadius: "50%",
                   display: "flex",

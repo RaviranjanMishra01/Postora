@@ -1,101 +1,110 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Bookmark, ArrowRight, Clock } from "lucide-react";
+import { Bookmark, Compass } from "lucide-react";
+import ArticleCard from "../profile/ArticleCard";
+import { CardSkeleton } from "../SkeletonLoader";
 
 const SavedPostsPreview = ({ bookmarks = [], loading = false }) => {
   return (
-    <div
-      style={{
-        background: "var(--bg-secondary)",
-        border: "1px solid var(--border-color)",
-        borderRadius: "var(--radius-lg)",
-        padding: "1.75rem",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
-        <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--text-primary)", fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <Bookmark size={18} color="#FF497C" /> Saved Articles
-        </h3>
-        <Link
-          to="/bookmarks"
-          style={{ fontSize: "0.8rem", fontWeight: 700, color: "#FF497C", display: "inline-flex", alignItems: "center", gap: "0.2rem" }}
+    <section style={{ marginBottom: "2.5rem" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          marginBottom: "1.25rem",
+        }}
+      >
+        <Bookmark size={18} color="#38bdf8" />
+        <h2
+          style={{
+            fontSize: "1.25rem",
+            fontWeight: 800,
+            color: "var(--text-primary, #f8fafc)",
+            margin: 0,
+          }}
         >
-          View all <ArrowRight size={13} />
-        </Link>
+          Saved Stories ({bookmarks.length})
+        </h2>
       </div>
 
       {loading ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-          <div className="skeleton" style={{ height: "60px" }} />
-          <div className="skeleton" style={{ height: "60px" }} />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: "1.5rem" }}>
+          <CardSkeleton />
         </div>
       ) : bookmarks.length === 0 ? (
         <div
           style={{
-            padding: "2.5rem 1rem",
+            padding: "2.5rem 1.75rem",
             textAlign: "center",
-            color: "var(--text-muted)",
-            fontSize: "0.88rem",
-            margin: "auto 0",
+            borderRadius: "var(--radius-lg, 16px)",
+            background: "rgba(30, 41, 59, 0.3)",
+            border: "1px dashed var(--border-color, rgba(255, 255, 255, 0.1))",
           }}
         >
-          <p style={{ color: "var(--text-secondary)", fontWeight: 600 }}>No saved articles yet.</p>
-          <span style={{ fontSize: "0.78rem" }}>Save articles to read them anytime.</span>
-          <div style={{ marginTop: "1rem" }}>
-            <Link to="/" className="btn-secondary" style={{ padding: "0.45rem 0.9rem", fontSize: "0.78rem" }}>
-              Explore Articles
-            </Link>
+          <div
+            style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "50%",
+              background: "rgba(56, 189, 248, 0.12)",
+              color: "#38bdf8",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 1rem auto",
+            }}
+          >
+            <Bookmark size={22} />
           </div>
+
+          <h3
+            style={{
+              fontSize: "1.05rem",
+              fontWeight: 700,
+              color: "var(--text-primary, #f8fafc)",
+              margin: "0 0 0.35rem 0",
+            }}
+          >
+            Your reading list is empty
+          </h3>
+
+          <p
+            style={{
+              fontSize: "0.85rem",
+              color: "var(--text-secondary, #94a3b8)",
+              maxWidth: "380px",
+              margin: "0 auto 1.25rem auto",
+              lineHeight: 1.5,
+            }}
+          >
+            Found something worth reading? Save it here and come back anytime.
+          </p>
+
+          <Link
+            to="/"
+            className="btn-secondary"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.45rem",
+              padding: "0.55rem 1.1rem",
+              fontSize: "0.85rem",
+              borderRadius: "var(--radius-md, 8px)",
+              textDecoration: "none",
+            }}
+          >
+            <Compass size={15} /> Explore Stories →
+          </Link>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {bookmarks.slice(0, 4).map((item) => {
-            const post = item.post || item;
-            if (!post || !post.title) return null;
-
-            return (
-              <div
-                key={post._id}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "70px 1fr",
-                  gap: "0.85rem",
-                  alignItems: "center",
-                  paddingBottom: "0.85rem",
-                  borderBottom: "1px solid var(--border-color)",
-                }}
-              >
-                {post.featuredImage && (
-                  <Link
-                    to={`/post/${post.slug}`}
-                    style={{ width: "70px", height: "58px", borderRadius: "var(--radius-sm)", overflow: "hidden", display: "block" }}
-                  >
-                    <img src={post.featuredImage} alt={post.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  </Link>
-                )}
-
-                <div>
-                  {post.category && (
-                    <span className="editorial-category" style={{ fontSize: "0.65rem", display: "block", marginBottom: "0.15rem" }}>
-                      {post.category.name}
-                    </span>
-                  )}
-                  <h4 style={{ fontSize: "0.88rem", fontWeight: 700, lineHeight: 1.3, color: "var(--text-primary)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                    <Link to={`/post/${post.slug}`}>{post.title}</Link>
-                  </h4>
-                  <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", display: "inline-flex", alignItems: "center", gap: "0.2rem", marginTop: "0.15rem" }}>
-                    <Clock size={11} /> {post.readingTime || 4}m read
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: "1.5rem" }}>
+          {bookmarks.slice(0, 3).map((post) => (
+            <ArticleCard key={post._id} post={post} />
+          ))}
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

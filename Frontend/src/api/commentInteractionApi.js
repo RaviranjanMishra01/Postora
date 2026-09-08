@@ -13,11 +13,14 @@ export const interactionApi = {
   toggleBookmark: (postId) => axiosInstance.post(`/interactions/bookmark/${postId}`),
   getStatus: (postId) => axiosInstance.get(`/interactions/status/${postId}`),
   getBookmarks: () => axiosInstance.get("/interactions/bookmarks"),
+  getLikedPosts: () => axiosInstance.get("/interactions/liked"),
 };
 
 export const followApi = {
   toggleFollow: (authorId) => axiosInstance.post(`/follows/${authorId}`),
   getAuthorFeed: () => axiosInstance.get("/follows/feed"),
+  getFollowers: (userId) => axiosInstance.get(`/follows/followers${userId ? "/" + userId : ""}`),
+  getFollowing: (userId) => axiosInstance.get(`/follows/following${userId ? "/" + userId : ""}`),
 };
 
 export const notificationApi = {
@@ -40,6 +43,10 @@ export const adminApi = {
   deleteUser: (id) => axiosInstance.delete(`/admin/users/${id}`),
   getAdminPosts: (params) => axiosInstance.get("/admin/posts", { params }),
   toggleFeaturedPost: (id) => axiosInstance.put(`/admin/posts/${id}/feature`),
+  deletePost: (id) => axiosInstance.delete(`/admin/posts/${id}`),
+  getAuditLogs: () => axiosInstance.get("/admin/audit-logs"),
+  getSettings: () => axiosInstance.get("/admin/settings"),
+  updateSettings: (data) => axiosInstance.put("/admin/settings", data),
 };
 
 export const reportApi = {

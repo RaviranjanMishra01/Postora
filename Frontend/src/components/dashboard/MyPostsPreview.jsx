@@ -1,99 +1,107 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FileText, Eye, Heart, Edit3, Plus } from "lucide-react";
+import { BookOpen, ArrowRight, PenTool } from "lucide-react";
+import ArticleCard from "../profile/ArticleCard";
+import { CardSkeleton } from "../SkeletonLoader";
 
-const MyPostsPreview = ({ posts = [], loading = false }) => {
+const MyPostsPreview = ({ posts = [], loading = false, onViewAll, onDeleteSuccess }) => {
   return (
-    <div
-      style={{
-        background: "var(--bg-secondary)",
-        border: "1px solid var(--border-color)",
-        borderRadius: "var(--radius-lg)",
-        padding: "1.75rem",
-        marginBottom: "2rem",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
-        <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--text-primary)", fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <FileText size={18} color="#FF497C" /> My Published Stories
-        </h3>
+    <section style={{ marginBottom: "2.5rem" }}>
+      {/* Section Header */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "1.25rem",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <BookOpen size={18} color="var(--accent-primary, #ec4899)" />
+          <h2
+            style={{
+              fontSize: "1.25rem",
+              fontWeight: 800,
+              color: "var(--text-primary, #f8fafc)",
+              margin: 0,
+            }}
+          >
+            My Stories ({posts.length})
+          </h2>
+        </div>
 
-        <Link to="/create-post" className="btn-primary" style={{ padding: "0.4rem 0.85rem", fontSize: "0.75rem" }}>
-          <Plus size={13} /> Create Story
-        </Link>
+        {posts.length > 0 && (
+          <button
+            type="button"
+            onClick={onViewAll}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--accent-primary, #ec4899)",
+              fontSize: "0.88rem",
+              fontWeight: "600",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.25rem",
+            }}
+          >
+            <span>View all</span>
+            <ArrowRight size={14} />
+          </button>
+        )}
       </div>
 
       {loading ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-          <div className="skeleton" style={{ height: "40px" }} />
-          <div className="skeleton" style={{ height: "40px" }} />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: "1.5rem" }}>
+          <CardSkeleton />
         </div>
       ) : posts.length === 0 ? (
-        <div style={{ padding: "2rem", textAlign: "center", color: "var(--text-muted)", fontSize: "0.88rem" }}>
-          <p style={{ color: "var(--text-secondary)", fontWeight: 600, marginBottom: "0.5rem" }}>You haven't published any articles yet.</p>
-          <Link to="/create-post" className="btn-primary" style={{ padding: "0.45rem 1rem", fontSize: "0.8rem" }}>
-            Write Your First Article
+        <div
+          style={{
+            padding: "3rem 2rem",
+            textAlign: "center",
+            borderRadius: "var(--radius-lg, 16px)",
+            background: "rgba(30, 41, 59, 0.3)",
+            border: "1px dashed var(--border-color, rgba(255, 255, 255, 0.1))",
+          }}
+        >
+          <BookOpen size={36} color="var(--accent-primary, #ec4899)" style={{ marginBottom: "1rem" }} />
+          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary, #f8fafc)", margin: "0 0 0.4rem 0" }}>
+            No published stories yet
+          </h3>
+          <p style={{ fontSize: "0.88rem", color: "var(--text-secondary, #94a3b8)", margin: "0 0 1.5rem 0" }}>
+            Share your ideas, tutorials, and stories with the world.
+          </p>
+          <Link
+            to="/create-post"
+            className="btn-primary"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.65rem 1.25rem",
+              fontSize: "0.88rem",
+              borderRadius: "var(--radius-md, 8px)",
+              textDecoration: "none",
+            }}
+          >
+            <PenTool size={16} /> Write a Story
           </Link>
         </div>
       ) : (
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem", textAlign: "left" }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid var(--border-color)", color: "var(--text-muted)", fontSize: "0.75rem", textTransform: "uppercase" }}>
-                <th style={{ padding: "0.6rem 0.5rem" }}>Title</th>
-                <th style={{ padding: "0.6rem 0.5rem" }}>Views</th>
-                <th style={{ padding: "0.6rem 0.5rem" }}>Likes</th>
-                <th style={{ padding: "0.6rem 0.5rem" }}>Date</th>
-                <th style={{ padding: "0.6rem 0.5rem", textAlign: "right" }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {posts.map((post) => {
-                const formattedDate = post.createdAt ? new Date(post.createdAt).toLocaleDateString() : "";
-
-                return (
-                  <tr key={post._id} style={{ borderBottom: "1px solid var(--border-color)" }}>
-                    <td style={{ padding: "0.75rem 0.5rem", fontWeight: 700, color: "var(--text-primary)" }}>
-                      <Link to={`/post/${post.slug}`} style={{ color: "inherit" }}>
-                        {post.title}
-                      </Link>
-                    </td>
-                    <td style={{ padding: "0.75rem 0.5rem", color: "var(--text-secondary)" }}>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: "0.2rem" }}>
-                        <Eye size={12} /> {post.views || 0}
-                      </span>
-                    </td>
-                    <td style={{ padding: "0.75rem 0.5rem", color: "var(--text-secondary)" }}>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: "0.2rem" }}>
-                        <Heart size={12} color="#FF497C" /> {post.likesCount || 0}
-                      </span>
-                    </td>
-                    <td style={{ padding: "0.75rem 0.5rem", color: "var(--text-muted)", fontSize: "0.78rem" }}>
-                      {formattedDate}
-                    </td>
-                    <td style={{ padding: "0.75rem 0.5rem", textAlign: "right" }}>
-                      <Link
-                        to={`/edit-post/${post._id}`}
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "0.2rem",
-                          color: "#FF497C",
-                          fontSize: "0.78rem",
-                          fontWeight: 700,
-                        }}
-                      >
-                        <Edit3 size={13} /> Edit
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: "1.5rem" }}>
+          {posts.slice(0, 3).map((post) => (
+            <ArticleCard
+              key={post._id}
+              post={post}
+              isOwnPost={true}
+              onDeleteSuccess={onDeleteSuccess}
+            />
+          ))}
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

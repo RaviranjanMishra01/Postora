@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Bookmark } from "lucide-react";
 import OverlayPostCard from "./OverlayPostCard";
 import { useAuth } from "../context/AuthContext";
 import { interactionApi } from "../api/commentInteractionApi";
-import { toast } from "react-toastify";
+import { toast } from "../context/ToastContext";
 
 const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
   const { user } = useAuth();
@@ -110,14 +110,14 @@ const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: isBookmarked ? "#FF497C" : "#FFFFFF",
+                  color: isBookmarked ? "var(--carrino-pink)" : "#FFFFFF",
                   cursor: "pointer",
                   backdropFilter: "blur(4px)",
                   marginLeft: "auto",
                 }}
                 title="Save story"
               >
-                <Bookmark size={16} fill={isBookmarked ? "#FF497C" : "none"} />
+                <Bookmark size={16} fill={isBookmarked ? "var(--carrino-pink)" : "none"} />
               </button>
             </div>
 
@@ -135,8 +135,8 @@ const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
                     left: "16px",
                     top: "50%",
                     transform: "translateY(-50%)",
-                    background: "#FFFFFF",
-                    color: "#213448",
+                    background: "var(--bg-card)",
+                    color: "var(--text-primary)",
                     border: "none",
                     borderRadius: "50%",
                     width: "40px",
@@ -146,7 +146,7 @@ const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
                     justifyContent: "center",
                     cursor: "pointer",
                     zIndex: 4,
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    boxShadow: "var(--shadow-subtle)",
                   }}
                 >
                   <ChevronLeft size={20} />
@@ -163,8 +163,8 @@ const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
                     right: "16px",
                     top: "50%",
                     transform: "translateY(-50%)",
-                    background: "#FFFFFF",
-                    color: "#213448",
+                    background: "var(--bg-card)",
+                    color: "var(--text-primary)",
                     border: "none",
                     borderRadius: "50%",
                     width: "40px",
@@ -174,7 +174,7 @@ const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
                     justifyContent: "center",
                     cursor: "pointer",
                     zIndex: 4,
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    boxShadow: "var(--shadow-subtle)",
                   }}
                 >
                   <ChevronRight size={20} />

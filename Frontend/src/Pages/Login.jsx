@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LogIn, Mail, Lock, Sparkles } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
+import { toast } from "../context/ToastContext";
 
 import GoogleSignInButton from "../components/GoogleSignInButton";
 
@@ -25,7 +25,13 @@ const Login = () => {
     try {
       const res = await login({ email, password });
       toast.success(res.message || "Welcome back!");
-      navigate("/");
+      const loggedUser = res.user || res.data?.user;
+      const role = loggedUser?.role?.toLowerCase();
+      if (loggedUser && (role === "admin" || role === "superadmin")) {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       toast.error(err.message || "Invalid credentials");
     } finally {

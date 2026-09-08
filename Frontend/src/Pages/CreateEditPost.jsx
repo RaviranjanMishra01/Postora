@@ -4,7 +4,7 @@ import { PenTool, Globe, Save } from "lucide-react";
 import { postApi } from "../api/postApi";
 import { categoryApi, tagApi } from "../api/categoryTagApi";
 import RichTextEditor from "../components/RichTextEditor";
-import { toast } from "react-toastify";
+import { toast } from "../context/ToastContext";
 
 const CreateEditPost = () => {
   const { id } = useParams(); // If present, edit mode
