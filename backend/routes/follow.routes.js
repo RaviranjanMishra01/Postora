@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { toggleFollow, getAuthorFeed, getFollowersList, getFollowingList } = require("../controllers/followController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authmiddleware");
 
 router.post("/:authorId", protect, toggleFollow);
 router.get("/feed", protect, getAuthorFeed);

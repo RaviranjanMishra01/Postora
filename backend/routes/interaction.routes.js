@@ -7,7 +7,7 @@ const {
   getSavedPosts,
   getLikedPosts,
 } = require("../controllers/interactionController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authmiddleware");
 
 router.post("/like/:postId", protect, toggleLike);
 router.post("/bookmark/:postId", protect, toggleBookmark);

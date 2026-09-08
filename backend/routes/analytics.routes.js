@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { recordPageView, getAnalytics } = require("../controllers/analyticsController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authmiddleware");
 const { authorize } = require("../middleware/roleMiddleware");
 
 router.post("/view", recordPageView);

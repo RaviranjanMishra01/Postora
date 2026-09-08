@@ -7,7 +7,7 @@ const {
   deleteComment,
   likeComment,
 } = require("../controllers/commentController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authmiddleware");
 const { commentLimiter } = require("../middleware/rateLimiter");
 
 router.get("/post/:postId", getPostComments);

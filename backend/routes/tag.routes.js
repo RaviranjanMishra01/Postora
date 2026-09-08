@@ -7,7 +7,7 @@ const {
   createTag,
   deleteTag,
 } = require("../controllers/tagController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authmiddleware");
 const { authorize } = require("../middleware/roleMiddleware");
 
 router.get("/", getTags);

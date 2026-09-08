@@ -9,7 +9,7 @@ const {
   deleteAccount,
   getPublicAuthorProfile,
 } = require("../controllers/userController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authmiddleware");
 const upload = require("../middleware/uploadMiddleware");
 
 router.get("/profile", protect, getProfile);
