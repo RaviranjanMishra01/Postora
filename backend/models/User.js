@@ -31,9 +31,21 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: function () {
+        return this.authProvider === "local";
+      },
       minlength: [6, "Password must be at least 6 characters"],
       select: false,
+    },
+    googleId: {
+      type: String,
+      default: null,
+      sparse: true,
+    },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
     },
     avatar: {
       type: String,
@@ -48,6 +60,20 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["user", "author", "admin", "superadmin"],
       default: "user",
+    },
+    permissions: {
+      type: [String],
+      default: [
+        "MANAGE_USERS",
+        "MANAGE_POSTS",
+        "MANAGE_COMMENTS",
+        "MANAGE_REPORTS",
+        "MANAGE_CATEGORIES",
+        "MANAGE_TAGS",
+        "VIEW_ANALYTICS",
+        "MANAGE_SUPPORT",
+        "MANAGE_NEWSLETTER",
+      ],
     },
     status: {
       type: String,
@@ -90,13 +116,14 @@ const userSchema = new mongoose.Schema(
 
 // Hash password before saving
 userSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
+  if (!this.password || !this.isModified("password")) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Compare password
 userSchema.methods.comparePassword = async function (enteredPassword) {
+  if (!this.password) return false;
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
