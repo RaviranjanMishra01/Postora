@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LogIn, Mail, Lock, Sparkles } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "../context/ToastContext";
-
+import AuthSplitLayout from "../components/auth/AuthSplitLayout";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
@@ -17,13 +18,13 @@ const Login = () => {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      toast.error("Please enter email and password");
+      toast.error("Please enter your email and password");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await login({ email, password });
+      const res = await login({ email: email.trim(), password });
       toast.success(res.message || "Welcome back!");
       const loggedUser = res.user || res.data?.user;
       const role = loggedUser?.role?.toLowerCase();
@@ -40,78 +41,165 @@ const Login = () => {
   };
 
   return (
-    <div className="container" style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "2rem" }}>
-      <div className="glass-card" style={{ width: "100%", maxWidth: "420px", padding: "2.5rem", background: "var(--bg-card)" }}>
-        <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
-          <div style={{ width: "48px", height: "48px", borderRadius: "12px", background: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem auto" }}>
-            <Sparkles size={24} color="var(--text-inverse)" />
+    <AuthSplitLayout
+      title="Welcome back"
+      subtitle="Sign in to continue to your Carrino account."
+    >
+      <form onSubmit={handleLoginSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        {/* Email Field */}
+        <div>
+          <label
+            style={{
+              display: "block",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              color: "var(--text-secondary)",
+              marginBottom: "0.4rem",
+            }}
+          >
+            Email Address
+          </label>
+          <div className="auth-input-focus" style={{ position: "relative", borderRadius: "10px", border: "1px solid var(--border-color)", transition: "all 0.2s" }}>
+            <Mail
+              size={18}
+              style={{
+                position: "absolute",
+                left: "14px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "var(--text-muted)",
+              }}
+            />
+            <input
+              type="email"
+              placeholder="user@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={{
+                width: "100%",
+                padding: "0.85rem 1rem 0.85rem 2.6rem",
+                borderRadius: "10px",
+                background: "var(--bg-secondary)",
+                border: "none",
+                color: "var(--text-primary)",
+                fontSize: "0.92rem",
+                outline: "none",
+              }}
+            />
           </div>
-          <h2 style={{ fontSize: "1.75rem", color: "var(--text-primary)" }}>Welcome Back</h2>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", marginTop: "0.25rem" }}>Log in to manage your posts and settings</p>
         </div>
 
-        {/* Continue with Google Button */}
-        <div style={{ marginBottom: "1.25rem" }}>
-          <GoogleSignInButton text="Continue with Google" />
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", margin: "1.25rem 0", gap: "0.75rem" }}>
-          <div style={{ flex: 1, height: "1px", backgroundColor: "var(--border-color, #334155)" }}></div>
-          <span style={{ fontSize: "0.78rem", color: "var(--text-muted, #94a3b8)", textTransform: "uppercase" }}>OR</span>
-          <div style={{ flex: 1, height: "1px", backgroundColor: "var(--border-color, #334155)" }}></div>
-        </div>
-
-        <form onSubmit={handleLoginSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-          <div>
-            <label style={{ display: "block", fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.35rem" }}>Email Address</label>
-            <div style={{ position: "relative" }}>
-              <Mail size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-              <input
-                type="email"
-                placeholder="user@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.4rem", borderRadius: "var(--radius-md)", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", color: "var(--text-primary)", outline: "none" }}
-              />
-            </div>
+        {/* Password Field */}
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
+            <label
+              style={{
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                color: "var(--text-secondary)",
+              }}
+            >
+              Password
+            </label>
+            <Link
+              to="/forgot-password"
+              style={{
+                fontSize: "0.82rem",
+                color: "var(--carrino-pink, #FF3F7F)",
+                textDecoration: "none",
+                fontWeight: 600,
+              }}
+            >
+              Forgot Password?
+            </Link>
           </div>
-
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.35rem" }}>
-              <label style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>Password</label>
-              <Link to="/forgot-password" style={{ fontSize: "0.78rem", color: "var(--accent-secondary)" }}>Forgot?</Link>
-            </div>
-            <div style={{ position: "relative" }}>
-              <Lock size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.4rem", borderRadius: "var(--radius-md)", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", color: "var(--text-primary)", outline: "none" }}
-              />
-            </div>
+          <div className="auth-input-focus" style={{ position: "relative", borderRadius: "10px", border: "1px solid var(--border-color)", transition: "all 0.2s" }}>
+            <Lock
+              size={18}
+              style={{
+                position: "absolute",
+                left: "14px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "var(--text-muted)",
+              }}
+            />
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={{
+                width: "100%",
+                padding: "0.85rem 2.6rem 0.85rem 2.6rem",
+                borderRadius: "10px",
+                background: "var(--bg-secondary)",
+                border: "none",
+                color: "var(--text-primary)",
+                fontSize: "0.92rem",
+                outline: "none",
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              style={{
+                position: "absolute",
+                right: "14px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                color: "var(--text-muted)",
+                cursor: "pointer",
+                padding: 0,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
-
-          <button type="submit" className="btn-primary" disabled={loading} style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
-            <LogIn size={18} /> {loading ? "Signing in..." : "Log In"}
-          </button>
-        </form>
-
-        <p style={{ textAlign: "center", marginTop: "1.75rem", fontSize: "0.88rem", color: "var(--text-secondary)" }}>
-          Don't have an account? <Link to="/register" style={{ color: "var(--accent-secondary)", fontWeight: 600 }}>Sign up</Link>
-        </p>
-
-        {/* Demo Credentials Hint */}
-        <div style={{ marginTop: "1.5rem", padding: "0.85rem", borderRadius: "var(--radius-sm)", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", fontSize: "0.78rem", color: "var(--text-muted)" }}>
-          <p style={{ fontWeight: 600, color: "var(--text-secondary)", marginBottom: "0.25rem" }}>Demo Accounts:</p>
-          <p>• SuperAdmin: <code>superadmin@blog.com</code> / <code>Password123!</code></p>
-          <p>• Author: <code>author@blog.com</code> / <code>Password123!</code></p>
         </div>
+
+        {/* Primary CTA Submit Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-primary"
+          style={{
+            width: "100%",
+            padding: "0.85rem",
+            fontSize: "0.95rem",
+            fontWeight: 700,
+            borderRadius: "10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.5rem",
+            marginTop: "0.5rem",
+            cursor: loading ? "not-allowed" : "pointer",
+          }}
+        >
+          <LogIn size={18} /> {loading ? "Signing in..." : "Sign In"}
+        </button>
+      </form>
+
+      {/* Divider */}
+      <div style={{ display: "flex", alignItems: "center", margin: "1.5rem 0", gap: "0.75rem" }}>
+        <div style={{ flex: 1, height: "1px", backgroundColor: "var(--border-color)" }} />
+        <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, letterSpacing: "0.5px" }}>
+          OR CONTINUE WITH
+        </span>
+        <div style={{ flex: 1, height: "1px", backgroundColor: "var(--border-color)" }} />
       </div>
-    </div>
+
+      {/* Google SSO Button */}
+      <GoogleSignInButton text="Continue with Google" />
+    </AuthSplitLayout>
   );
 };
 

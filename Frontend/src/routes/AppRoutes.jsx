@@ -18,6 +18,7 @@ import SearchPage from "../pages/SearchPage";
 import AdminDashboard from "../pages/AdminDashboard";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import ForgotPassword from "../pages/ForgotPassword";
 import AdminLogin from "../pages/AdminLogin";
 import SuperAdminLogin from "../pages/SuperAdminLogin";
 import AdminForgotPassword from "../pages/AdminForgotPassword";
@@ -60,6 +61,29 @@ const SuperAdminRoute = ({ children }) => {
   return role === "superadmin" ? children : <Navigate to="/super-admin/login" replace />;
 };
 
+// Guest Only Route Guard (Prevents logged in users from seeing login forms again)
+const GuestOnlyRoute = ({ children, portalType = "user" }) => {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+
+  if (user) {
+    const role = user.role?.toLowerCase();
+    if (role === "superadmin") {
+      return <Navigate to="/super-admin/dashboard" replace />;
+    }
+    if (role === "admin") {
+      return <Navigate to="/admin/dashboard" replace />;
+    }
+    // Normal USER or AUTHOR
+    if (portalType === "admin" || portalType === "superadmin") {
+      return <Navigate to="/" replace />;
+    }
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+};
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -73,14 +97,15 @@ const AppRoutes = () => {
       <Route path="/search" element={<SearchPage />} />
 
       {/* User Auth Routes */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<GuestOnlyRoute portalType="user"><Login /></GuestOnlyRoute>} />
+      <Route path="/register" element={<GuestOnlyRoute portalType="user"><Register /></GuestOnlyRoute>} />
+      <Route path="/forgot-password" element={<GuestOnlyRoute portalType="user"><ForgotPassword /></GuestOnlyRoute>} />
 
       {/* Dedicated Admin & Super Admin Auth Routes */}
-      <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
-      <Route path="/super-admin/login" element={<SuperAdminLogin />} />
-      <Route path="/super-admin/forgot-password" element={<SuperAdminForgotPassword />} />
+      <Route path="/admin/login" element={<GuestOnlyRoute portalType="admin"><AdminLogin /></GuestOnlyRoute>} />
+      <Route path="/admin/forgot-password" element={<GuestOnlyRoute portalType="admin"><AdminForgotPassword /></GuestOnlyRoute>} />
+      <Route path="/super-admin/login" element={<GuestOnlyRoute portalType="superadmin"><SuperAdminLogin /></GuestOnlyRoute>} />
+      <Route path="/super-admin/forgot-password" element={<GuestOnlyRoute portalType="superadmin"><SuperAdminForgotPassword /></GuestOnlyRoute>} />
 
       {/* Static Pages */}
       <Route path="/about" element={<AboutPage />} />

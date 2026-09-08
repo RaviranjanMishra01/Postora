@@ -29,19 +29,19 @@ const AdminForgotPassword = () => {
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#0A101D", padding: "1.5rem" }}>
-      <div className="glass-card" style={{ width: "100%", maxWidth: "420px", padding: "2.5rem", background: "#121D2F", border: "1px solid #23344E", borderRadius: "16px" }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "var(--bg-primary)", padding: "1.5rem" }}>
+      <div className="glass-card" style={{ width: "100%", maxWidth: "420px", padding: "2.5rem", background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-xl, 16px)" }}>
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <div style={{ width: "52px", height: "52px", borderRadius: "14px", background: "linear-gradient(135deg, #2563eb, #1d4ed8)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem auto" }}>
-            <ShieldCheck size={26} color="#ffffff" />
+          <div style={{ width: "52px", height: "52px", borderRadius: "14px", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem auto" }}>
+            <ShieldCheck size={26} color="var(--carrino-pink, #547792)" />
           </div>
-          <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#f8fafc" }}>Admin Password Reset</h2>
-          <p style={{ color: "#94a3b8", fontSize: "0.85rem", marginTop: "0.4rem" }}>Enter your registered administrator email address</p>
+          <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--text-primary)" }}>Admin Password Reset</h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.4rem" }}>Enter your registered administrator email address</p>
         </div>
 
         {sent ? (
           <div style={{ textAlign: "center" }}>
-            <p style={{ color: "#38bdf8", fontSize: "0.9rem", lineHeight: 1.5, marginBottom: "1.5rem" }}>
+            <p style={{ color: "var(--carrino-pink, #547792)", fontSize: "0.9rem", lineHeight: 1.5, marginBottom: "1.5rem" }}>
               If an administrative account matches <strong>{email}</strong>, a single-use password recovery link has been dispatched to your inbox.
             </p>
             <Link to="/admin/login" className="btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }}>
@@ -51,16 +51,16 @@ const AdminForgotPassword = () => {
         ) : (
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             <div>
-              <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#cbd5e1", marginBottom: "0.4rem" }}>Admin Email Address</label>
+              <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: "0.4rem" }}>Admin Email Address</label>
               <div style={{ position: "relative" }}>
-                <Mail size={18} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
+                <Mail size={18} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
                 <input
                   type="email"
                   placeholder="admin@carrino.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  style={{ width: "100%", padding: "0.8rem 1rem 0.8rem 2.6rem", borderRadius: "10px", background: "#0B1321", border: "1px solid #1E2D45", color: "#f8fafc", fontSize: "0.9rem", outline: "none" }}
+                  style={{ width: "100%", padding: "0.8rem 1rem 0.8rem 2.6rem", borderRadius: "10px", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", color: "var(--text-primary)", fontSize: "0.9rem", outline: "none" }}
                 />
               </div>
             </div>
@@ -68,13 +68,14 @@ const AdminForgotPassword = () => {
             <button
               type="submit"
               disabled={loading}
-              style={{ width: "100%", padding: "0.85rem", borderRadius: "10px", background: "linear-gradient(135deg, #2563eb, #1d4ed8)", color: "#ffffff", fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: loading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}
+              className="btn-primary"
+              style={{ width: "100%", padding: "0.85rem", justifyContent: "center", fontSize: "0.95rem" }}
             >
               <Send size={18} /> {loading ? "Dispatching..." : "Send Reset Link"}
             </button>
 
             <div style={{ textAlign: "center", marginTop: "1rem" }}>
-              <Link to="/admin/login" style={{ color: "#60a5fa", fontSize: "0.85rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
+              <Link to="/admin/login" style={{ color: "var(--carrino-pink, #547792)", fontSize: "0.85rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.4rem", fontWeight: 600 }}>
                 <ArrowLeft size={16} /> Back to Admin Sign In
               </Link>
             </div>

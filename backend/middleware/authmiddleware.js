@@ -39,8 +39,41 @@ const protect = asyncHandler(async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    if (error instanceof ApiError) throw error;
     throw new ApiError(401, "Invalid or expired authorization token");
   }
 });
 
-module.exports = { protect };
+// Role-based authorization middleware
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      throw new ApiError(401, "Authentication required");
+    }
+    if (!roles.includes(req.user.role)) {
+      throw new ApiError(403, `Access denied for role '${req.user.role}'`);
+    }
+    next();
+  };
+};
+
+// Permission-based authorization middleware
+const checkPermission = (permission) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      throw new ApiError(401, "Authentication required");
+    }
+    if (req.user.role === "superadmin") {
+      return next();
+    }
+    if (req.user.role === "admin") {
+      const allowed = req.user.permissions || [];
+      if (allowed.includes(permission)) {
+        return next();
+      }
+    }
+    throw new ApiError(403, `Permission '${permission}' is required to perform this operation`);
+  };
+};
+
+module.exports = { protect, authorize, checkPermission };

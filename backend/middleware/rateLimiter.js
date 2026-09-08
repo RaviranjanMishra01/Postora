@@ -31,4 +31,15 @@ const commentLimiter = rateLimit({
   },
 });
 
-module.exports = { apiLimiter, authLimiter, commentLimiter };
+const adminAuthLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Strict limit: 5 attempts per 15 minutes
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many privileged authentication attempts, please try again after 15 minutes",
+  },
+});
+
+module.exports = { apiLimiter, authLimiter, adminAuthLimiter, commentLimiter };

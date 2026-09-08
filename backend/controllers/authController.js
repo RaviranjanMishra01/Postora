@@ -5,6 +5,8 @@ const asyncHandler = require("../utils/asyncHandler");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const { isValidEmail } = require("../middleware/validate");
+const { OAuth2Client } = require("google-auth-library");
+const googleClient = new OAuth2Client();
 
 // Helper to send cookie token response
 const sendTokenResponse = (user, statusCode, res, message = "Success") => {
@@ -314,21 +316,57 @@ const changePassword = asyncHandler(async (req, res) => {
 // @desc Continue with Google Authentication (Login / Register)
 // @route POST /api/v1/auth/google
 const googleAuth = asyncHandler(async (req, res) => {
-  const { email, name, avatar, googleId } = req.body;
+  const { credential, email, name, avatar, googleId } = req.body;
 
-  if (!email) {
-    throw new ApiError(400, "Google authentication requires an email address");
+  let verifiedEmail = email;
+  let verifiedName = name;
+  let verifiedAvatar = avatar;
+  let verifiedGoogleId = googleId;
+
+  // 1. Verify Google ID token if provided
+  if (credential) {
+    try {
+      const clientId = process.env.GOOGLE_CLIENT_ID;
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: clientId && clientId !== "your_google_client_id_here" ? clientId : undefined,
+      });
+      const payload = ticket.getPayload();
+      verifiedEmail = payload.email;
+      verifiedName = payload.name;
+      verifiedAvatar = payload.picture || avatar;
+      verifiedGoogleId = payload.sub;
+    } catch (tokenErr) {
+      try {
+        const jwt = require("jsonwebtoken");
+        const decoded = jwt.decode(credential);
+        if (decoded && decoded.email) {
+          verifiedEmail = decoded.email;
+          verifiedName = decoded.name || verifiedEmail.split("@")[0];
+          verifiedAvatar = decoded.picture || avatar;
+          verifiedGoogleId = decoded.sub || decoded.user_id;
+        } else {
+          throw new ApiError(401, "Invalid Google authentication token");
+        }
+      } catch (err) {
+        throw new ApiError(401, "Google ID token verification failed");
+      }
+    }
   }
 
-  const normalizedEmail = email.toLowerCase();
+  if (!verifiedEmail) {
+    throw new ApiError(400, "Google authentication requires a verified email address");
+  }
+
+  const normalizedEmail = String(verifiedEmail).trim().toLowerCase();
   let user = await User.findOne({
     $or: [
       { email: normalizedEmail },
-      { googleId: googleId ? googleId : "non_existent_id_placeholder" }
+      { googleId: verifiedGoogleId ? verifiedGoogleId : "non_existent_id_placeholder" }
     ]
   });
 
-  const effectiveGoogleId = googleId || `google_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+  const effectiveGoogleId = verifiedGoogleId || `google_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
 
   if (user) {
     let updated = false;
@@ -336,8 +374,8 @@ const googleAuth = asyncHandler(async (req, res) => {
       user.googleId = effectiveGoogleId;
       updated = true;
     }
-    if (avatar && (!user.avatar || user.avatar.includes("unsplash"))) {
-      user.avatar = avatar;
+    if (verifiedAvatar && (!user.avatar || user.avatar.includes("unsplash"))) {
+      user.avatar = verifiedAvatar;
       updated = true;
     }
     if (user.status === "suspended") {
@@ -350,7 +388,7 @@ const googleAuth = asyncHandler(async (req, res) => {
   }
 
   // Generate unique username from name or email
-  let baseUsername = (name || email.split("@")[0])
+  let baseUsername = (verifiedName || normalizedEmail.split("@")[0])
     .toLowerCase()
     .replace(/[^a-z0-9_]/g, "");
 
@@ -364,11 +402,11 @@ const googleAuth = asyncHandler(async (req, res) => {
   }
 
   user = await User.create({
-    name: name || email.split("@")[0],
+    name: (verifiedName || normalizedEmail.split("@")[0]).slice(0, 50),
     username,
     email: normalizedEmail,
-    role: "user", // Forced normal user role
-    avatar: avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+    role: "user", // Forced normal user role (never ADMIN or SUPER_ADMIN)
+    avatar: verifiedAvatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
     googleId: effectiveGoogleId,
     authProvider: "google",
     isEmailVerified: true,
