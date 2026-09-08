@@ -3,26 +3,26 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 // Pages
-import Home from "../pages/Home";
-import PostDetail from "../pages/PostDetail";
-import CreateEditPost from "../pages/CreateEditPost";
-import CategoryDetail from "../pages/CategoryDetail";
-import CategoriesPage from "../pages/CategoriesPage";
-import TagDetail from "../pages/TagDetail";
-import AuthorProfile from "../pages/AuthorProfile";
-import UserProfile from "../pages/UserProfile";
-import Dashboard from "../pages/Dashbord";
-import BookmarksPage from "../pages/BookmarksPage";
-import AuthorFeedPage from "../pages/AuthorFeedPage";
-import SearchPage from "../pages/SearchPage";
-import AdminDashboard from "../pages/AdminDashboard";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
-import ForgotPassword from "../pages/ForgotPassword";
-import AdminLogin from "../pages/AdminLogin";
-import SuperAdminLogin from "../pages/SuperAdminLogin";
-import AdminForgotPassword from "../pages/AdminForgotPassword";
-import SuperAdminForgotPassword from "../pages/SuperAdminForgotPassword";
+import Home from "../Pages/Home";
+import PostDetail from "../Pages/PostDetail";
+import CreateEditPost from "../Pages/CreateEditPost";
+import CategoryDetail from "../Pages/CategoryDetail";
+import CategoriesPage from "../Pages/CategoriesPage";
+import TagDetail from "../Pages/TagDetail";
+import AuthorProfile from "../Pages/AuthorProfile";
+import UserProfile from "../Pages/UserProfile";
+import Dashboard from "../Pages/Dashbord";
+import BookmarksPage from "../Pages/BookmarksPage";
+import AuthorFeedPage from "../Pages/AuthorFeedPage";
+import SearchPage from "../Pages/SearchPage";
+import AdminDashboard from "../Pages/AdminDashboard";
+import Login from "../Pages/Login";
+import Register from "../Pages/Register";
+import ForgotPassword from "../Pages/ForgotPassword";
+import AdminLogin from "../Pages/AdminLogin";
+import SuperAdminLogin from "../Pages/SuperAdminLogin";
+import AdminForgotPassword from "../Pages/AdminForgotPassword";
+import SuperAdminForgotPassword from "../Pages/SuperAdminForgotPassword";
 import {
   AboutPage,
   ContactPage,
@@ -30,7 +30,7 @@ import {
   TermsPage,
   CookiePage,
   DisclaimerPage,
-} from "../pages/StaticPages";
+} from "../Pages/StaticPages";
 
 // Route Guards
 const ProtectedRoute = ({ children }) => {
