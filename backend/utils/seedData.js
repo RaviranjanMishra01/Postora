@@ -14,14 +14,12 @@ const seedInitialData = async () => {
 
     console.log("Seeding initial demo data into database...");
 
-    const hashedPassword = await bcrypt.hash("Password123!", 10);
-
     // Create Demo Users
     const superAdmin = await User.create({
       name: "Alex Vance (SuperAdmin)",
       username: "superadmin",
       email: "superadmin@blog.com",
-      password: hashedPassword,
+      password: "Password123!",
       role: "superadmin",
       status: "active",
       bio: "Platform Architect & Chief Editor.",
@@ -33,7 +31,7 @@ const seedInitialData = async () => {
       name: "Sarah Jenkins",
       username: "sarahadmin",
       email: "admin@blog.com",
-      password: hashedPassword,
+      password: "Password123!",
       role: "admin",
       status: "active",
       bio: "Managing Editor and Content Strategist.",
@@ -45,7 +43,7 @@ const seedInitialData = async () => {
       name: "Ravi Mishra",
       username: "ravimishra",
       email: "author@blog.com",
-      password: hashedPassword,
+      password: "Password123!",
       role: "author",
       status: "active",
       bio: "Full-Stack Developer writing about modern web tech, AI, and MERN architecture.",
@@ -62,7 +60,7 @@ const seedInitialData = async () => {
       name: "Jane Doe",
       username: "janedoe",
       email: "user@blog.com",
-      password: hashedPassword,
+      password: "Password123!",
       role: "user",
       status: "active",
       bio: "Passionate reader & tech enthusiast.",
