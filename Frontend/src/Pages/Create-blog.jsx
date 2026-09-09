@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-const API = import.meta.env.VITE_API;
+
 function CreateBlog() {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
