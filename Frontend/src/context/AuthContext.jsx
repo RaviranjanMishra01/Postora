@@ -7,13 +7,27 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const handleAuthResponse = (res) => {
+    const token = res.data?.token || res.token;
+    const user = res.data?.user || res.user;
+    if (token) {
+      localStorage.setItem("token", token);
+    }
+    if (user) {
+      setUser(user);
+    }
+    return res;
+  };
+
   const fetchCurrentUser = async () => {
     try {
       const res = await authApi.getMe();
-      if (res.data && res.data.user) {
-        setUser(res.data.user);
+      const user = res.data?.user || res.user;
+      if (user) {
+        setUser(user);
       }
     } catch (err) {
+      localStorage.removeItem("token");
       setUser(null);
     } finally {
       setLoading(false);
@@ -26,42 +40,27 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     const res = await authApi.login(credentials);
-    if (res.data && res.data.user) {
-      setUser(res.data.user);
-    }
-    return res;
+    return handleAuthResponse(res);
   };
 
   const adminLogin = async (credentials) => {
     const res = await authApi.adminLogin(credentials);
-    if (res.data && res.data.user) {
-      setUser(res.data.user);
-    }
-    return res;
+    return handleAuthResponse(res);
   };
 
   const superAdminLogin = async (credentials) => {
     const res = await authApi.superAdminLogin(credentials);
-    if (res.data && res.data.user) {
-      setUser(res.data.user);
-    }
-    return res;
+    return handleAuthResponse(res);
   };
 
   const register = async (userData) => {
     const res = await authApi.register(userData);
-    if (res.data && res.data.user) {
-      setUser(res.data.user);
-    }
-    return res;
+    return handleAuthResponse(res);
   };
 
   const googleLogin = async (googleData) => {
     const res = await authApi.googleAuth(googleData);
-    if (res.data && res.data.user) {
-      setUser(res.data.user);
-    }
-    return res;
+    return handleAuthResponse(res);
   };
 
   const logout = async () => {
@@ -70,6 +69,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error(err);
     } finally {
+      localStorage.removeItem("token");
       setUser(null);
     }
   };

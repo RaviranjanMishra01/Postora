@@ -1,16 +1,54 @@
-# React + Vite
+# 🎨 Postora Frontend (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern, responsive editorial SPA for the Postora MERN Blog platform built with React 19, Vite, and Lucide React.
 
-Currently, two official plugins are available:
+## 🌟 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Carrino Editorial Theme**: Sleek UI design system with dark/light themes and custom CSS variables.
+- **Dynamic Views**:
+  - Home feed with featured posts, latest stories, category blocks.
+  - Interactive Post Details with read time, views, likes, bookmarking, and nested comments.
+  - Author profiles, follower/following sections, and inline profile settings.
+  - Category and Tag discovery pages with search filtering.
+  - Admin & SuperAdmin dashboard views for full site control.
+- **Authentication Integration**: Login, Register, Password Reset, and Google One-Tap / OAuth sign-in.
+- **Toast Notifications**: Smooth notification feedback via custom Toast Context.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📁 Directory Structure
 
-## Expanding the ESLint configuration
+```text
+Frontend/
+├── src/
+│   ├── api/          # Axios instance and API call modules
+│   ├── assets/       # Static icons and assets
+│   ├── components/   # Post Cards, Hero sections, Admin widgets, Comment section
+│   ├── context/      # AuthContext, ToastContext
+│   ├── Pages/        # Main pages (Home, PostDetail, Profile, Admin Dashboard, etc.)
+│   ├── routes/       # React Router setup (`AppRoutes.jsx`)
+│   └── App.jsx       # Main App component
+├── .env.example      # Example environment variables
+├── package.json
+└── vite.config.js
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## ⚙️ Environment Variables (`.env`)
+
+See `.env.example` for reference:
+
+```env
+VITE_API_URL=https://your-backend.onrender.com/api/v1
+VITE_API=https://your-backend.onrender.com/api/v1
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+```
+
+---
+
+## ⚡ Scripts
+
+- `npm run dev` - Start local development server with Vite
+- `npm run build` - Build production bundle to `dist/`
+- `npm run preview` - Preview production build locally
