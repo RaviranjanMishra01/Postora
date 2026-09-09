@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { interactionApi } from "../api/commentInteractionApi";
 import { toast } from "../context/ToastContext";
 
-const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
+const PostoraHero = ({ featuredPosts = [], rightPosts = [] }) => {
   const { user } = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -54,7 +54,7 @@ const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
   return (
     <section style={{ paddingTop: "1.5rem", paddingBottom: "2.5rem" }}>
       <div
-        className="carrino-hero-grid"
+        className="Postora-hero-grid"
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 420px",
@@ -64,7 +64,7 @@ const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
       >
         {/* LEFT COLUMN: Main Hero Slider Card */}
         <div
-          className="carrino-card"
+          className="Postora-card"
           style={{
             height: "410px",
             position: "relative",
@@ -75,10 +75,10 @@ const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
               <img
                 src={currentPost.featuredImage}
                 alt={currentPost.title}
-                className="carrino-card-img"
+                className="Postora-card-img"
               />
             )}
-            <div className="carrino-gradient-overlay" />
+            <div className="Postora-gradient-overlay" />
 
             {/* Top Category Badge & Save Button */}
             <div
@@ -94,7 +94,7 @@ const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
               }}
             >
               {currentPost.category && (
-                <span className="carrino-badge-pill" style={{ margin: 0 }}>
+                <span className="Postora-badge-pill" style={{ margin: 0 }}>
                   {currentPost.category.name}
                 </span>
               )}
@@ -110,14 +110,14 @@ const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: isBookmarked ? "var(--carrino-pink)" : "#FFFFFF",
+                  color: isBookmarked ? "var(--Postora-pink)" : "#FFFFFF",
                   cursor: "pointer",
                   backdropFilter: "blur(4px)",
                   marginLeft: "auto",
                 }}
                 title="Save story"
               >
-                <Bookmark size={16} fill={isBookmarked ? "var(--carrino-pink)" : "none"} />
+                <Bookmark size={16} fill={isBookmarked ? "var(--Postora-pink)" : "none"} />
               </button>
             </div>
 
@@ -183,7 +183,7 @@ const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
             )}
 
             {/* Bottom Content Overlay */}
-            <div className="carrino-card-content" style={{ padding: "2rem 2rem 1.5rem 2rem" }}>
+            <div className="Postora-card-content" style={{ padding: "2rem 2rem 1.5rem 2rem" }}>
               <h1
                 style={{
                   fontSize: "clamp(1.5rem, 2.5vw, 2.1rem)",
@@ -271,4 +271,4 @@ const CarrinoHero = ({ featuredPosts = [], rightPosts = [] }) => {
   );
 };
 
-export default CarrinoHero;
+export default PostoraHero;

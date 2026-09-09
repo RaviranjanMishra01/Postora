@@ -39,7 +39,7 @@ const AdminSystemHealth = () => {
       >
         <div>
           <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary)", margin: 0, fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Activity color="var(--carrino-pink)" size={20} /> System Health & Infrastructure Matrix
+            <Activity color="var(--Postora-pink)" size={20} /> System Health & Infrastructure Matrix
           </h3>
           <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", margin: "0.2rem 0 0 0" }}>
             Real-time status monitor for core application services and database connections (Last checked: {lastCheck})

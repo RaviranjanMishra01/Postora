@@ -40,7 +40,7 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
         }
 
         .auth-input-focus:focus-within {
-          border-color: var(--carrino-pink, #FF3F7F) !important;
+          border-color: var(--Postora-pink, #FF3F7F) !important;
           box-shadow: 0 0 0 3px rgba(255, 63, 127, 0.15) !important;
         }
       `}</style>
@@ -104,7 +104,7 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
                   width: "40px",
                   height: "40px",
                   borderRadius: "12px",
-                  background: "var(--carrino-pink, #FF3F7F)",
+                  background: "var(--Postora-pink, #FF3F7F)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -122,7 +122,7 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
                   letterSpacing: "-0.5px",
                 }}
               >
-                Carrino
+                Postora
               </span>
             </Link>
           </div>
@@ -143,7 +143,7 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
                   borderRadius: "var(--radius-full, 9999px)",
                   background: "rgba(255, 63, 127, 0.1)",
                   border: "1px solid rgba(255, 63, 127, 0.25)",
-                  color: "var(--carrino-pink, #FF3F7F)",
+                  color: "var(--Postora-pink, #FF3F7F)",
                   fontSize: "0.8rem",
                   fontWeight: 600,
                   marginBottom: "1.25rem",
@@ -192,7 +192,7 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
                   boxShadow: "var(--shadow-subtle)",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: "var(--carrino-pink, #FF3F7F)", marginBottom: "0.4rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: "var(--Postora-pink, #FF3F7F)", marginBottom: "0.4rem" }}>
                   <Users size={18} />
                   <span style={{ fontWeight: 700, fontSize: "1.1rem" }}>10,000+</span>
                 </div>
@@ -244,7 +244,7 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
               "Share ideas. Build your audience. Create something worth reading."
             </p>
             <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)" }}>
-              Carrino — a modern publishing platform for creators and developers.
+              Postora — a modern publishing platform for creators and developers.
             </p>
           </div>
         </div>
@@ -270,7 +270,7 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
                   <Link
                     to="/login"
                     style={{
-                      color: "var(--carrino-pink, #FF3F7F)",
+                      color: "var(--Postora-pink, #FF3F7F)",
                       fontWeight: 700,
                       textDecoration: "none",
                       marginLeft: "0.3rem",
@@ -285,7 +285,7 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
                   <Link
                     to="/login"
                     style={{
-                      color: "var(--carrino-pink, #FF3F7F)",
+                      color: "var(--Postora-pink, #FF3F7F)",
                       fontWeight: 700,
                       textDecoration: "none",
                       marginLeft: "0.3rem",
@@ -300,7 +300,7 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
                   <Link
                     to="/register"
                     style={{
-                      color: "var(--carrino-pink, #FF3F7F)",
+                      color: "var(--Postora-pink, #FF3F7F)",
                       fontWeight: 700,
                       textDecoration: "none",
                       marginLeft: "0.3rem",

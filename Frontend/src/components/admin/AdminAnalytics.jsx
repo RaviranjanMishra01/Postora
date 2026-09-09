@@ -24,7 +24,7 @@ const AdminAnalytics = ({ stats, posts = [] }) => {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.92rem", fontWeight: 800, color: "var(--text-primary)", fontFamily: "var(--font-heading)" }}>
-          <Calendar size={18} color="var(--carrino-pink)" /> Analytics Time Window
+          <Calendar size={18} color="var(--Postora-pink)" /> Analytics Time Window
         </div>
 
         <div style={{ display: "flex", gap: "0.4rem" }}>
@@ -45,7 +45,7 @@ const AdminAnalytics = ({ stats, posts = [] }) => {
                 fontWeight: 700,
                 border: "none",
                 cursor: "pointer",
-                background: timeRange === range.id ? "var(--carrino-pink)" : "var(--bg-secondary)",
+                background: timeRange === range.id ? "var(--Postora-pink)" : "var(--bg-secondary)",
                 color: timeRange === range.id ? "#FFFFFF" : "var(--text-secondary)",
                 transition: "all 150ms ease",
               }}
@@ -74,10 +74,10 @@ const AdminAnalytics = ({ stats, posts = [] }) => {
           <div style={{ fontSize: "0.76rem", fontWeight: 800, color: "var(--text-secondary)", textTransform: "uppercase", marginBottom: "0.4rem" }}>
             Total Story Likes
           </div>
-          <div style={{ fontSize: "1.8rem", fontWeight: 900, color: "var(--carrino-pink)", fontFamily: "var(--font-heading)" }}>
+          <div style={{ fontSize: "1.8rem", fontWeight: 900, color: "var(--Postora-pink)", fontFamily: "var(--font-heading)" }}>
             {(stats.totalLikes || 0).toLocaleString()}
           </div>
-          <div style={{ fontSize: "0.74rem", color: "var(--carrino-pink)", fontWeight: 700, marginTop: "0.3rem" }}>
+          <div style={{ fontSize: "0.74rem", color: "var(--Postora-pink)", fontWeight: 700, marginTop: "0.3rem" }}>
             +8.4% ({timeRange})
           </div>
         </div>
@@ -135,7 +135,7 @@ const AdminAnalytics = ({ stats, posts = [] }) => {
         {/* Most Liked Posts */}
         <div className="glass-card-admin" style={{ padding: "1.5rem" }}>
           <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 1.25rem 0", fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Heart color="var(--carrino-pink)" size={18} /> Most Liked Publications
+            <Heart color="var(--Postora-pink)" size={18} /> Most Liked Publications
           </h3>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
@@ -147,8 +147,8 @@ const AdminAnalytics = ({ stats, posts = [] }) => {
                   </div>
                   <div style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>by {p.author?.name || "Author"}</div>
                 </div>
-                <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "var(--carrino-pink)", display: "flex", alignItems: "center", gap: "0.25rem", flexShrink: 0 }}>
-                  <Heart size={13} fill="var(--carrino-pink)" /> {(p.likesCount || 0).toLocaleString()}
+                <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "var(--Postora-pink)", display: "flex", alignItems: "center", gap: "0.25rem", flexShrink: 0 }}>
+                  <Heart size={13} fill="var(--Postora-pink)" /> {(p.likesCount || 0).toLocaleString()}
                 </div>
               </div>
             ))}

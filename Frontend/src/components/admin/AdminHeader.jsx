@@ -50,8 +50,8 @@ const AdminHeader = ({ title, subtitle, onToggleMobileSidebar, unreadNotificatio
         </button>
 
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.72rem", fontWeight: 800, color: "var(--carrino-pink)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-            <Shield size={13} /> {isSuperAdmin ? "CARRINO / SUPER ADMIN CONSOLE" : "CARRINO / ADMIN CONSOLE"}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.72rem", fontWeight: 800, color: "var(--Postora-pink)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <Shield size={13} /> {isSuperAdmin ? "Postora / SUPER ADMIN CONSOLE" : "Postora / ADMIN CONSOLE"}
           </div>
           <h1
             style={{
@@ -138,7 +138,7 @@ const AdminHeader = ({ title, subtitle, onToggleMobileSidebar, unreadNotificatio
                 position: "absolute",
                 top: "-2px",
                 right: "-2px",
-                background: "var(--carrino-pink)",
+                background: "var(--Postora-pink)",
                 color: "#FFFFFF",
                 fontSize: "0.65rem",
                 fontWeight: 900,
@@ -170,7 +170,7 @@ const AdminHeader = ({ title, subtitle, onToggleMobileSidebar, unreadNotificatio
                 height: "36px",
                 borderRadius: "50%",
                 objectFit: "cover",
-                border: "1.5px solid var(--carrino-pink)",
+                border: "1.5px solid var(--Postora-pink)",
               }}
             />
           </button>
@@ -189,7 +189,7 @@ const AdminHeader = ({ title, subtitle, onToggleMobileSidebar, unreadNotificatio
             >
               <div style={{ padding: "0.5rem 0.85rem", borderBottom: "1px solid var(--border-color)", marginBottom: "0.2rem" }}>
                 <p style={{ fontWeight: 800, fontSize: "0.85rem", color: "var(--text-primary)", margin: 0 }}>{user?.name || "Alex Vance"}</p>
-                <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "var(--carrino-pink)", textTransform: "uppercase" }}>
+                <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "var(--Postora-pink)", textTransform: "uppercase" }}>
                   {user?.role?.toUpperCase() || "SUPER ADMIN"}
                 </span>
               </div>
@@ -199,7 +199,7 @@ const AdminHeader = ({ title, subtitle, onToggleMobileSidebar, unreadNotificatio
                 style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.45rem 0.85rem", fontSize: "0.82rem", color: "var(--text-primary)", textDecoration: "none" }}
                 onClick={() => setIsDropdownOpen(false)}
               >
-                <LayoutDashboard size={14} color="var(--carrino-pink)" /> {isSuperAdmin ? "Super Admin Dashboard" : "Admin Dashboard"}
+                <LayoutDashboard size={14} color="var(--Postora-pink)" /> {isSuperAdmin ? "Super Admin Dashboard" : "Admin Dashboard"}
               </Link>
 
               <Link

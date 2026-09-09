@@ -63,7 +63,7 @@ const SidebarCompactList = ({ posts = [] }) => {
                 <Link
                   to={`/post/${post.slug}`}
                   style={{ color: "inherit", transition: "color 150ms ease" }}
-                  onMouseOver={(e) => (e.currentTarget.style.color = "var(--carrino-pink)")}
+                  onMouseOver={(e) => (e.currentTarget.style.color = "var(--Postora-pink)")}
                   onMouseOut={(e) => (e.currentTarget.style.color = "inherit")}
                 >
                   {post.title}

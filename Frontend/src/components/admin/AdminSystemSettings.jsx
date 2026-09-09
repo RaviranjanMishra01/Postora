@@ -5,7 +5,7 @@ import { toast } from "../../context/ToastContext";
 
 const AdminSystemSettings = ({ activeSubTab }) => {
   const [settings, setSettings] = useState({
-    siteName: "carrino",
+    siteName: "Postora",
     allowUserRegistrations: true,
     requireEmailVerification: true,
     maxFeaturedPosts: 5,
@@ -58,7 +58,7 @@ const AdminSystemSettings = ({ activeSubTab }) => {
             }}
           >
             <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 1.25rem 0", fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <Settings color="var(--carrino-pink)" size={18} /> Global Platform Settings
+              <Settings color="var(--Postora-pink)" size={18} /> Global Platform Settings
             </h3>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.25rem" }}>
@@ -89,7 +89,7 @@ const AdminSystemSettings = ({ activeSubTab }) => {
                   type="checkbox"
                   checked={settings.allowUserRegistrations}
                   onChange={(e) => handleChange("allowUserRegistrations", e.target.checked)}
-                  style={{ accentColor: "var(--carrino-pink)", width: "18px", height: "18px" }}
+                  style={{ accentColor: "var(--Postora-pink)", width: "18px", height: "18px" }}
                 />
                 <span>Allow New User Registrations</span>
               </label>
@@ -99,7 +99,7 @@ const AdminSystemSettings = ({ activeSubTab }) => {
                   type="checkbox"
                   checked={settings.requireEmailVerification}
                   onChange={(e) => handleChange("requireEmailVerification", e.target.checked)}
-                  style={{ accentColor: "var(--carrino-pink)", width: "18px", height: "18px" }}
+                  style={{ accentColor: "var(--Postora-pink)", width: "18px", height: "18px" }}
                 />
                 <span>Require Email Verification for New Authors</span>
               </label>
@@ -125,7 +125,7 @@ const AdminSystemSettings = ({ activeSubTab }) => {
             }}
           >
             <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 1.25rem 0", fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <Lock color="var(--carrino-pink)" size={18} /> System Security Policies
+              <Lock color="var(--Postora-pink)" size={18} /> System Security Policies
             </h3>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
@@ -134,7 +134,7 @@ const AdminSystemSettings = ({ activeSubTab }) => {
                   type="checkbox"
                   checked={settings.enforce2FA}
                   onChange={(e) => handleChange("enforce2FA", e.target.checked)}
-                  style={{ accentColor: "var(--carrino-pink)", width: "18px", height: "18px" }}
+                  style={{ accentColor: "var(--Postora-pink)", width: "18px", height: "18px" }}
                 />
                 <span>Enforce Two-Factor Authentication (2FA) for All Administrators</span>
               </label>
@@ -169,7 +169,7 @@ const AdminSystemSettings = ({ activeSubTab }) => {
           }}
         >
           <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 1.25rem 0", fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Wrench color="var(--carrino-pink)" size={18} /> Platform Maintenance Control
+            <Wrench color="var(--Postora-pink)" size={18} /> Platform Maintenance Control
           </h3>
 
           <div

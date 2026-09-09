@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { postApi } from "../api/postApi";
 import { categoryApi } from "../api/categoryTagApi";
 
-import CarrinoHero from "../components/CarrinoHero";
+import PostoraHero from "../components/PostoraHero";
 import OverlayPostCard from "../components/OverlayPostCard";
 import ExploreCategoriesSection from "../components/ExploreCategoriesSection";
 import SidebarCompactList from "../components/SidebarCompactList";
@@ -41,7 +41,7 @@ const Home = () => {
     fetchData();
   }, [page]);
 
-  // Data Partitioning for Carrino Layout
+  // Data Partitioning for Postora Layout
   const featuredPosts = posts.filter((p) => p.isFeatured).length > 0
     ? posts.filter((p) => p.isFeatured)
     : posts.slice(0, 3);
@@ -91,7 +91,7 @@ const Home = () => {
       ) : (
         <>
           {/* 1. HERO SECTION: Carousel + Stacked Right Cards */}
-          <CarrinoHero featuredPosts={featuredPosts} rightPosts={heroRightPosts} />
+          <PostoraHero featuredPosts={featuredPosts} rightPosts={heroRightPosts} />
 
           {/* 2. EDITORS PICKS SECTION */}
           {editorsPicksPosts.length > 0 && (
@@ -171,7 +171,7 @@ const Home = () => {
             </div>
 
             <div
-              className="carrino-latest-grid"
+              className="Postora-latest-grid"
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 340px",

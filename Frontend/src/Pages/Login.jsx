@@ -43,7 +43,7 @@ const Login = () => {
   return (
     <AuthSplitLayout
       title="Welcome back"
-      subtitle="Sign in to continue to your Carrino account."
+      subtitle="Sign in to continue to your Postora account."
     >
       <form onSubmit={handleLoginSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
         {/* Email Field */}
@@ -106,7 +106,7 @@ const Login = () => {
               to="/forgot-password"
               style={{
                 fontSize: "0.82rem",
-                color: "var(--carrino-pink, #FF3F7F)",
+                color: "var(--Postora-pink, #FF3F7F)",
                 textDecoration: "none",
                 fontWeight: 600,
               }}

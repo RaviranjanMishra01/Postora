@@ -27,7 +27,7 @@ const FeatureHighlightsBar = () => {
               width: "48px",
               height: "48px",
               borderRadius: "50%",
-              background: "var(--carrino-pink)",
+              background: "var(--Postora-pink)",
               color: "#FFFFFF",
               display: "flex",
               alignItems: "center",

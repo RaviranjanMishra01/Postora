@@ -110,7 +110,7 @@ const PostCard = ({ post }) => {
           <Link
             to={`/post/${post.slug}`}
             style={{ color: "inherit", transition: "color 150ms ease" }}
-            onMouseOver={(e) => (e.currentTarget.style.color = "var(--carrino-pink)")}
+            onMouseOver={(e) => (e.currentTarget.style.color = "var(--Postora-pink)")}
             onMouseOut={(e) => (e.currentTarget.style.color = "inherit")}
           >
             {post.title}
@@ -171,7 +171,7 @@ const PostCard = ({ post }) => {
               <Eye size={12} /> {post.views || 0}
             </span>
             <span style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}>
-              <Heart size={12} fill="var(--carrino-pink)" color="var(--carrino-pink)" /> {post.likesCount || 0}
+              <Heart size={12} fill="var(--Postora-pink)" color="var(--Postora-pink)" /> {post.likesCount || 0}
             </span>
           </div>
         </div>

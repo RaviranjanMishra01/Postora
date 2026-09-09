@@ -93,7 +93,7 @@ const AdminTags = ({ tags = [], onRefresh }) => {
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-              <TagIcon size={16} color="var(--carrino-pink)" />
+              <TagIcon size={16} color="var(--Postora-pink)" />
               <div>
                 <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-primary)" }}>
                   #{t.name}

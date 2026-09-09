@@ -142,7 +142,7 @@ const AdminSidebar = ({ activeTab, onSelectTab, isMobileOpen, onCloseMobile }) =
                 width: "32px",
                 height: "32px",
                 borderRadius: "8px",
-                background: "var(--carrino-pink)",
+                background: "var(--Postora-pink)",
                 color: "#FFFFFF",
                 display: "flex",
                 alignItems: "center",
@@ -165,7 +165,7 @@ const AdminSidebar = ({ activeTab, onSelectTab, isMobileOpen, onCloseMobile }) =
                   lineHeight: 1.1,
                 }}
               >
-                CARRINO
+                Postora
               </span>
               <span
                 style={{
@@ -173,7 +173,7 @@ const AdminSidebar = ({ activeTab, onSelectTab, isMobileOpen, onCloseMobile }) =
                   fontWeight: 800,
                   letterSpacing: "0.1em",
                   textTransform: "uppercase",
-                  color: "var(--carrino-pink)",
+                  color: "var(--Postora-pink)",
                 }}
               >
                 {isSuperAdmin ? "SUPER ADMIN" : "ADMIN CONSOLE"}
@@ -248,7 +248,7 @@ const AdminSidebar = ({ activeTab, onSelectTab, isMobileOpen, onCloseMobile }) =
                         fontSize: "0.85rem",
                         fontWeight: isActive ? 700 : 500,
                         color: isActive ? "var(--btn-primary-text)" : "var(--text-secondary)",
-                        background: isActive ? "var(--carrino-pink)" : "transparent",
+                        background: isActive ? "var(--Postora-pink)" : "transparent",
                         border: "none",
                         cursor: "pointer",
                         width: "100%",
@@ -325,7 +325,7 @@ const AdminSidebar = ({ activeTab, onSelectTab, isMobileOpen, onCloseMobile }) =
                 style={{
                   fontSize: "0.7rem",
                   fontWeight: 800,
-                  color: "var(--carrino-pink)",
+                  color: "var(--Postora-pink)",
                   textTransform: "uppercase",
                   letterSpacing: "0.05em",
                 }}

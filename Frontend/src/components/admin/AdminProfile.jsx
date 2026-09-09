@@ -92,14 +92,14 @@ const AdminProfile = () => {
         <img
           src={user?.avatar || "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80"}
           alt={user?.name}
-          style={{ width: "80px", height: "80px", borderRadius: "50%", objectFit: "cover", border: "2px solid var(--carrino-pink)" }}
+          style={{ width: "80px", height: "80px", borderRadius: "50%", objectFit: "cover", border: "2px solid var(--Postora-pink)" }}
         />
         <div>
           <h2 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 0.25rem 0", fontFamily: "var(--font-heading)" }}>
             {user?.name}
           </h2>
           <p style={{ fontSize: "0.88rem", color: "var(--text-secondary)", margin: 0 }}>
-            @{user?.username} · <span style={{ color: "var(--carrino-pink)", fontWeight: 800 }}>{user?.role?.toUpperCase()}</span>
+            @{user?.username} · <span style={{ color: "var(--Postora-pink)", fontWeight: 800 }}>{user?.role?.toUpperCase()}</span>
           </p>
         </div>
       </div>

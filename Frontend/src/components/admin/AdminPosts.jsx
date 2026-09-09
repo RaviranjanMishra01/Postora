@@ -125,7 +125,7 @@ const AdminPosts = ({ posts, onToggleFeature, onDeletePost }) => {
                   </td>
 
                   <td style={{ padding: "0.85rem 0.75rem" }}>
-                    <span className="carrino-badge-pill" style={{ margin: 0, fontSize: "0.65rem" }}>
+                    <span className="Postora-badge-pill" style={{ margin: 0, fontSize: "0.65rem" }}>
                       {p.category?.name || "General"}
                     </span>
                   </td>

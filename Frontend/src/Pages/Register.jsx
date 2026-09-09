@@ -73,7 +73,7 @@ const Register = () => {
   return (
     <AuthSplitLayout
       title="Create your account"
-      subtitle="Join Carrino and start sharing your ideas with the community."
+      subtitle="Join Postora and start sharing your ideas with the community."
     >
       <form onSubmit={handleRegisterSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
         {/* Full Name Field */}

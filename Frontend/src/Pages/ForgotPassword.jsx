@@ -36,7 +36,7 @@ const ForgotPassword = () => {
     >
       {sent ? (
         <div style={{ textAlign: "center", padding: "1rem 0" }}>
-          <p style={{ color: "var(--carrino-pink, #FF3F7F)", fontSize: "0.92rem", lineHeight: 1.6, marginBottom: "1.5rem", fontWeight: 500 }}>
+          <p style={{ color: "var(--Postora-pink, #FF3F7F)", fontSize: "0.92rem", lineHeight: 1.6, marginBottom: "1.5rem", fontWeight: 500 }}>
             If an account matches <strong>{email}</strong>, a password reset link has been dispatched to your inbox.
           </p>
           <Link

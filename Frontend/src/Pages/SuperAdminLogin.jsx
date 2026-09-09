@@ -53,7 +53,7 @@ const SuperAdminLogin = () => {
         <div style={{ padding: "3rem 2.5rem", display: "flex", flexDirection: "column", justifyContent: "center" }}>
           <div style={{ marginBottom: "2rem" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.3rem 0.75rem", borderRadius: "20px", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", marginBottom: "1rem" }}>
-              <ShieldAlert size={16} color="var(--carrino-pink, #547792)" />
+              <ShieldAlert size={16} color="var(--Postora-pink, #547792)" />
               <span style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "1.5px", color: "var(--text-primary)", textTransform: "uppercase" }}>SUPER ADMIN PORTAL</span>
             </div>
             <h2 style={{ fontSize: "2rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Login</h2>
@@ -67,7 +67,7 @@ const SuperAdminLogin = () => {
                 <Mail size={18} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
                 <input
                   type="text"
-                  placeholder="superadmin@carrino.com"
+                  placeholder="superadmin@Postora.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -88,7 +88,7 @@ const SuperAdminLogin = () => {
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
                 <label style={{ fontSize: "0.83rem", fontWeight: 600, color: "var(--text-secondary)" }}>Password</label>
-                <Link to="/super-admin/forgot-password" style={{ fontSize: "0.8rem", color: "var(--carrino-pink, #547792)", textDecoration: "none", fontWeight: 600 }}>Forgot Password?</Link>
+                <Link to="/super-admin/forgot-password" style={{ fontSize: "0.8rem", color: "var(--Postora-pink, #547792)", textDecoration: "none", fontWeight: 600 }}>Forgot Password?</Link>
               </div>
               <div style={{ position: "relative" }}>
                 <Lock size={18} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
@@ -169,19 +169,19 @@ const SuperAdminLogin = () => {
           <div style={{ width: "180px", height: "180px", marginBottom: "2rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg width="160" height="160" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="100" cy="100" r="80" stroke="var(--border-color)" strokeWidth="3" fill="var(--bg-card)" />
-              <circle cx="100" cy="100" r="55" stroke="var(--carrino-pink)" strokeWidth="2" strokeDasharray="6 6" />
+              <circle cx="100" cy="100" r="55" stroke="var(--Postora-pink)" strokeWidth="2" strokeDasharray="6 6" />
               <path d="M100 60V140M60 100H140" stroke="var(--border-color)" strokeWidth="2" />
-              <rect x="82" y="82" width="36" height="36" rx="8" fill="var(--carrino-pink)" opacity="0.3" stroke="var(--carrino-pink)" strokeWidth="2" />
+              <rect x="82" y="82" width="36" height="36" rx="8" fill="var(--Postora-pink)" opacity="0.3" stroke="var(--Postora-pink)" strokeWidth="2" />
               <circle cx="100" cy="100" r="6" fill="var(--text-primary)" />
             </svg>
           </div>
 
           <h3 style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "0.5rem" }}>
             Welcome to <br />
-            <span style={{ color: "var(--carrino-pink, #547792)" }}>Super Admin Portal</span>
+            <span style={{ color: "var(--Postora-pink, #547792)" }}>Super Admin Portal</span>
           </h3>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", maxWidth: "300px", lineHeight: 1.5 }}>
-            Secure access to the Carrino platform control center for governance, infrastructure matrix, and audit oversight.
+            Secure access to the Postora platform control center for governance, infrastructure matrix, and audit oversight.
           </p>
         </div>
       </div>

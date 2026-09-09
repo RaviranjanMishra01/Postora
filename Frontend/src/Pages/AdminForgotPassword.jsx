@@ -33,7 +33,7 @@ const AdminForgotPassword = () => {
       <div className="glass-card" style={{ width: "100%", maxWidth: "420px", padding: "2.5rem", background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-xl, 16px)" }}>
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
           <div style={{ width: "52px", height: "52px", borderRadius: "14px", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem auto" }}>
-            <ShieldCheck size={26} color="var(--carrino-pink, #547792)" />
+            <ShieldCheck size={26} color="var(--Postora-pink, #547792)" />
           </div>
           <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--text-primary)" }}>Admin Password Reset</h2>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.4rem" }}>Enter your registered administrator email address</p>
@@ -41,7 +41,7 @@ const AdminForgotPassword = () => {
 
         {sent ? (
           <div style={{ textAlign: "center" }}>
-            <p style={{ color: "var(--carrino-pink, #547792)", fontSize: "0.9rem", lineHeight: 1.5, marginBottom: "1.5rem" }}>
+            <p style={{ color: "var(--Postora-pink, #547792)", fontSize: "0.9rem", lineHeight: 1.5, marginBottom: "1.5rem" }}>
               If an administrative account matches <strong>{email}</strong>, a single-use password recovery link has been dispatched to your inbox.
             </p>
             <Link to="/admin/login" className="btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }}>
@@ -56,7 +56,7 @@ const AdminForgotPassword = () => {
                 <Mail size={18} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
                 <input
                   type="email"
-                  placeholder="admin@carrino.com"
+                  placeholder="admin@Postora.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -75,7 +75,7 @@ const AdminForgotPassword = () => {
             </button>
 
             <div style={{ textAlign: "center", marginTop: "1rem" }}>
-              <Link to="/admin/login" style={{ color: "var(--carrino-pink, #547792)", fontSize: "0.85rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.4rem", fontWeight: 600 }}>
+              <Link to="/admin/login" style={{ color: "var(--Postora-pink, #547792)", fontSize: "0.85rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.4rem", fontWeight: 600 }}>
                 <ArrowLeft size={16} /> Back to Admin Sign In
               </Link>
             </div>

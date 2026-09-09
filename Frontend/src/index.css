@@ -5,8 +5,8 @@
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* BRAND ACCENT COLOR */
-  --carrino-pink: #FF3F7F;
-  --carrino-pink-hover: #E6356F;
+  --Postora-pink: #FF3F7F;
+  --Postora-pink-hover: #E6356F;
   --brand-pink: #FF3F7F;
   --brand-soft: #FFF0F5;
 
@@ -55,7 +55,7 @@
   --skeleton-base: #E8EBE8;
   --skeleton-highlight: #F5F7F5;
 
-  /* Carrino Style Rounded Corners */
+  /* Postora Style Rounded Corners */
   --radius-sm: 6px;
   --radius-md: 14px;
   --radius-lg: 18px;
@@ -64,8 +64,8 @@
 
 html.dark, [data-theme="dark"] {
   /* DARK THEME TOKENS */
-  --carrino-pink: #FF3F7F;
-  --carrino-pink-hover: #E6356F;
+  --Postora-pink: #FF3F7F;
+  --Postora-pink-hover: #E6356F;
   --brand-pink: #FF3F7F;
   --brand-soft: #351D2A;
 
@@ -176,7 +176,7 @@ button, input, textarea, select {
   background: var(--bg-primary);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--carrino-pink);
+  background: var(--Postora-pink);
   border-radius: var(--radius-full);
 }
 
@@ -193,8 +193,8 @@ button, input, textarea, select {
   }
 }
 
-/* Carrino Overlay Card Styles */
-.carrino-card {
+/* Postora Overlay Card Styles */
+.Postora-card {
   position: relative;
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -202,23 +202,23 @@ button, input, textarea, select {
   transition: transform 250ms ease, box-shadow 250ms ease;
 }
 
-.carrino-card:hover {
+.Postora-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-glow);
 }
 
-.carrino-card-img {
+.Postora-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 500ms ease;
 }
 
-.carrino-card:hover .carrino-card-img {
+.Postora-card:hover .Postora-card-img {
   transform: scale(1.05);
 }
 
-.carrino-gradient-overlay {
+.Postora-gradient-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.85) 100%);
@@ -226,7 +226,7 @@ button, input, textarea, select {
   z-index: 1;
 }
 
-.carrino-card-content {
+.Postora-card-content {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -236,9 +236,9 @@ button, input, textarea, select {
   color: #FFFFFF;
 }
 
-.carrino-badge-pill {
+.Postora-badge-pill {
   display: inline-block;
-  background: var(--carrino-pink);
+  background: var(--Postora-pink);
   color: #FFFFFF;
   font-size: 0.68rem;
   font-weight: 800;
@@ -251,7 +251,7 @@ button, input, textarea, select {
 
 /* Buttons */
 .btn-primary {
-  background: var(--carrino-pink);
+  background: var(--Postora-pink);
   color: #FFFFFF;
   border: none;
   padding: 0.6rem 1.35rem;
@@ -268,7 +268,7 @@ button, input, textarea, select {
 }
 
 .btn-primary:hover {
-  background: var(--carrino-pink-hover);
+  background: var(--Postora-pink-hover);
   transform: translateY(-1px);
 }
 
@@ -300,10 +300,10 @@ button, input, textarea, select {
 }
 
 @media (max-width: 1024px) {
-  .carrino-hero-grid {
+  .Postora-hero-grid {
     grid-template-columns: 1fr !important;
   }
-  .carrino-latest-grid {
+  .Postora-latest-grid {
     grid-template-columns: 1fr !important;
   }
 }

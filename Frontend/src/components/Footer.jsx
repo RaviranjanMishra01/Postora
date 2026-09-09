@@ -52,7 +52,7 @@ const Footer = () => {
                 marginBottom: "0.85rem",
               }}
             >
-              carrino
+              Postora
             </Link>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", lineHeight: 1.6, maxWidth: "280px" }}>
               A modern publishing magazine platform for creative authors who love to read, write, and share ideas.
@@ -210,7 +210,7 @@ const Footer = () => {
             color: "var(--text-muted)",
           }}
         >
-          <p>© {new Date().getFullYear()} Carrino. All Rights Reserved.</p>
+          <p>© {new Date().getFullYear()} Postora. All Rights Reserved.</p>
           <p style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
             Designed with <Heart size={13} fill="#FF497C" color="#FF497C" /> by ThemeZaa
           </p>

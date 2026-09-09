@@ -92,7 +92,7 @@ const AdminComments = ({ comments = [], onDeleteComment }) => {
                     {c.user?.name || c.author?.name || "User"}
                   </td>
 
-                  <td style={{ padding: "0.85rem 0.75rem", color: "var(--carrino-pink)", fontWeight: 600 }}>
+                  <td style={{ padding: "0.85rem 0.75rem", color: "var(--Postora-pink)", fontWeight: 600 }}>
                     {c.post?.title ? (
                       <Link to={`/post/${c.post.slug}`} style={{ color: "inherit" }}>
                         {c.post.title.slice(0, 30)}...

@@ -10,7 +10,7 @@ const { escapeRegex } = require("../middleware/validate");
 // In-memory system settings state for admin/superadmin
 let systemSettings = {
   maintenanceMode: false,
-  siteName: "carrino",
+  siteName: "Postora",
   allowUserRegistrations: true,
   requireEmailVerification: true,
   maxFeaturedPosts: 5,

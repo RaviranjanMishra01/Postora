@@ -69,7 +69,7 @@ const AdminSuperAdminManagement = ({ activeSubTab, users = [], onRefresh }) => {
           >
             <div>
               <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary)", margin: 0, fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <ShieldCheck color="var(--carrino-pink)" size={18} /> Administrator Roster & Permissions ({adminsList.length})
+                <ShieldCheck color="var(--Postora-pink)" size={18} /> Administrator Roster & Permissions ({adminsList.length})
               </h3>
               <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", margin: "0.2rem 0 0 0" }}>
                 Manage administrator credentials and authorization scope
@@ -195,7 +195,7 @@ const AdminSuperAdminManagement = ({ activeSubTab, users = [], onRefresh }) => {
                           borderRadius: "4px",
                           textTransform: "uppercase",
                           background: a.role === "superadmin" ? "var(--brand-soft)" : "rgba(139, 92, 246, 0.15)",
-                          color: a.role === "superadmin" ? "var(--carrino-pink)" : "var(--accent-purple)",
+                          color: a.role === "superadmin" ? "var(--Postora-pink)" : "var(--accent-purple)",
                         }}
                       >
                         {a.role}
@@ -258,7 +258,7 @@ const AdminSuperAdminManagement = ({ activeSubTab, users = [], onRefresh }) => {
           }}
         >
           <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 1.25rem 0", fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <KeyRound color="var(--carrino-pink)" size={18} /> Role-Based Access Control (RBAC) Matrix
+            <KeyRound color="var(--Postora-pink)" size={18} /> Role-Based Access Control (RBAC) Matrix
           </h3>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.25rem" }}>
@@ -299,7 +299,7 @@ const AdminSuperAdminManagement = ({ activeSubTab, users = [], onRefresh }) => {
           }}
         >
           <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 1.25rem 0", fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <FileSearch color="var(--carrino-pink)" size={18} /> System Audit Trail & Event Logs
+            <FileSearch color="var(--Postora-pink)" size={18} /> System Audit Trail & Event Logs
           </h3>
 
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.86rem", textAlign: "left" }}>
@@ -321,7 +321,7 @@ const AdminSuperAdminManagement = ({ activeSubTab, users = [], onRefresh }) => {
                   <td style={{ padding: "0.75rem", fontWeight: 700, color: "var(--text-primary)" }}>
                     {log.actor}
                   </td>
-                  <td style={{ padding: "0.75rem", fontWeight: 700, color: "var(--carrino-pink)" }}>
+                  <td style={{ padding: "0.75rem", fontWeight: 700, color: "var(--Postora-pink)" }}>
                     {log.action}
                   </td>
                   <td style={{ padding: "0.75rem", color: "var(--text-secondary)" }}>

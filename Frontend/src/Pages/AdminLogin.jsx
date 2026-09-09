@@ -53,7 +53,7 @@ const AdminLogin = () => {
         <div style={{ padding: "3rem 2.5rem", display: "flex", flexDirection: "column", justifyContent: "center" }}>
           <div style={{ marginBottom: "2rem" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.3rem 0.75rem", borderRadius: "20px", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", marginBottom: "1rem" }}>
-              <ShieldCheck size={16} color="var(--carrino-pink, #547792)" />
+              <ShieldCheck size={16} color="var(--Postora-pink, #547792)" />
               <span style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "1.5px", color: "var(--text-primary)", textTransform: "uppercase" }}>ADMIN PORTAL</span>
             </div>
             <h2 style={{ fontSize: "2rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Login</h2>
@@ -67,7 +67,7 @@ const AdminLogin = () => {
                 <Mail size={18} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
                 <input
                   type="text"
-                  placeholder="admin@carrino.com"
+                  placeholder="admin@Postora.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -88,7 +88,7 @@ const AdminLogin = () => {
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
                 <label style={{ fontSize: "0.83rem", fontWeight: 600, color: "var(--text-secondary)" }}>Password</label>
-                <Link to="/admin/forgot-password" style={{ fontSize: "0.8rem", color: "var(--carrino-pink, #547792)", textDecoration: "none", fontWeight: 600 }}>Forgot Password?</Link>
+                <Link to="/admin/forgot-password" style={{ fontSize: "0.8rem", color: "var(--Postora-pink, #547792)", textDecoration: "none", fontWeight: 600 }}>Forgot Password?</Link>
               </div>
               <div style={{ position: "relative" }}>
                 <Lock size={18} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
@@ -147,7 +147,7 @@ const AdminLogin = () => {
           </form>
 
           <div style={{ marginTop: "2.5rem", paddingTop: "1.25rem", borderTop: "1px solid var(--border-color)", textAlign: "center" }}>
-            <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", margin: 0 }}>Protected Administrator Gateway • Carrino Core</p>
+            <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", margin: 0 }}>Protected Administrator Gateway • Postora Core</p>
           </div>
         </div>
 
@@ -170,10 +170,10 @@ const AdminLogin = () => {
             <svg width="160" height="160" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="20" y="30" width="160" height="120" rx="16" fill="var(--bg-card)" stroke="var(--border-color)" strokeWidth="3" />
               <path d="M40 65H160" stroke="var(--border-color)" strokeWidth="2" strokeDasharray="4 4" />
-              <rect x="40" y="85" width="50" height="45" rx="8" fill="var(--carrino-pink)" opacity="0.25" />
+              <rect x="40" y="85" width="50" height="45" rx="8" fill="var(--Postora-pink)" opacity="0.25" />
               <rect x="100" y="85" width="60" height="12" rx="4" fill="var(--text-primary)" opacity="0.8" />
               <rect x="100" y="105" width="45" height="10" rx="4" fill="var(--text-secondary)" opacity="0.6" />
-              <circle cx="160" cy="48" r="5" fill="var(--carrino-pink)" />
+              <circle cx="160" cy="48" r="5" fill="var(--Postora-pink)" />
               <circle cx="144" cy="48" r="5" fill="var(--border-color)" />
               <circle cx="128" cy="48" r="5" fill="var(--border-color)" />
             </svg>
@@ -181,10 +181,10 @@ const AdminLogin = () => {
 
           <h3 style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "0.5rem" }}>
             Welcome to <br />
-            <span style={{ color: "var(--carrino-pink, #547792)" }}>Admin Portal</span>
+            <span style={{ color: "var(--Postora-pink, #547792)" }}>Admin Portal</span>
           </h3>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", maxWidth: "300px", lineHeight: 1.5 }}>
-            Secure access to the Carrino administration console for daily content and community operations.
+            Secure access to the Postora administration console for daily content and community operations.
           </p>
         </div>
       </div>

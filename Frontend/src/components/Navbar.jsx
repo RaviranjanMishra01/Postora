@@ -131,7 +131,7 @@ const Navbar = () => {
 
           {/* CENTER: Brand Logo */}
           <Link to="/" className="header-brand-logo">
-            carrino
+            Postora
           </Link>
 
           {/* RIGHT GROUP: Header Controls */}
@@ -206,7 +206,7 @@ const Navbar = () => {
                       {["admin", "superadmin"].includes(user.role) ? (
                         <>
                           <Link to="/admin/dashboard" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>
-                            <LayoutDashboard size={14} color="var(--carrino-pink)" /> {user.role === "superadmin" ? "Super Admin Dashboard" : "Admin Dashboard"}
+                            <LayoutDashboard size={14} color="var(--Postora-pink)" /> {user.role === "superadmin" ? "Super Admin Dashboard" : "Admin Dashboard"}
                           </Link>
 
                           <Link to="/profile" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>
@@ -220,7 +220,7 @@ const Navbar = () => {
                       ) : (
                         <>
                           <Link to="/dashboard" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>
-                            <LayoutDashboard size={14} color="var(--carrino-pink)" /> Dashboard
+                            <LayoutDashboard size={14} color="var(--Postora-pink)" /> Dashboard
                           </Link>
 
                           <Link to="/profile" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>

@@ -83,14 +83,14 @@ const FeaturedPostCard = ({ post }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: isBookmarked ? "var(--carrino-pink)" : "var(--text-inverse)",
+            color: isBookmarked ? "var(--Postora-pink)" : "var(--text-inverse)",
             cursor: "pointer",
             backdropFilter: "blur(6px)",
             zIndex: 2,
           }}
           title="Save story"
         >
-          <Bookmark size={16} fill={isBookmarked ? "var(--carrino-pink)" : "none"} />
+          <Bookmark size={16} fill={isBookmarked ? "var(--Postora-pink)" : "none"} />
         </button>
       </Link>
 
@@ -118,7 +118,7 @@ const FeaturedPostCard = ({ post }) => {
           <Link
             to={`/post/${post.slug}`}
             style={{ color: "inherit", transition: "color 150ms ease" }}
-            onMouseOver={(e) => (e.currentTarget.style.color = "var(--carrino-pink)")}
+            onMouseOver={(e) => (e.currentTarget.style.color = "var(--Postora-pink)")}
             onMouseOut={(e) => (e.currentTarget.style.color = "inherit")}
           >
             {post.title}

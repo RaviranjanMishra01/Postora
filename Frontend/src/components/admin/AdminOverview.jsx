@@ -61,7 +61,7 @@ const AdminOverview = ({ stats, recentPosts = [], reports = [], users = [], onSe
       trend: "+12.1%",
       period: "this month",
       icon: Eye,
-      color: "var(--carrino-pink)",
+      color: "var(--Postora-pink)",
       bgColor: "var(--brand-soft)",
     },
     {
@@ -245,7 +245,7 @@ const AdminOverview = ({ stats, recentPosts = [], reports = [], users = [], onSe
                     fontWeight: 700,
                     border: "none",
                     cursor: "pointer",
-                    background: growthTimeframe === tf ? "var(--carrino-pink)" : "var(--bg-secondary)",
+                    background: growthTimeframe === tf ? "var(--Postora-pink)" : "var(--bg-secondary)",
                     color: growthTimeframe === tf ? "#FFFFFF" : "var(--text-secondary)",
                   }}
                 >
@@ -337,7 +337,7 @@ const AdminOverview = ({ stats, recentPosts = [], reports = [], users = [], onSe
                   fontWeight: 700,
                   border: "none",
                   cursor: "pointer",
-                  background: performanceTab === "views" ? "var(--carrino-pink)" : "var(--bg-secondary)",
+                  background: performanceTab === "views" ? "var(--Postora-pink)" : "var(--bg-secondary)",
                   color: performanceTab === "views" ? "#FFFFFF" : "var(--text-secondary)",
                 }}
               >
@@ -353,7 +353,7 @@ const AdminOverview = ({ stats, recentPosts = [], reports = [], users = [], onSe
                   fontWeight: 700,
                   border: "none",
                   cursor: "pointer",
-                  background: performanceTab === "likes" ? "var(--carrino-pink)" : "var(--bg-secondary)",
+                  background: performanceTab === "likes" ? "var(--Postora-pink)" : "var(--bg-secondary)",
                   color: performanceTab === "likes" ? "#FFFFFF" : "var(--text-secondary)",
                 }}
               >
@@ -376,7 +376,7 @@ const AdminOverview = ({ stats, recentPosts = [], reports = [], users = [], onSe
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", minWidth: 0 }}>
-                  <span style={{ fontSize: "0.8rem", fontWeight: 900, color: "var(--carrino-pink)", width: "20px" }}>
+                  <span style={{ fontSize: "0.8rem", fontWeight: 900, color: "var(--Postora-pink)", width: "20px" }}>
                     0{idx + 1}
                   </span>
                   <div style={{ minWidth: 0 }}>
@@ -402,7 +402,7 @@ const AdminOverview = ({ stats, recentPosts = [], reports = [], users = [], onSe
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
             <div>
               <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--text-primary)", margin: 0, fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                <ShieldAlert size={18} color="var(--carrino-pink)" /> Needs Attention
+                <ShieldAlert size={18} color="var(--Postora-pink)" /> Needs Attention
               </h3>
               <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", margin: "0.15rem 0 0 0" }}>
                 Actionable moderation items requiring review
@@ -479,7 +479,7 @@ const AdminOverview = ({ stats, recentPosts = [], reports = [], users = [], onSe
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "0.75rem" }}>
             {[
-              { label: "Manage Admins", tab: "admins", icon: ShieldCheck, color: "var(--carrino-pink)" },
+              { label: "Manage Admins", tab: "admins", icon: ShieldCheck, color: "var(--Postora-pink)" },
               { label: "Manage Permissions", tab: "roles", icon: KeyRound, color: "var(--accent-purple)" },
               { label: "Review Reports", tab: "reports", icon: AlertTriangle, color: "#EF4444" },
               { label: "View Audit Logs", tab: "audit-logs", icon: FileSearch, color: "var(--accent-blue)" },
@@ -540,7 +540,7 @@ const AdminOverview = ({ stats, recentPosts = [], reports = [], users = [], onSe
 
             <div style={{ padding: "0.85rem", borderRadius: "8px", background: "var(--bg-secondary)" }}>
               <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 800 }}>System Admins</span>
-              <div style={{ fontSize: "1.4rem", fontWeight: 900, color: "var(--carrino-pink)" }}>{activeAdminsCount}</div>
+              <div style={{ fontSize: "1.4rem", fontWeight: 900, color: "var(--Postora-pink)" }}>{activeAdminsCount}</div>
             </div>
           </div>
         </div>

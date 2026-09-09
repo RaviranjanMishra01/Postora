@@ -7,7 +7,7 @@ Postora is a modern, scalable, high-performance full-stack MERN (MongoDB, Expres
 ## 🌟 Key Features
 
 ### 🎨 Frontend (React + Vite)
-- **Editorial UI Design**: Custom modern Carrino editorial design with dark/light themes, dynamic animations (Framer Motion), and responsive layouts.
+- **Editorial UI Design**: Custom modern Postora editorial design with dark/light themes, dynamic animations (Framer Motion), and responsive layouts.
 - **Authentication**: Email/Password authentication & Google One-Tap / OAuth integration.
 - **Article Reader & Editor**: Rich text article viewer, read-time calculation, category/tag filtering, and search functionality.
 - **Social & Community**: Follow/unfollow authors, like posts, bookmark articles, and nested commenting system.

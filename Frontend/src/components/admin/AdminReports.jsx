@@ -39,7 +39,7 @@ const AdminReports = ({ reports = [], onRefresh }) => {
       >
         <div>
           <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary)", margin: 0, fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <AlertTriangle color="var(--carrino-pink)" size={18} /> Moderation Queue ({filteredReports.length})
+            <AlertTriangle color="var(--Postora-pink)" size={18} /> Moderation Queue ({filteredReports.length})
           </h3>
           <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", margin: "0.2rem 0 0 0" }}>
             Review user reports on posts, comments, or user conduct

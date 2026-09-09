@@ -133,7 +133,7 @@ const GoogleSignInButton = ({ text = "Continue with Google", onSuccess }) => {
       }}
       onMouseEnter={(e) => {
         if (!loading) {
-          e.currentTarget.style.borderColor = "var(--carrino-pink, #FF3F7F)";
+          e.currentTarget.style.borderColor = "var(--Postora-pink, #FF3F7F)";
           e.currentTarget.style.boxShadow = "0 2px 8px rgba(255, 63, 127, 0.15)";
         }
       }}

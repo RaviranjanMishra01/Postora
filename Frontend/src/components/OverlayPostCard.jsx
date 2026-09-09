@@ -41,7 +41,7 @@ const OverlayPostCard = ({ post, height = "280px", showBadgeIcon = false }) => {
 
   return (
     <article
-      className="carrino-card"
+      className="Postora-card"
       style={{
         height,
         width: "100%",
@@ -54,16 +54,16 @@ const OverlayPostCard = ({ post, height = "280px", showBadgeIcon = false }) => {
             src={post.featuredImage}
             alt={post.title}
             loading="lazy"
-            className="carrino-card-img"
+            className="Postora-card-img"
           />
         )}
 
-        <div className="carrino-gradient-overlay" />
+        <div className="Postora-gradient-overlay" />
 
         {/* Top Badges */}
         <div style={{ position: "absolute", top: "14px", left: "14px", right: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 3 }}>
           {post.category && (
-            <span className="carrino-badge-pill" style={{ margin: 0 }}>
+            <span className="Postora-badge-pill" style={{ margin: 0 }}>
               {post.category.name}
             </span>
           )}
@@ -107,7 +107,7 @@ const OverlayPostCard = ({ post, height = "280px", showBadgeIcon = false }) => {
         </div>
 
         {/* Bottom Content Overlay */}
-        <div className="carrino-card-content">
+        <div className="Postora-card-content">
           <h3
             style={{
               fontSize: height > "320px" ? "1.4rem" : "1.1rem",

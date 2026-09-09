@@ -39,7 +39,7 @@ const AdminSupport = ({ messages = [], onRefresh }) => {
       >
         <div>
           <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary)", margin: 0, fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Mail color="var(--carrino-pink)" size={18} /> Support & Contact Inbox ({filteredMessages.length})
+            <Mail color="var(--Postora-pink)" size={18} /> Support & Contact Inbox ({filteredMessages.length})
           </h3>
           <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", margin: "0.2rem 0 0 0" }}>
             User feedback, inquiry messages, and support tickets

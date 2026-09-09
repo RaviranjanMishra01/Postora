@@ -4,7 +4,7 @@ Modern, responsive editorial SPA for the Postora MERN Blog platform built with R
 
 ## 🌟 Features
 
-- **Carrino Editorial Theme**: Sleek UI design system with dark/light themes and custom CSS variables.
+- **Postora Editorial Theme**: Sleek UI design system with dark/light themes and custom CSS variables.
 - **Dynamic Views**:
   - Home feed with featured posts, latest stories, category blocks.
   - Interactive Post Details with read time, views, likes, bookmarking, and nested comments.
