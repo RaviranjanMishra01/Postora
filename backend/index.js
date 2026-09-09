@@ -39,35 +39,12 @@ app.use(customMongoSanitize);
 app.use(compression());
 app.use(cookieParser());
 
-// CORS configuration supporting single or comma-separated origins, Vercel deployments, & local testing
-const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(",").map((url) => url.trim().replace(/\/$/, ""))
-  : [];
-
+// CORS configuration allowing dynamic origin mirroring with credentials support across Vercel, Render, & local testing
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-
-      const cleanOrigin = origin.replace(/\/$/, "");
-
-      if (
-        allowedOrigins.length === 0 ||
-        allowedOrigins.includes("*") ||
-        allowedOrigins.includes(cleanOrigin) ||
-        cleanOrigin.endsWith(".vercel.app") ||
-        cleanOrigin.endsWith(".onrender.com") ||
-        cleanOrigin.includes("localhost") ||
-        cleanOrigin.includes("127.0.0.1")
-      ) {
-        return callback(null, true);
-      }
-
-      if (process.env.NODE_ENV !== "production") {
-        return callback(null, true);
-      }
-
-      return callback(null, false);
+      // Dynamically echo requesting origin to support multi-domain deployments (Vercel previews, custom domains, local)
+      callback(null, true);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
