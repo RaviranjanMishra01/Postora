@@ -4,10 +4,11 @@ const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const compression = require("compression");
 const path = require("path");
+const fs = require("fs");
 
 const errorHandler = require("./middleware/errorHandler");
 const customMongoSanitize = require("./middleware/mongoSanitize");
-// const { apiLimiter } = require("./middleware/rateLimiter");
+const { apiLimiter } = require("./middleware/rateLimiter");
 
 // Route imports
 const authRoutes = require("./routes/auth.routes");
@@ -29,19 +30,32 @@ const seoRoutes = require("./routes/seo.routes");
 
 const app = express();
 
+// Enable trust proxy for production reverse proxies (Render, Vercel, Nginx, Cloudflare)
+app.set("trust proxy", 1);
+
 // Security & Optimization Middleware
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(customMongoSanitize);
 app.use(compression());
 app.use(cookieParser());
 
-// CORS configuration
+// CORS configuration supporting single or comma-separated origins
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(",").map((url) => url.trim())
+  : [];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: function (origin, callback) {
+      if (!origin || process.env.NODE_ENV !== "production") return callback(null, true);
+      if (allowedOrigins.length === 0 || allowedOrigins.includes(origin) || allowedOrigins.includes("*")) {
+        return callback(null, true);
+      }
+      return callback(new Error("CORS policy violation: Origin not allowed"), false);
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
 
@@ -49,10 +63,14 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Rate limiter for general API routes
-// app.use("/api", apiLimiter);
+app.use("/api", apiLimiter);
 
-// Serve static uploads
-app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
+// Ensure static uploads directory exists and serve files
+const uploadsDir = path.join(__dirname, "public/uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+app.use("/uploads", express.static(uploadsDir));
 
 // Mount API Endpoints
 app.use("/api/v1/auth", authRoutes);

@@ -11,7 +11,9 @@ const connectDB = async () => {
     await seedInitialData();
   } catch (error) {
     console.error(`Error connecting to MongoDB: ${error.message}`);
-    // Don't terminate process in dev so app can still respond with mock/helpful errors if DB isn't running locally yet
+    if (process.env.NODE_ENV === "production") {
+      process.exit(1);
+    }
   }
 };
 

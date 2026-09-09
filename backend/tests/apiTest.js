@@ -1,9 +1,10 @@
+process.env.NODE_ENV = "test";
+const dotenv = require("dotenv");
+dotenv.config();
+
 const app = require("../index");
 const connectDB = require("../DB/connectDB");
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-
-dotenv.config();
 
 const runTests = async () => {
   console.log("Connecting to Database for tests...");
@@ -13,11 +14,12 @@ const runTests = async () => {
 
   const server = app.listen(0, async () => {
     const port = server.address().port;
-    console.log(`Test server running on port ${port}`);
+    const baseUrl = `http://127.0.0.1:${port}`;
+    console.log(`Test server running on ${baseUrl}`);
 
     try {
       // Test 1: Health check endpoint
-      const res = await fetch(`http://localhost:${port}/api/health`);
+      const res = await fetch(`${baseUrl}/api/health`);
       const data = await res.json();
 
       if (res.status === 200 && data.success) {
@@ -27,17 +29,17 @@ const runTests = async () => {
       }
 
       // Test 2: Categories listing
-      const catRes = await fetch(`http://localhost:${port}/api/v1/categories`);
+      const catRes = await fetch(`${baseUrl}/api/v1/categories`);
       const catData = await catRes.json();
 
       if (catRes.status === 200 && catData.success) {
-        console.log("✅ TEST 2 PASSED: /api/v1/categories returned 200 OK");
+        console.log("✅ TEST 1 PASSED: /api/v1/categories returned 200 OK");
       } else {
         console.error("❌ TEST 2 FAILED:", catData);
       }
 
       // Test 3: Posts listing
-      const postRes = await fetch(`http://localhost:${port}/api/v1/posts`);
+      const postRes = await fetch(`${baseUrl}/api/v1/posts`);
       const postData = await postRes.json();
 
       if (postRes.status === 200 && postData.success) {
@@ -47,7 +49,7 @@ const runTests = async () => {
       }
 
       // Test 4: Google Auth endpoint
-      const googleRes = await fetch(`http://localhost:${port}/api/v1/auth/google`, {
+      const googleRes = await fetch(`${baseUrl}/api/v1/auth/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -66,7 +68,7 @@ const runTests = async () => {
 
       // Test 5: Public Registration forces role = 'user'
       const testUsername = "user_role_test_" + Date.now().toString().slice(-4);
-      const regRes = await fetch(`http://localhost:${port}/api/v1/auth/register`, {
+      const regRes = await fetch(`${baseUrl}/api/v1/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -88,7 +90,7 @@ const runTests = async () => {
       }
 
       // Test 6: Dedicated Admin Login rejects normal USER accounts
-      const adminLoginRes = await fetch(`http://localhost:${port}/api/v1/auth/admin/login`, {
+      const adminLoginRes = await fetch(`${baseUrl}/api/v1/auth/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
