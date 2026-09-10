@@ -5,10 +5,24 @@ const Category = require("../models/Category");
 const Tag = require("../models/Tag");
 const User = require("../models/User");
 
-const CLIENT_URL = process.env.CLIENT_URL || "https://postora-seven.vercel.app";
+const getCleanBaseUrl = () => {
+  const rawUrl = process.env.SITE_URL || process.env.CLIENT_URL || "https://postora-seven.vercel.app";
+  const urls = rawUrl.split(",").map((u) => u.trim());
+  const vercelOrProdUrl = urls.find(
+    (u) => u.includes("vercel.app") || (!u.includes("localhost") && !u.includes("127.0.0.1") && !u.includes("onrender.com"))
+  );
+
+  let targetUrl = vercelOrProdUrl || urls[0] || "https://postora-seven.vercel.app";
+  if (targetUrl.includes("localhost") || targetUrl.includes("127.0.0.1") || targetUrl.includes("onrender.com")) {
+    targetUrl = "https://postora-seven.vercel.app";
+  }
+
+  return targetUrl.replace(/\/$/, "");
+};
 
 // @route GET /robots.txt
 router.get("/robots.txt", (req, res) => {
+  const baseUrl = getCleanBaseUrl();
   res.type("text/plain");
   res.send(
 `User-agent: *
@@ -17,7 +31,7 @@ Disallow: /admin/
 Disallow: /super-admin/
 Disallow: /api/
 
-Sitemap: ${CLIENT_URL}/sitemap.xml`
+Sitemap: ${baseUrl}/sitemap.xml`
   );
 });
 
@@ -29,7 +43,7 @@ router.get("/sitemap.xml", async (req, res) => {
     const tags = await Tag.find().select("slug updatedAt").sort({ name: 1 });
     const authors = await User.find({ status: "active", role: { $in: ["author", "admin", "superadmin"] } }).select("username updatedAt");
 
-    const baseUrl = CLIENT_URL.replace(/\/$/, "");
+    const baseUrl = getCleanBaseUrl();
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
 
@@ -85,7 +99,7 @@ const generateRssFeed = async (req, res) => {
       .sort({ publishedAt: -1 })
       .limit(30);
 
-    const baseUrl = CLIENT_URL.replace(/\/$/, "");
+    const baseUrl = getCleanBaseUrl();
 
     let rss = `<?xml version="1.0" encoding="UTF-8" ?>\n`;
     rss += `<rss version="2.0" xmlns:atom="http://www.w3.org/2000/xmlns/atom">\n`;
