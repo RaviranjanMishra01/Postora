@@ -4,6 +4,7 @@ import { tagApi } from "../api/categoryTagApi";
 import PostCard from "../components/PostCard";
 import { CardSkeleton } from "../components/SkeletonLoader";
 import { Tag as TagIcon } from "lucide-react";
+import SEO from "../components/SEO";
 
 const TagDetail = () => {
   const { slug } = useParams();
@@ -32,6 +33,11 @@ const TagDetail = () => {
 
   return (
     <div className="container" style={{ paddingTop: "2.5rem" }}>
+      <SEO
+        title={`#${tag.name} Articles`}
+        description={`Explore all articles and publications tagged under #${tag.name} on Postora.`}
+        url={`/tag/${tag.slug}`}
+      />
       <div className="glass-card" style={{ padding: "2rem", marginBottom: "3rem" }}>
         <h1 style={{ fontSize: "2rem", display: "flex", alignItems: "center", gap: "0.6rem" }}>
           <TagIcon className="gradient-text" size={28} /> #{tag.name}

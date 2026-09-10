@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || import.meta.env.VITE_API || "/api/v1",
+  baseURL: import.meta.env.VITE_API_URL || import.meta.env.VITE_API || "https://postora-vo54.onrender.com/api/v1",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

@@ -3,6 +3,7 @@ import { categoryApi } from "../api/categoryTagApi";
 import ExploreCategoriesSection from "../components/ExploreCategoriesSection";
 import { CardSkeleton } from "../components/SkeletonLoader";
 import { Grid, Sparkles } from "lucide-react";
+import SEO from "../components/SEO";
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
@@ -26,6 +27,11 @@ const CategoriesPage = () => {
 
   return (
     <div className="container" style={{ paddingTop: "2.5rem", paddingBottom: "5rem" }}>
+      <SEO
+        title="Explore Categories"
+        description="Browse all publication topics and categories on Postora including Technology, Artificial Intelligence, Design & UX."
+        url="/categories"
+      />
       {/* Hero Banner Header */}
       <div
         style={{

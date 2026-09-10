@@ -1,0 +1,24 @@
+{
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "https://postora-vo54.onrender.com/sitemap.xml"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "https://postora-vo54.onrender.com/robots.txt"
+    },
+    {
+      "source": "/rss.xml",
+      "destination": "https://postora-vo54.onrender.com/rss.xml"
+    },
+    {
+      "source": "/feed.xml",
+      "destination": "https://postora-vo54.onrender.com/feed.xml"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
+  ]
+}

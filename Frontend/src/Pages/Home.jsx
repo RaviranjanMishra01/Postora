@@ -11,6 +11,7 @@ import SidebarCompactList from "../components/SidebarCompactList";
 import SidebarNewsletter from "../components/SidebarNewsletter";
 import FeatureHighlightsBar from "../components/FeatureHighlightsBar";
 import { HeroSkeleton, CardSkeleton } from "../components/SkeletonLoader";
+import SEO from "../components/SEO";
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
@@ -61,6 +62,7 @@ const Home = () => {
 
   return (
     <main className="container" style={{ paddingBottom: "2rem" }}>
+      <SEO url="/" title="Postora — Modern Tech, AI & Lifestyle Publication" description="Discover in-depth publications, engineering insights, artificial intelligence breakthroughs, and design trends on Postora." />
       {loading ? (
         <>
           <HeroSkeleton />

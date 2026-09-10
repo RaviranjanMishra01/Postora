@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { categoryApi } from "../api/categoryTagApi";
 import PostCard from "../components/PostCard";
 import { CardSkeleton } from "../components/SkeletonLoader";
+import SEO from "../components/SEO";
 
 const CategoryDetail = () => {
   const { slug } = useParams();
@@ -31,6 +32,17 @@ const CategoryDetail = () => {
 
   return (
     <div className="container" style={{ paddingTop: "2.5rem" }}>
+      <SEO
+        title={`${category.name} Articles`}
+        description={category.description || `Explore articles and publications in ${category.name} on Postora.`}
+        image={category.image}
+        url={`/category/${category.slug}`}
+        breadcrumbs={[
+          { name: "Home", item: "/" },
+          { name: "Categories", item: "/categories" },
+          { name: category.name, item: `/category/${category.slug}` }
+        ]}
+      />
       {/* Category Hero Header */}
       <div
         className="glass-card"

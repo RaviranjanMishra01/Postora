@@ -19,6 +19,7 @@ import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import { CardSkeleton } from "../components/SkeletonLoader";
 import { toast } from "../context/ToastContext";
+import SEO from "../components/SEO";
 
 const defaultAvatar =
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
@@ -124,6 +125,12 @@ const AuthorProfile = () => {
 
   return (
     <div className="creator-profile-container">
+      <SEO
+        title={`${author.name} (@${author.username})`}
+        description={author.bio || `Read articles published by ${author.name} on Postora.`}
+        image={author.avatar}
+        url={`/author/${author.username}`}
+      />
       {/* 1. COMPACT PREMIUM PROFILE HERO */}
       <div className="profile-hero-card">
         <div className="profile-hero-main-row">

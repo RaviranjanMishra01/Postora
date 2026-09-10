@@ -1,22 +1,24 @@
 import React, { useState } from "react";
-import { Mail, Send, CheckCircle } from "lucide-react";
+import { Send } from "lucide-react";
 import { contactApi } from "../api/commentInteractionApi";
 import { toast } from "../context/ToastContext";
+import SEO from "../components/SEO";
 
 export const AboutPage = () => (
   <div className="container" style={{ maxWidth: "800px", paddingTop: "3rem" }}>
-    <h1 className="gradient-text" style={{ fontSize: "2.5rem", marginBottom: "1.5rem" }}>About MERN Blog</h1>
+    <SEO title="About Us" description="Learn about Postora, an enterprise-grade modern tech publication and publishing platform." url="/about" />
+    <h1 className="gradient-text" style={{ fontSize: "2.5rem", marginBottom: "1.5rem" }}>About Postora</h1>
     <div style={{ color: "#e2e8f0", lineHeight: 1.8, fontSize: "1.05rem" }}>
       <p style={{ marginBottom: "1.25rem" }}>
-        MERN Blog is an open-source, enterprise-grade publishing platform engineered for developers, technical writers, and content creators. Built using MongoDB, Express.js, React 19, and Node.js.
+        Postora is a modern tech publication and open publishing platform engineered for developers, software architects, AI researchers, and digital creators. Built on high-performance MERN architecture and Cloudinary image infrastructure.
       </p>
       <h3 style={{ marginTop: "2rem", marginBottom: "1rem" }}>Platform Highlights</h3>
       <ul style={{ paddingLeft: "1.5rem", marginBottom: "2rem" }}>
         <li>Role-based access control (User, Author, Admin, SuperAdmin)</li>
-        <li>JWT security with HTTP-only cookie authentication</li>
+        <li>JWT security with HTTP-only cookie authentication & Bearer token headers</li>
+        <li>Cloudinary real-time media management and structured asset storage</li>
         <li>Nested comments, moderation reporting, and spam protection</li>
-        <li>Dynamic SEO optimization, dynamic sitemaps, and OpenGraph metadata</li>
-        <li>High-performance media handling and CDN distribution</li>
+        <li>Dynamic SEO optimization, dynamic sitemaps, RSS feeds, and OpenGraph metadata</li>
       </ul>
     </div>
   </div>
@@ -48,9 +50,10 @@ export const ContactPage = () => {
 
   return (
     <div className="container" style={{ maxWidth: "700px", paddingTop: "3rem" }}>
+      <SEO title="Contact Us" description="Get in touch with the Postora editorial and support team." url="/contact" />
       <h1 className="gradient-text" style={{ fontSize: "2.3rem", marginBottom: "0.5rem" }}>Contact Us</h1>
       <p style={{ color: "var(--text-secondary)", marginBottom: "2rem" }}>
-        Have questions, feedback, or business inquiries? Send us a message below.
+        Have questions, feedback, or editorial inquiries? Send us a message below.
       </p>
 
       <form onSubmit={handleSubmit} className="glass-card" style={{ padding: "2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
@@ -80,22 +83,25 @@ export const ContactPage = () => {
 
 export const PrivacyPage = () => (
   <div className="container" style={{ maxWidth: "800px", paddingTop: "3rem", color: "#e2e8f0", lineHeight: 1.8 }}>
+    <SEO title="Privacy Policy" description="Postora Privacy Policy and data protection guidelines." url="/privacy" />
     <h1 className="gradient-text" style={{ fontSize: "2.3rem", marginBottom: "1.5rem" }}>Privacy Policy</h1>
-    <p>We take your privacy seriously. This document outlines how user information is handled on MERN Blog.</p>
-    <h3 style={{ marginTop: "1.5rem", marginBottom: "0.5rem" }}>Data Collection</h3>
-    <p>We store user registration data (name, email, hashed password) securely in our MongoDB database. Session tokens are maintained via HTTP-only secure cookies.</p>
+    <p>We take your privacy seriously. This document outlines how user information is handled on Postora.</p>
+    <h3 style={{ marginTop: "1.5rem", marginBottom: "0.5rem" }}>Data Protection</h3>
+    <p>We store user registration data (name, email, hashed password) securely in our MongoDB database. Session tokens are maintained via HTTP-only secure cookies and Bearer tokens.</p>
   </div>
 );
 
 export const TermsPage = () => (
   <div className="container" style={{ maxWidth: "800px", paddingTop: "3rem", color: "#e2e8f0", lineHeight: 1.8 }}>
+    <SEO title="Terms of Service" description="Postora Terms of Service and community guidelines." url="/terms" />
     <h1 className="gradient-text" style={{ fontSize: "2.3rem", marginBottom: "1.5rem" }}>Terms of Service</h1>
-    <p>By accessing MERN Blog, you agree to comply with our community guidelines and moderation policies.</p>
+    <p>By accessing Postora, you agree to comply with our community guidelines and publication policies.</p>
   </div>
 );
 
 export const CookiePage = () => (
   <div className="container" style={{ maxWidth: "800px", paddingTop: "3rem", color: "#e2e8f0", lineHeight: 1.8 }}>
+    <SEO title="Cookie Policy" description="Postora Cookie Policy and session management details." url="/cookie-policy" />
     <h1 className="gradient-text" style={{ fontSize: "2.3rem", marginBottom: "1.5rem" }}>Cookie Policy</h1>
     <p>We use essential HTTP-only cookies to keep you safely logged in. We do not sell tracking cookies to third parties.</p>
   </div>
@@ -103,7 +109,8 @@ export const CookiePage = () => (
 
 export const DisclaimerPage = () => (
   <div className="container" style={{ maxWidth: "800px", paddingTop: "3rem", color: "#e2e8f0", lineHeight: 1.8 }}>
+    <SEO title="Disclaimer" description="Postora content disclaimer and editorial terms." url="/disclaimer" />
     <h1 className="gradient-text" style={{ fontSize: "2.3rem", marginBottom: "1.5rem" }}>Disclaimer</h1>
-    <p>Content published on MERN Blog reflects the opinions of individual authors and does not constitute professional advice.</p>
+    <p>Content published on Postora reflects the opinions of individual authors and does not constitute professional financial or legal advice.</p>
   </div>
 );

@@ -6,6 +6,8 @@ import { toast } from "../context/ToastContext";
 import AuthSplitLayout from "../components/auth/AuthSplitLayout";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 
+import SEO from "../components/SEO";
+
 const Register = () => {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
@@ -71,7 +73,9 @@ const Register = () => {
   };
 
   return (
-    <AuthSplitLayout
+    <>
+      <SEO title="Create Account" description="Join Postora to publish tech articles, read stories, and connect with authors." url="/register" noindex={true} />
+      <AuthSplitLayout
       title="Create your account"
       subtitle="Join Postora and start sharing your ideas with the community."
     >
@@ -299,6 +303,7 @@ const Register = () => {
         .
       </p>
     </AuthSplitLayout>
+    </>
   );
 };
 

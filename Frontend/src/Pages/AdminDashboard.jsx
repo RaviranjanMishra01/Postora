@@ -22,6 +22,7 @@ import AdminSystemSettings from "../components/admin/AdminSystemSettings";
 import AdminSystemHealth from "../components/admin/AdminSystemHealth";
 import NotificationDrawer from "../components/NotificationDrawer";
 import { CardSkeleton } from "../components/SkeletonLoader";
+import SEO from "../components/SEO";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -213,6 +214,7 @@ const AdminDashboard = () => {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg-primary)" }}>
+      <SEO title="Admin Console" url="/admin" noindex={true} />
       {/* 1. LEFT SIDEBAR NAVIGATION */}
       <AdminSidebar
         activeTab={activeTab}

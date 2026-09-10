@@ -22,6 +22,7 @@ import PostCard from "../components/PostCard";
 import { PostDetailSkeleton } from "../components/SkeletonLoader";
 import DOMPurify from "dompurify";
 import { toast } from "../context/ToastContext";
+import SEO from "../components/SEO";
 
 const defaultAvatar =
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80";
@@ -226,6 +227,19 @@ const PostDetail = () => {
 
   return (
     <>
+      <SEO
+        title={post.seoTitle || post.title}
+        description={post.seoDescription || post.excerpt}
+        image={post.featuredImage}
+        url={`/post/${post.slug}`}
+        type="article"
+        articleData={post}
+        breadcrumbs={[
+          { name: "Home", item: "/" },
+          ...(post.category ? [{ name: post.category.name, item: `/category/${post.category.slug}` }] : []),
+          { name: post.title, item: `/post/${post.slug}` }
+        ]}
+      />
       {/* 1. THIN READING PROGRESS BAR */}
       <div
         className="reading-progress-bar"

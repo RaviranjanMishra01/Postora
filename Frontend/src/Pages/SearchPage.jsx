@@ -3,6 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { Search, User, Clock, Eye, Heart, X, RotateCcw, FileText } from "lucide-react";
 import { searchApi } from "../api/commentInteractionApi";
 import { categoryApi, tagApi } from "../api/categoryTagApi";
+import SEO from "../components/SEO";
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -98,6 +99,12 @@ const SearchPage = () => {
 
   return (
     <div className="search-page-container">
+      <SEO
+        title={query ? `Search: "${query}"` : "Search Articles"}
+        description="Search publications, tech articles, and authors on Postora."
+        url="/search"
+        noindex={true}
+      />
       {/* COMPACT SEARCH & FILTERS HEADER */}
       <div className="search-header-card">
         {/* Search Bar Input */}

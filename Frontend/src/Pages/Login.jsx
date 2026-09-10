@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { toast } from "../context/ToastContext";
 import AuthSplitLayout from "../components/auth/AuthSplitLayout";
 import GoogleSignInButton from "../components/GoogleSignInButton";
+import SEO from "../components/SEO";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -41,10 +42,12 @@ const Login = () => {
   };
 
   return (
-    <AuthSplitLayout
-      title="Welcome back"
-      subtitle="Sign in to continue to your Postora account."
-    >
+    <>
+      <SEO title="Sign In" description="Sign in to your Postora account." url="/login" noindex={true} />
+      <AuthSplitLayout
+        title="Welcome back"
+        subtitle="Sign in to continue to your Postora account."
+      >
       <form onSubmit={handleLoginSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
         {/* Email Field */}
         <div>
@@ -200,6 +203,7 @@ const Login = () => {
       {/* Google SSO Button */}
       <GoogleSignInButton text="Continue with Google" />
     </AuthSplitLayout>
+    </>
   );
 };
 

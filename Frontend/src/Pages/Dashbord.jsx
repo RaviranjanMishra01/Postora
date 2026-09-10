@@ -19,6 +19,7 @@ import ActivityTimeline from "../components/profile/ActivityTimeline";
 import InlineProfileSettings from "../components/profile/InlineProfileSettings";
 import EmptyState from "../components/profile/EmptyState";
 import { CardSkeleton } from "../components/SkeletonLoader";
+import SEO from "../components/SEO";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -146,6 +147,7 @@ const Dashboard = () => {
 
   return (
     <div className="container" style={{ maxWidth: "1280px", paddingTop: "2rem", paddingBottom: "5rem" }}>
+      <SEO title="User Dashboard" url="/dashboard" noindex={true} />
       {/* 2-COLUMN SINGLE-PAGE DASHBOARD LAYOUT */}
       <div
         style={{
