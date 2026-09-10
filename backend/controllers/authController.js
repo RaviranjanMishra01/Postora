@@ -201,7 +201,8 @@ const forgotPassword = asyncHandler(async (req, res) => {
     const resetToken = user.getResetPasswordToken();
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `${req.protocol}://${req.get("host")}/reset-password/${resetToken}`;
+    const clientUrl = process.env.CLIENT_URL || "https://postora-seven.vercel.app";
+    const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
     const message = `Password Reset Request:\n\n${resetUrl}`;
 
     await sendEmail({
@@ -230,7 +231,8 @@ const adminForgotPassword = asyncHandler(async (req, res) => {
     const resetToken = user.getResetPasswordToken();
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `${req.protocol}://${req.get("host")}/admin/reset-password/${resetToken}`;
+    const clientUrl = process.env.CLIENT_URL || "https://postora-seven.vercel.app";
+    const resetUrl = `${clientUrl}/admin/reset-password/${resetToken}`;
     const message = `Admin Password Reset Request:\n\n${resetUrl}`;
 
     await sendEmail({
@@ -259,7 +261,8 @@ const superAdminForgotPassword = asyncHandler(async (req, res) => {
     const resetToken = user.getResetPasswordToken();
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `${req.protocol}://${req.get("host")}/super-admin/reset-password/${resetToken}`;
+    const clientUrl = process.env.CLIENT_URL || "https://postora-seven.vercel.app";
+    const resetUrl = `${clientUrl}/super-admin/reset-password/${resetToken}`;
     const message = `Super Admin Password Reset Request:\n\n${resetUrl}`;
 
     await sendEmail({

@@ -5,6 +5,8 @@ const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 const slugify = require("slugify");
 
+const { uploadToCloudinary, deleteFromCloudinary } = require("../utils/cloudinary");
+
 // @desc Get all categories
 // @route GET /api/v1/categories
 const getCategories = asyncHandler(async (req, res) => {
@@ -50,11 +52,17 @@ const createCategory = asyncHandler(async (req, res) => {
   const existing = await Category.findOne({ slug });
   if (existing) throw new ApiError(400, "Category already exists");
 
+  let categoryImage = image;
+  if (req.file) {
+    const uploadRes = await uploadToCloudinary(req.file.path, "categories", { protocol: req.protocol, host: req.get("host") });
+    categoryImage = uploadRes?.secure_url || categoryImage;
+  }
+
   const category = await Category.create({
     name,
     slug,
     description,
-    image: image || (req.file ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}` : undefined),
+    image: categoryImage,
   });
 
   res.status(201).json(new ApiResponse(201, { category }, "Category created successfully"));
@@ -72,8 +80,19 @@ const updateCategory = asyncHandler(async (req, res) => {
     category.slug = slugify(name, { lower: true, strict: true });
   }
   if (description !== undefined) category.description = description;
-  if (image) category.image = image;
-  if (req.file) category.image = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+
+  if (req.file) {
+    if (category.image) {
+      await deleteFromCloudinary(category.image);
+    }
+    const uploadRes = await uploadToCloudinary(req.file.path, "categories", { protocol: req.protocol, host: req.get("host") });
+    category.image = uploadRes?.secure_url || category.image;
+  } else if (image && image !== category.image) {
+    if (category.image) {
+      await deleteFromCloudinary(category.image);
+    }
+    category.image = image;
+  }
 
   await category.save();
   res.status(200).json(new ApiResponse(200, { category }, "Category updated successfully"));
@@ -82,6 +101,10 @@ const updateCategory = asyncHandler(async (req, res) => {
 // @desc Delete Category
 // @route DELETE /api/v1/categories/:id
 const deleteCategory = asyncHandler(async (req, res) => {
+  const category = await Category.findById(req.params.id);
+  if (category && category.image) {
+    await deleteFromCloudinary(category.image);
+  }
   await Category.findByIdAndDelete(req.params.id);
   res.status(200).json(new ApiResponse(200, {}, "Category deleted successfully"));
 });

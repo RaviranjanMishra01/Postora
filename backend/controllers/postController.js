@@ -8,6 +8,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const calculateReadingTime = require("../utils/readingTime");
 const slugify = require("slugify");
 const { isValidObjectId, sanitizeRichText } = require("../middleware/validate");
+const { uploadToCloudinary, deleteFromCloudinary } = require("../utils/cloudinary");
 
 // @desc Create a Post
 // @route POST /api/v1/posts
@@ -40,12 +41,18 @@ const createPost = asyncHandler(async (req, res) => {
   const generatedSlug = slugify(title, { lower: true, strict: true }) + "-" + Date.now().toString().slice(-4);
   const calculatedReadingTime = calculateReadingTime(cleanContent || content);
 
+  let postFeaturedImage = featuredImage;
+  if (req.file) {
+    const uploadRes = await uploadToCloudinary(req.file.path, "posts", { protocol: req.protocol, host: req.get("host") });
+    postFeaturedImage = uploadRes?.secure_url || postFeaturedImage;
+  }
+
   const post = await Post.create({
     title: title.trim(),
     slug: generatedSlug,
     excerpt: excerpt ? excerpt.trim().slice(0, 500) : title.trim(),
     content: cleanContent || content,
-    featuredImage: featuredImage || (req.file ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}` : undefined),
+    featuredImage: postFeaturedImage,
     readingTime: calculatedReadingTime,
     author: req.user.id,
     category,
@@ -223,8 +230,20 @@ const updatePost = asyncHandler(async (req, res) => {
   }
 
   if (excerpt !== undefined) post.excerpt = String(excerpt).trim().slice(0, 500);
-  if (featuredImage) post.featuredImage = featuredImage;
-  if (req.file) post.featuredImage = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+
+  if (req.file) {
+    if (post.featuredImage) {
+      await deleteFromCloudinary(post.featuredImage);
+    }
+    const uploadRes = await uploadToCloudinary(req.file.path, "posts", { protocol: req.protocol, host: req.get("host") });
+    post.featuredImage = uploadRes?.secure_url || post.featuredImage;
+  } else if (featuredImage && featuredImage !== post.featuredImage) {
+    if (post.featuredImage) {
+      await deleteFromCloudinary(post.featuredImage);
+    }
+    post.featuredImage = featuredImage;
+  }
+
   if (status && ["published", "draft", "scheduled", "trash"].includes(status)) {
     post.status = status;
     if (status === "published" && !post.publishedAt) {
@@ -260,7 +279,10 @@ const deletePost = asyncHandler(async (req, res) => {
   }
 
   if (post.status === "trash") {
-    // Permanent deletion
+    // Permanent deletion from database & real-time Cloudinary removal
+    if (post.featuredImage) {
+      await deleteFromCloudinary(post.featuredImage);
+    }
     await post.deleteOne();
     res.status(200).json(new ApiResponse(200, {}, "Post permanently deleted"));
   } else {

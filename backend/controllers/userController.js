@@ -5,6 +5,7 @@ const ApiResponse = require("../utils/ApiResponse");
 const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 const { isValidEmail, isValidUrl } = require("../middleware/validate");
+const { uploadToCloudinary, deleteFromCloudinary } = require("../utils/cloudinary");
 
 // @desc Get current user profile
 // @route GET /api/v1/users/profile
@@ -59,21 +60,26 @@ const updateProfile = asyncHandler(async (req, res) => {
 // @route PUT /api/v1/users/avatar
 const changeAvatar = asyncHandler(async (req, res) => {
   let avatarUrl = req.body.avatar;
+  const currentUser = await User.findById(req.user.id);
+  if (!currentUser) throw new ApiError(404, "User not found");
+
   if (req.file) {
-    avatarUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    const uploadRes = await uploadToCloudinary(req.file.path, "avatars", { protocol: req.protocol, host: req.get("host") });
+    avatarUrl = uploadRes?.secure_url || avatarUrl;
+
+    if (currentUser.avatar) {
+      await deleteFromCloudinary(currentUser.avatar);
+    }
   }
 
   if (!avatarUrl) {
     throw new ApiError(400, "Please provide an image file or avatar URL");
   }
 
-  const user = await User.findByIdAndUpdate(
-    req.user.id,
-    { avatar: avatarUrl },
-    { new: true }
-  );
+  currentUser.avatar = avatarUrl;
+  await currentUser.save();
 
-  res.status(200).json(new ApiResponse(200, { user }, "Avatar updated successfully"));
+  res.status(200).json(new ApiResponse(200, { user: currentUser }, "Avatar updated successfully"));
 });
 
 // @desc Change Email
@@ -127,6 +133,10 @@ const changeUsername = asyncHandler(async (req, res) => {
 // @desc Delete account
 // @route DELETE /api/v1/users/delete-account
 const deleteAccount = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id);
+  if (user && user.avatar) {
+    await deleteFromCloudinary(user.avatar);
+  }
   await User.findByIdAndDelete(req.user.id);
   res.cookie("token", "none", { expires: new Date(Date.now() + 10 * 1000), httpOnly: true });
   res.status(200).json(new ApiResponse(200, {}, "Account deleted successfully"));
