@@ -6,7 +6,11 @@ const Tag = require("../models/Tag");
 const User = require("../models/User");
 
 const getCleanBaseUrl = () => {
-  const rawUrl = process.env.SITE_URL || process.env.CLIENT_URL || "https://postora-seven.vercel.app";
+  let rawUrl = process.env.SITE_URL || process.env.CLIENT_URL || "https://postora-seven.vercel.app";
+  
+  // Clean up accidental typo where .vercel.app.com was passed in env variables
+  rawUrl = rawUrl.replace(/vercel\.app\.com/g, "vercel.app");
+
   const urls = rawUrl.split(",").map((u) => u.trim());
   const vercelOrProdUrl = urls.find(
     (u) => u.includes("vercel.app") || (!u.includes("localhost") && !u.includes("127.0.0.1") && !u.includes("onrender.com"))
@@ -17,7 +21,12 @@ const getCleanBaseUrl = () => {
     targetUrl = "https://postora-seven.vercel.app";
   }
 
-  return targetUrl.replace(/\/$/, "");
+  targetUrl = targetUrl.replace(/\/$/, "");
+  if (targetUrl.endsWith(".vercel.app.com")) {
+    targetUrl = targetUrl.replace(/\.vercel\.app\.com$/, ".vercel.app");
+  }
+
+  return targetUrl;
 };
 
 // @route GET /robots.txt
