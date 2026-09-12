@@ -114,38 +114,29 @@ const GoogleSignInButton = ({ text = "Continue with Google", onSuccess }) => {
       type="button"
       onClick={handleGoogleClick}
       disabled={loading}
+      className="auth-btn-google"
       style={{
         width: "100%",
+        height: "48px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         gap: "0.75rem",
-        padding: "0.8rem 1rem",
-        borderRadius: "10px",
-        backgroundColor: "var(--bg-secondary)",
-        color: "var(--text-primary)",
-        border: "1px solid var(--border-color)",
+        padding: "0 1.25rem",
+        borderRadius: "12px",
+        backgroundColor: "var(--bg-card, #FFFFFF)",
+        color: "var(--text-primary, #0F172A)",
+        border: "1px solid var(--border-color, #E2E8F0)",
         fontWeight: "600",
         fontSize: "0.92rem",
         cursor: loading ? "not-allowed" : "pointer",
-        transition: "all 0.2s ease",
+        transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)",
         opacity: loading ? 0.7 : 1,
-      }}
-      onMouseEnter={(e) => {
-        if (!loading) {
-          e.currentTarget.style.borderColor = "var(--Postora-pink, #FF3F7F)";
-          e.currentTarget.style.boxShadow = "0 2px 8px rgba(255, 63, 127, 0.15)";
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!loading) {
-          e.currentTarget.style.borderColor = "var(--border-color)";
-          e.currentTarget.style.boxShadow = "none";
-        }
+        boxSizing: "border-box",
       }}
     >
       {/* Official Google Logo */}
-      <svg width="18" height="18" viewBox="0 0 18 18">
+      <svg width="18" height="18" viewBox="0 0 18 18" style={{ flexShrink: 0 }}>
         <path
           fill="#4285F4"
           d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.259h2.908c1.702-1.567 2.684-3.874 2.684-6.617z"

@@ -4,6 +4,8 @@ import { Mail, Send, ArrowLeft } from "lucide-react";
 import { authApi } from "../api/authApi";
 import { toast } from "../context/ToastContext";
 import AuthSplitLayout from "../components/auth/AuthSplitLayout";
+import AuthInput from "../components/auth/AuthInput";
+import AuthButton from "../components/auth/AuthButton";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -36,83 +38,75 @@ const ForgotPassword = () => {
     >
       {sent ? (
         <div style={{ textAlign: "center", padding: "1rem 0" }}>
-          <p style={{ color: "var(--Postora-pink, #FF3F7F)", fontSize: "0.92rem", lineHeight: 1.6, marginBottom: "1.5rem", fontWeight: 500 }}>
+          <p style={{ color: "var(--Postora-pink, #FF3F7F)", fontSize: "0.95rem", lineHeight: 1.6, marginBottom: "1.5rem", fontWeight: 500 }}>
             If an account matches <strong>{email}</strong>, a password reset link has been dispatched to your inbox.
           </p>
           <Link
             to="/login"
-            className="btn-primary"
+            className="auth-btn auth-btn-primary"
             style={{
               display: "inline-flex",
               alignItems: "center",
+              justifyContent: "center",
               gap: "0.5rem",
               textDecoration: "none",
               padding: "0.8rem 1.5rem",
-              borderRadius: "10px",
+              borderRadius: "12px",
               fontWeight: 600,
             }}
           >
-            <ArrowLeft size={16} /> Return to Sign In
+            <ArrowLeft size={18} /> Return to Sign In
           </Link>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-          <div>
-            <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: "0.4rem" }}>
-              Registered Email Address
-            </label>
-            <div className="auth-input-focus" style={{ position: "relative", borderRadius: "10px", border: "1px solid var(--border-color)", transition: "all 0.2s" }}>
-              <Mail
-                size={18}
-                style={{
-                  position: "absolute",
-                  left: "14px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "var(--text-muted)",
-                }}
-              />
-              <input
-                type="email"
-                placeholder="user@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                style={{
-                  width: "100%",
-                  padding: "0.85rem 1rem 0.85rem 2.6rem",
-                  borderRadius: "10px",
-                  background: "var(--bg-secondary)",
-                  border: "none",
-                  color: "var(--text-primary)",
-                  fontSize: "0.92rem",
-                  outline: "none",
-                }}
-              />
-            </div>
-          </div>
+        <>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+            <AuthInput
+              id="forgot-email"
+              label="Registered Email Address"
+              type="email"
+              placeholder="name@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              icon={Mail}
+              autoComplete="email"
+            />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary"
+            <div style={{ marginTop: "0.25rem" }}>
+              <AuthButton
+                type="submit"
+                loading={loading}
+                icon={Send}
+              >
+                Send Reset Link
+              </AuthButton>
+            </div>
+          </form>
+
+          {/* Account Switch Link */}
+          <div
             style={{
-              width: "100%",
-              padding: "0.85rem",
-              fontSize: "0.95rem",
-              fontWeight: 700,
-              borderRadius: "10px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "0.5rem",
-              marginTop: "0.5rem",
-              cursor: loading ? "not-allowed" : "pointer",
+              textAlign: "center",
+              fontSize: "14px",
+              color: "var(--text-secondary, #64748B)",
+              marginTop: "16px",
             }}
           >
-            <Send size={18} /> {loading ? "Dispatching..." : "Send Reset Link"}
-          </button>
-        </form>
+            Remember your password?{" "}
+            <Link
+              to="/login"
+              style={{
+                color: "var(--Postora-pink, #FF3F7F)",
+                fontWeight: 600,
+                textDecoration: "none",
+                marginLeft: "4px",
+              }}
+            >
+              Log in
+            </Link>
+          </div>
+        </>
       )}
     </AuthSplitLayout>
   );

@@ -95,13 +95,13 @@ const FeaturedPostCard = ({ post }) => {
       </Link>
 
       <div style={{ textAlign: "center", padding: "0 0.5rem" }}>
-        {post.category && (
+        {(post.customCategory || post.category) && (
           <Link
-            to={`/category/${post.category.slug}`}
+            to={post.category?.slug ? `/category/${post.category.slug}` : `/categories`}
             className="editorial-category"
             style={{ display: "inline-block", marginBottom: "0.5rem" }}
           >
-            {post.category.name}
+            {post.customCategory && post.customCategory.trim() ? post.customCategory : post.category?.name}
           </Link>
         )}
 

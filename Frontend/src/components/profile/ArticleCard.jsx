@@ -129,7 +129,7 @@ const ArticleCard = ({
         </Link>
 
         {/* Category Pill */}
-        {post.category && (
+        {(post.customCategory || post.category) && (
           <span
             style={{
               position: "absolute",
@@ -147,7 +147,11 @@ const ArticleCard = ({
               letterSpacing: "0.04em",
             }}
           >
-            {typeof post.category === "object" ? post.category.name : post.category}
+            {post.customCategory && post.customCategory.trim()
+              ? post.customCategory
+              : typeof post.category === "object"
+              ? post.category?.name
+              : post.category}
           </span>
         )}
 

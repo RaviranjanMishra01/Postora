@@ -52,13 +52,13 @@ const CompactPostCard = ({ post, showImage = true }) => {
       )}
 
       <div>
-        {post.category && (
+        {(post.customCategory || post.category) && (
           <Link
-            to={`/category/${post.category.slug}`}
+            to={post.category?.slug ? `/category/${post.category.slug}` : `/categories`}
             className="editorial-category"
             style={{ display: "inline-block", marginBottom: "0.35rem" }}
           >
-            {post.category.name}
+            {post.customCategory && post.customCategory.trim() ? post.customCategory : post.category?.name}
           </Link>
         )}
 

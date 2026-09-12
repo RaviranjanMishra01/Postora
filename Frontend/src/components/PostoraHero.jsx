@@ -93,9 +93,11 @@ const PostoraHero = ({ featuredPosts = [], rightPosts = [] }) => {
                 zIndex: 3,
               }}
             >
-              {currentPost.category && (
+              {(currentPost.customCategory || currentPost.category) && (
                 <span className="Postora-badge-pill" style={{ margin: 0 }}>
-                  {currentPost.category.name}
+                  {currentPost.customCategory && currentPost.customCategory.trim()
+                    ? currentPost.customCategory
+                    : currentPost.category?.name}
                 </span>
               )}
 

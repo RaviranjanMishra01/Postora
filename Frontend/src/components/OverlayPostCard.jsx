@@ -62,9 +62,9 @@ const OverlayPostCard = ({ post, height = "280px", showBadgeIcon = false }) => {
 
         {/* Top Badges */}
         <div style={{ position: "absolute", top: "14px", left: "14px", right: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 3 }}>
-          {post.category && (
+          {(post.customCategory || post.category) && (
             <span className="Postora-badge-pill" style={{ margin: 0 }}>
-              {post.category.name}
+              {post.customCategory && post.customCategory.trim() ? post.customCategory : post.category?.name}
             </span>
           )}
 

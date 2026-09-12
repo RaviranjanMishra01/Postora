@@ -1,20 +1,18 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Feather, BookOpen, Users, Sparkles } from "lucide-react";
+import { Feather, BookOpen, Users, Sparkles, Quote } from "lucide-react";
 
 const AuthSplitLayout = ({ children, title, subtitle }) => {
   const location = useLocation();
-  const isRegister = location.pathname === "/register";
-  const isForgotPassword = location.pathname === "/forgot-password";
 
   return (
     <div
       style={{
         minHeight: "100vh",
         display: "flex",
-        backgroundColor: "var(--bg-primary)",
-        color: "var(--text-primary)",
+        backgroundColor: "var(--bg-primary, #F8FAFC)",
+        color: "var(--text-primary, #0F172A)",
         position: "relative",
         overflowX: "hidden",
       }}
@@ -22,9 +20,61 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
       <style>{`
         .auth-split-wrapper {
           display: grid;
-          grid-template-columns: 1.1fr 1fr;
+          grid-template-columns: 1.15fr 1fr;
           width: 100%;
           min-height: 100vh;
+        }
+
+        .auth-custom-input:focus {
+          border-color: var(--Postora-pink, #FF3F7F) !important;
+          box-shadow: 0 0 0 4px rgba(255, 63, 127, 0.12) !important;
+          background-color: var(--bg-card, #FFFFFF) !important;
+        }
+
+        .auth-custom-input:hover:not(:focus) {
+          border-color: #CBD5E1 !important;
+        }
+
+        .auth-btn-primary {
+          background-color: var(--Postora-pink, #FF3F7F) !important;
+          color: #FFFFFF !important;
+          border: none !important;
+          box-shadow: 0 4px 14px rgba(255, 63, 127, 0.25) !important;
+        }
+
+        .auth-btn-primary:hover:not(:disabled) {
+          background-color: var(--Postora-pink-hover, #E6356F) !important;
+          transform: translateY(-1px) !important;
+          box-shadow: 0 6px 20px rgba(255, 63, 127, 0.35) !important;
+        }
+
+        .auth-btn-primary:active:not(:disabled) {
+          transform: translateY(0) !important;
+          box-shadow: 0 2px 8px rgba(255, 63, 127, 0.25) !important;
+        }
+
+        .auth-btn-google:hover:not(:disabled) {
+          border-color: rgba(255, 63, 127, 0.4) !important;
+          background-color: var(--bg-secondary, #F8FAFC) !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+          transform: translateY(-1px) !important;
+        }
+
+        .auth-btn-google:active:not(:disabled) {
+          transform: translateY(0) !important;
+        }
+
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+        .spin-animation {
+          animation: spin 1s linear infinite;
+        }
+
+        .auth-mobile-header {
+          display: none;
         }
 
         @media (max-width: 960px) {
@@ -34,14 +84,12 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
           .auth-left-visual {
             display: none !important;
           }
+          .auth-mobile-header {
+            display: flex !important;
+          }
           .auth-right-form {
             padding: 2.5rem 1.25rem !important;
           }
-        }
-
-        .auth-input-focus:focus-within {
-          border-color: var(--Postora-pink, #FF3F7F) !important;
-          box-shadow: 0 0 0 3px rgba(255, 63, 127, 0.15) !important;
         }
       `}</style>
 
@@ -50,26 +98,28 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
         <div
           className="auth-left-visual"
           style={{
-            background: "var(--bg-secondary)",
-            borderRight: "1px solid var(--border-color)",
-            padding: "3.5rem",
+            background: "var(--bg-secondary, #F8FAFC)",
+            borderRight: "1px solid var(--border-color, #E2E8F0)",
+            padding: "3.5rem 4rem",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
             position: "relative",
             overflow: "hidden",
+            minHeight: "100vh",
+            boxSizing: "border-box",
           }}
         >
-          {/* Ambient Glow Effects */}
+          {/* Subtle Pink Ambient Glow */}
           <div
             style={{
               position: "absolute",
-              top: "-10%",
-              left: "-10%",
-              width: "400px",
-              height: "400px",
+              top: "-12%",
+              left: "-12%",
+              width: "450px",
+              height: "450px",
               borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(255, 63, 127, 0.15) 0%, rgba(0,0,0,0) 70%)",
+              background: "radial-gradient(circle, rgba(255, 63, 127, 0.12) 0%, rgba(255,255,255,0) 70%)",
               filter: "blur(60px)",
               pointerEvents: "none",
             }}
@@ -79,32 +129,49 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
               position: "absolute",
               bottom: "-10%",
               right: "-10%",
-              width: "450px",
-              height: "450px",
+              width: "480px",
+              height: "480px",
               borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(84, 119, 146, 0.18) 0%, rgba(0,0,0,0) 70%)",
-              filter: "blur(60px)",
+              background: "radial-gradient(circle, rgba(76, 141, 255, 0.08) 0%, rgba(255,255,255,0) 70%)",
+              filter: "blur(70px)",
               pointerEvents: "none",
             }}
           />
 
-          {/* Top Brand Tag */}
+          {/* Abstract Light Grid Overlay Pattern */}
+          <svg
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              opacity: 0.35,
+              pointerEvents: "none",
+            }}
+          >
+            <pattern id="auth-grid-dots" width="24" height="24" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1.2" fill="var(--text-muted, #94A3B8)" opacity="0.3" />
+            </pattern>
+            <rect width="100%" height="100%" fill="url(#auth-grid-dots)" />
+          </svg>
+
+          {/* Top Brand Logo Tag */}
           <div style={{ zIndex: 2 }}>
             <Link
               to="/"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "0.6rem",
+                gap: "0.75rem",
                 textDecoration: "none",
               }}
             >
               <div
                 style={{
-                  width: "40px",
-                  height: "40px",
+                  width: "42px",
+                  height: "42px",
                   borderRadius: "12px",
-                  background: "var(--Postora-pink, #FF3F7F)",
+                  background: "linear-gradient(135deg, #FF3F7F 0%, #E6356F 100%)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -116,9 +183,9 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
               <span
                 style={{
                   fontFamily: "var(--font-heading)",
-                  fontSize: "1.4rem",
+                  fontSize: "1.45rem",
                   fontWeight: 800,
-                  color: "var(--text-primary)",
+                  color: "var(--text-primary, #0F172A)",
                   letterSpacing: "-0.5px",
                 }}
               >
@@ -127,227 +194,257 @@ const AuthSplitLayout = ({ children, title, subtitle }) => {
             </Link>
           </div>
 
-          {/* Middle Editorial Illustration Card */}
-          <div style={{ zIndex: 2, margin: "auto 0", padding: "2rem 0" }}>
+          {/* Middle Content Section */}
+          <div style={{ zIndex: 2, margin: "auto 0", padding: "2.5rem 0" }}>
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
             >
+              {/* Badge */}
               <div
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "0.5rem",
-                  padding: "0.4rem 0.9rem",
-                  borderRadius: "var(--radius-full, 9999px)",
-                  background: "rgba(255, 63, 127, 0.1)",
-                  border: "1px solid rgba(255, 63, 127, 0.25)",
+                  gap: "0.45rem",
+                  padding: "0.4rem 0.95rem",
+                  borderRadius: "9999px",
+                  background: "rgba(255, 63, 127, 0.08)",
+                  border: "1px solid rgba(255, 63, 127, 0.2)",
                   color: "var(--Postora-pink, #FF3F7F)",
-                  fontSize: "0.8rem",
+                  fontSize: "0.82rem",
                   fontWeight: 600,
-                  marginBottom: "1.25rem",
+                  marginBottom: "1.5rem",
                 }}
               >
                 <Sparkles size={14} /> Modern Publishing Platform
               </div>
 
+              {/* Main Headline */}
               <h1
                 style={{
                   fontFamily: "var(--font-heading)",
                   fontSize: "2.5rem",
                   fontWeight: 800,
-                  lineHeight: 1.15,
+                  lineHeight: 1.18,
                   letterSpacing: "-0.02em",
-                  color: "var(--text-primary)",
-                  marginBottom: "1rem",
+                  color: "var(--text-primary, #0F172A)",
+                  marginBottom: "1.2rem",
                 }}
               >
                 Where great ideas find their voice.
               </h1>
 
+              {/* Subtitle / Description */}
               <p
                 style={{
                   fontSize: "1.05rem",
-                  color: "var(--text-secondary)",
+                  color: "var(--text-secondary, #475569)",
                   lineHeight: 1.6,
                   maxWidth: "480px",
-                  marginBottom: "2rem",
+                  marginBottom: "2.25rem",
                 }}
               >
                 Write, connect, and build an audience with custom Markdown tools, real-time analytics, and vibrant developer communities.
               </p>
             </motion.div>
 
-            {/* Interactive Stats Cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", maxWidth: "460px" }}>
+            {/* Metric SaaS Cards */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", maxWidth: "480px" }}>
               <motion.div
-                whileHover={{ y: -4 }}
-                transition={{ type: "spring", stiffness: 300 }}
+                whileHover={{ y: -3 }}
+                transition={{ duration: 0.2 }}
                 style={{
-                  padding: "1.2rem",
-                  borderRadius: "var(--radius-md, 14px)",
-                  background: "var(--bg-card)",
-                  border: "1px solid var(--border-color)",
-                  boxShadow: "var(--shadow-subtle)",
+                  padding: "1.25rem",
+                  borderRadius: "14px",
+                  background: "var(--bg-card, #FFFFFF)",
+                  border: "1px solid var(--border-color, #E2E8F0)",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.03)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.4rem",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: "var(--Postora-pink, #FF3F7F)", marginBottom: "0.4rem" }}>
-                  <Users size={18} />
-                  <span style={{ fontWeight: 700, fontSize: "1.1rem" }}>10,000+</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--Postora-pink, #FF3F7F)" }}>
+                  <div
+                    style={{
+                      width: "32px",
+                      height: "32px",
+                      borderRadius: "8px",
+                      background: "rgba(255, 63, 127, 0.1)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Users size={16} color="var(--Postora-pink, #FF3F7F)" />
+                  </div>
+                  <span style={{ fontWeight: 800, fontSize: "1.15rem", color: "var(--text-primary, #0F172A)" }}>
+                    10,000+
+                  </span>
                 </div>
-                <div style={{ fontSize: "0.82rem", color: "var(--text-secondary)", fontWeight: 500 }}>
+                <div style={{ fontSize: "0.82rem", color: "var(--text-secondary, #64748B)", fontWeight: 500 }}>
                   Active Creators & Authors
                 </div>
               </motion.div>
 
               <motion.div
-                whileHover={{ y: -4 }}
-                transition={{ type: "spring", stiffness: 300 }}
+                whileHover={{ y: -3 }}
+                transition={{ duration: 0.2 }}
                 style={{
-                  padding: "1.2rem",
-                  borderRadius: "var(--radius-md, 14px)",
-                  background: "var(--bg-card)",
-                  border: "1px solid var(--border-color)",
-                  boxShadow: "var(--shadow-subtle)",
+                  padding: "1.25rem",
+                  borderRadius: "14px",
+                  background: "var(--bg-card, #FFFFFF)",
+                  border: "1px solid var(--border-color, #E2E8F0)",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.03)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.4rem",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: "var(--accent-blue, #4C8DFF)", marginBottom: "0.4rem" }}>
-                  <BookOpen size={18} />
-                  <span style={{ fontWeight: 700, fontSize: "1.1rem" }}>50,000+</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <div
+                    style={{
+                      width: "32px",
+                      height: "32px",
+                      borderRadius: "8px",
+                      background: "rgba(76, 141, 255, 0.1)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <BookOpen size={16} color="#3B82F6" />
+                  </div>
+                  <span style={{ fontWeight: 800, fontSize: "1.15rem", color: "var(--text-primary, #0F172A)" }}>
+                    50,000+
+                  </span>
                 </div>
-                <div style={{ fontSize: "0.82rem", color: "var(--text-secondary)", fontWeight: 500 }}>
+                <div style={{ fontSize: "0.82rem", color: "var(--text-secondary, #64748B)", fontWeight: 500 }}>
                   Published Tech Stories
                 </div>
               </motion.div>
             </div>
           </div>
 
-          {/* Bottom Statement */}
+          {/* Inspirational Quote Footer */}
           <div
             style={{
               zIndex: 2,
               paddingTop: "1.5rem",
-              borderTop: "1px solid var(--border-color)",
+              borderTop: "1px solid var(--border-color, #E2E8F0)",
+              display: "flex",
+              alignItems: "flex-start",
+              gap: "0.75rem",
             }}
           >
-            <p
-              style={{
-                fontStyle: "italic",
-                fontSize: "1rem",
-                color: "var(--text-primary)",
-                fontWeight: 600,
-                lineHeight: 1.4,
-                marginBottom: "0.3rem",
-              }}
-            >
-              "Share ideas. Build your audience. Create something worth reading."
-            </p>
-            <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)" }}>
-              Postora — a modern publishing platform for creators and developers.
-            </p>
+            <Quote size={20} style={{ color: "var(--Postora-pink, #FF3F7F)", flexShrink: 0, marginTop: "2px" }} />
+            <div>
+              <p
+                style={{
+                  fontSize: "0.92rem",
+                  color: "var(--text-primary, #0F172A)",
+                  fontWeight: 500,
+                  lineHeight: 1.5,
+                  marginBottom: "0.25rem",
+                }}
+              >
+                "Share ideas. Build your audience. Create something worth reading."
+              </p>
+              <p style={{ fontSize: "0.8rem", color: "var(--text-muted, #94A3B8)", fontWeight: 500 }}>
+                Postora — Modern publishing for creators & developers
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* RIGHT FORM PANEL */}
+        {/* RIGHT FORM PANEL - VERTICALLY CENTERED SINGLE COHESIVE UNIT */}
         <div
           className="auth-right-form"
           style={{
             display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            padding: "3.5rem 4rem",
-            background: "var(--bg-card)",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "3.5rem 2.5rem",
+            background: "var(--bg-card, #FFFFFF)",
             position: "relative",
+            minHeight: "100vh",
+            boxSizing: "border-box",
           }}
         >
-          {/* Top-Right Navigation Link */}
-          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "2rem" }}>
-            <div style={{ fontSize: "0.9rem", color: "var(--text-secondary)" }}>
-              {isRegister ? (
-                <>
-                  Already have an account?{" "}
-                  <Link
-                    to="/login"
-                    style={{
-                      color: "var(--Postora-pink, #FF3F7F)",
-                      fontWeight: 700,
-                      textDecoration: "none",
-                      marginLeft: "0.3rem",
-                    }}
-                  >
-                    Log in
-                  </Link>
-                </>
-              ) : isForgotPassword ? (
-                <>
-                  Remember your password?{" "}
-                  <Link
-                    to="/login"
-                    style={{
-                      color: "var(--Postora-pink, #FF3F7F)",
-                      fontWeight: 700,
-                      textDecoration: "none",
-                      marginLeft: "0.3rem",
-                    }}
-                  >
-                    Log in
-                  </Link>
-                </>
-              ) : (
-                <>
-                  Don't have an account?{" "}
-                  <Link
-                    to="/register"
-                    style={{
-                      color: "var(--Postora-pink, #FF3F7F)",
-                      fontWeight: 700,
-                      textDecoration: "none",
-                      marginLeft: "0.3rem",
-                    }}
-                  >
-                    Sign up
-                  </Link>
-                </>
-              )}
+          {/* Centered Max-Width 440px Content Container */}
+          <div style={{ width: "100%", maxWidth: "440px", margin: "0 auto" }}>
+            {/* Mobile Top Brand Header */}
+            <div className="auth-mobile-header" style={{ marginBottom: "2rem", justifyContent: "center" }}>
+              <Link
+                to="/"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.6rem",
+                  textDecoration: "none",
+                }}
+              >
+                <div
+                  style={{
+                    width: "38px",
+                    height: "38px",
+                    borderRadius: "10px",
+                    background: "linear-gradient(135deg, #FF3F7F 0%, #E6356F 100%)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 4px 12px rgba(255, 63, 127, 0.25)",
+                  }}
+                >
+                  <Feather size={20} color="#ffffff" />
+                </div>
+                <span
+                  style={{
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "1.4rem",
+                    fontWeight: 800,
+                    color: "var(--text-primary, #0F172A)",
+                    letterSpacing: "-0.5px",
+                  }}
+                >
+                  Postora
+                </span>
+              </Link>
             </div>
-          </div>
 
-          {/* Form Content Wrapper with Framer Motion Animation */}
-          <div style={{ width: "100%", maxWidth: "420px", margin: "0 auto" }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={location.pathname}
-                initial={{ opacity: 0, x: isRegister ? 24 : -24 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: isRegister ? -24 : 24 }}
-                transition={{ duration: 0.35, ease: "easeInOut" }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
               >
-                <div style={{ marginBottom: "2rem" }}>
+                {/* Main Heading & Description */}
+                <div style={{ textAlign: "center", marginBottom: "32px" }}>
                   <h2
                     style={{
                       fontFamily: "var(--font-heading)",
-                      fontSize: "2rem",
+                      fontSize: "1.85rem",
                       fontWeight: 800,
-                      color: "var(--text-primary)",
+                      color: "var(--text-primary, #0F172A)",
                       letterSpacing: "-0.02em",
-                      marginBottom: "0.4rem",
+                      marginBottom: "10px",
                     }}
                   >
                     {title}
                   </h2>
-                  <p style={{ color: "var(--text-secondary)", fontSize: "0.92rem", lineHeight: 1.5 }}>
+                  <p style={{ color: "var(--text-secondary, #64748B)", fontSize: "0.93rem", lineHeight: 1.55, margin: 0 }}>
                     {subtitle}
                   </p>
                 </div>
 
+                {/* Form & Actions (including Primary Button, Account Switch Link, Divider, Google Button) */}
                 {children}
               </motion.div>
             </AnimatePresence>
           </div>
-
-          {/* Bottom Footer Spacer */}
-          <div style={{ marginTop: "2rem" }} />
         </div>
       </div>
     </div>

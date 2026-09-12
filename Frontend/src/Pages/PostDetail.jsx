@@ -370,13 +370,15 @@ const PostDetail = () => {
                 </details>
               )}
 
-              {/* Sanitized Body HTML Content */}
-              <div
-                className="editorial-prose"
-                dangerouslySetInnerHTML={{
-                  __html: sanitizedContent || DOMPurify.sanitize(post.content),
-                }}
-              />
+              {/* Sanitized Body HTML Content (if content exists) */}
+              {(sanitizedContent || post.content) ? (
+                <div
+                  className="editorial-prose"
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizedContent || DOMPurify.sanitize(post.content || ""),
+                  }}
+                />
+              ) : null}
 
               {/* TOPICS / TAGS SECTION */}
               {post.tags && post.tags.length > 0 && (

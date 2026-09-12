@@ -49,7 +49,7 @@ const PostCard = ({ post }) => {
           />
         </Link>
 
-        {post.category && (
+        {(post.customCategory || post.category) && (
           <span
             className="editorial-category"
             style={{
@@ -64,7 +64,7 @@ const PostCard = ({ post }) => {
               boxShadow: "var(--shadow-subtle)",
             }}
           >
-            {post.category.name}
+            {post.customCategory && post.customCategory.trim() ? post.customCategory : post.category?.name}
           </span>
         )}
 

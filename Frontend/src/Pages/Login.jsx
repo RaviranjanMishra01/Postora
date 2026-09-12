@@ -4,6 +4,8 @@ import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "../context/ToastContext";
 import AuthSplitLayout from "../components/auth/AuthSplitLayout";
+import AuthInput from "../components/auth/AuthInput";
+import AuthButton from "../components/auth/AuthButton";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import SEO from "../components/SEO";
 
@@ -48,161 +50,116 @@ const Login = () => {
         title="Welcome back"
         subtitle="Sign in to continue to your Postora account."
       >
-      <form onSubmit={handleLoginSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-        {/* Email Field */}
-        <div>
-          <label
-            style={{
-              display: "block",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              color: "var(--text-secondary)",
-              marginBottom: "0.4rem",
-            }}
-          >
-            Email Address
-          </label>
-          <div className="auth-input-focus" style={{ position: "relative", borderRadius: "10px", border: "1px solid var(--border-color)", transition: "all 0.2s" }}>
-            <Mail
-              size={18}
-              style={{
-                position: "absolute",
-                left: "14px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                color: "var(--text-muted)",
-              }}
-            />
-            <input
-              type="email"
-              placeholder="user@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "0.85rem 1rem 0.85rem 2.6rem",
-                borderRadius: "10px",
-                background: "var(--bg-secondary)",
-                border: "none",
-                color: "var(--text-primary)",
-                fontSize: "0.92rem",
-                outline: "none",
-              }}
-            />
-          </div>
-        </div>
+        <form onSubmit={handleLoginSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          {/* Email Address Input */}
+          <AuthInput
+            id="login-email"
+            label="Email Address"
+            type="email"
+            placeholder="name@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            icon={Mail}
+            autoComplete="email"
+          />
 
-        {/* Password Field */}
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
-            <label
-              style={{
-                fontSize: "0.85rem",
-                fontWeight: 600,
-                color: "var(--text-secondary)",
-              }}
-            >
-              Password
-            </label>
-            <Link
-              to="/forgot-password"
-              style={{
-                fontSize: "0.82rem",
-                color: "var(--Postora-pink, #FF3F7F)",
-                textDecoration: "none",
-                fontWeight: 600,
-              }}
-            >
-              Forgot Password?
-            </Link>
-          </div>
-          <div className="auth-input-focus" style={{ position: "relative", borderRadius: "10px", border: "1px solid var(--border-color)", transition: "all 0.2s" }}>
-            <Lock
-              size={18}
-              style={{
-                position: "absolute",
-                left: "14px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                color: "var(--text-muted)",
-              }}
-            />
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "0.85rem 2.6rem 0.85rem 2.6rem",
-                borderRadius: "10px",
-                background: "var(--bg-secondary)",
-                border: "none",
-                color: "var(--text-primary)",
-                fontSize: "0.92rem",
-                outline: "none",
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
-              style={{
-                position: "absolute",
-                right: "14px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                background: "none",
-                border: "none",
-                color: "var(--text-muted)",
-                cursor: "pointer",
-                padding: 0,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-        </div>
+          {/* Password Input */}
+          <AuthInput
+            id="login-password"
+            label="Password"
+            type={showPassword ? "text" : "password"}
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            icon={Lock}
+            autoComplete="current-password"
+            labelRight={
+              <Link
+                to="/forgot-password"
+                style={{
+                  fontSize: "0.82rem",
+                  color: "var(--Postora-pink, #FF3F7F)",
+                  textDecoration: "none",
+                  fontWeight: 600,
+                  transition: "opacity 150ms ease",
+                }}
+              >
+                Forgot Password?
+              </Link>
+            }
+            rightElement={
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "var(--text-muted, #94A3B8)",
+                  cursor: "pointer",
+                  padding: "4px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "6px",
+                  transition: "color 150ms ease",
+                }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            }
+          />
 
-        {/* Primary CTA Submit Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn-primary"
+          {/* Primary CTA Submit Button */}
+          <div style={{ marginTop: "6px" }}>
+            <AuthButton
+              type="submit"
+              loading={loading}
+              icon={LogIn}
+            >
+              Sign In
+            </AuthButton>
+          </div>
+        </form>
+
+        {/* Account-Switch Link (Directly below Primary Button) */}
+        <div
           style={{
-            width: "100%",
-            padding: "0.85rem",
-            fontSize: "0.95rem",
-            fontWeight: 700,
-            borderRadius: "10px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "0.5rem",
-            marginTop: "0.5rem",
-            cursor: loading ? "not-allowed" : "pointer",
+            textAlign: "center",
+            fontSize: "14px",
+            color: "var(--text-secondary, #64748B)",
+            marginTop: "16px",
+            marginBottom: "24px",
           }}
         >
-          <LogIn size={18} /> {loading ? "Signing in..." : "Sign In"}
-        </button>
-      </form>
+          Don't have an account?{" "}
+          <Link
+            to="/register"
+            style={{
+              color: "var(--Postora-pink, #FF3F7F)",
+              fontWeight: 600,
+              textDecoration: "none",
+              marginLeft: "4px",
+            }}
+          >
+            Sign up
+          </Link>
+        </div>
 
-      {/* Divider */}
-      <div style={{ display: "flex", alignItems: "center", margin: "1.5rem 0", gap: "0.75rem" }}>
-        <div style={{ flex: 1, height: "1px", backgroundColor: "var(--border-color)" }} />
-        <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, letterSpacing: "0.5px" }}>
-          OR CONTINUE WITH
-        </span>
-        <div style={{ flex: 1, height: "1px", backgroundColor: "var(--border-color)" }} />
-      </div>
+        {/* Divider */}
+        <div style={{ display: "flex", alignItems: "center", marginBottom: "24px", gap: "12px" }}>
+          <div style={{ flex: 1, height: "1px", backgroundColor: "var(--border-color, #E2E8F0)" }} />
+          <span style={{ fontSize: "11px", color: "var(--text-muted, #94A3B8)", fontWeight: 700, letterSpacing: "0.08em" }}>
+            OR CONTINUE WITH
+          </span>
+          <div style={{ flex: 1, height: "1px", backgroundColor: "var(--border-color, #E2E8F0)" }} />
+        </div>
 
-      {/* Google SSO Button */}
-      <GoogleSignInButton text="Continue with Google" />
-    </AuthSplitLayout>
+        {/* Google SSO Button */}
+        <GoogleSignInButton text="Continue with Google" />
+      </AuthSplitLayout>
     </>
   );
 };

@@ -45,13 +45,13 @@ const TrendingPosts = ({ posts = [] }) => {
                 {numStr}
               </div>
 
-              {post.category && (
+              {(post.customCategory || post.category) && (
                 <Link
-                  to={`/category/${post.category.slug}`}
+                  to={post.category?.slug ? `/category/${post.category.slug}` : `/categories`}
                   className="editorial-category"
                   style={{ marginBottom: "0.35rem", fontSize: "0.68rem" }}
                 >
-                  {post.category.name}
+                  {post.customCategory && post.customCategory.trim() ? post.customCategory : post.category?.name}
                 </Link>
               )}
 
