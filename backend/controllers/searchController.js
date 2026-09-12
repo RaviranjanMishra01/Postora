@@ -27,17 +27,44 @@ const searchAll = asyncHandler(async (req, res) => {
   // Search Posts
   const postQuery = { status: "published" };
   if (searchRegex) {
-    postQuery.$or = [{ title: searchRegex }, { excerpt: searchRegex }, { content: searchRegex }];
+    postQuery.$or = [
+      { title: searchRegex },
+      { excerpt: searchRegex },
+      { customCategory: searchRegex },
+      { topics: searchRegex },
+    ];
   }
 
   if (category) {
-    const catObj = await Category.findOne({ slug: category });
-    if (catObj) postQuery.category = catObj._id;
+    const safeCat = escapeRegex(category);
+    const catObj = await Category.findOne({
+      $or: [{ slug: category }, { name: new RegExp("^" + safeCat + "$", "i") }],
+    });
+    if (catObj) {
+      postQuery.$or = [
+        { category: catObj._id },
+        { customCategory: { $regex: new RegExp("^" + safeCat + "$", "i") } },
+      ];
+    } else {
+      postQuery.customCategory = { $regex: new RegExp("^" + safeCat + "$", "i") };
+    }
   }
+
   if (tag) {
-    const tagObj = await Tag.findOne({ slug: tag });
-    if (tagObj) postQuery.tags = tagObj._id;
+    const safeTag = escapeRegex(tag);
+    const tagObj = await Tag.findOne({
+      $or: [{ slug: tag }, { name: new RegExp("^" + safeTag + "$", "i") }],
+    });
+    if (tagObj) {
+      postQuery.$or = [
+        { tags: tagObj._id },
+        { topics: { $regex: new RegExp("^" + safeTag + "$", "i") } },
+      ];
+    } else {
+      postQuery.topics = { $regex: new RegExp("^" + safeTag + "$", "i") };
+    }
   }
+
   if (author) {
     postQuery.author = author;
   }
@@ -84,7 +111,12 @@ const getSuggestions = asyncHandler(async (req, res) => {
 
   const cleanQ = q.trim().slice(0, 100);
   const regex = new RegExp(escapeRegex(cleanQ), "i");
-  const posts = await Post.find({ title: regex, status: "published" }).select("title slug").limit(5);
+  const posts = await Post.find({
+    $or: [{ title: regex }, { customCategory: regex }, { topics: regex }],
+    status: "published",
+  })
+    .select("title slug")
+    .limit(5);
   const tags = await Tag.find({ name: regex }).select("name slug").limit(3);
 
   const suggestions = [

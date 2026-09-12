@@ -16,18 +16,14 @@ const hasProfanity = (text) => {
 // @desc Create comment or reply
 // @route POST /api/v1/comments
 const createComment = asyncHandler(async (req, res) => {
-  const { post: postId, content, parentComment } = req.body;
+  const { post: postId, parentComment } = req.body;
 
-  if (!postId || !content || !content.trim()) {
+  if (!postId || !content.trim()) {
     throw new ApiError(400, "Post ID and non-empty content are required");
   }
 
   if (!isValidObjectId(postId)) {
     throw new ApiError(400, "Invalid post ID format");
-  }
-
-  if (content.trim().length > 2000) {
-    throw new ApiError(400, "Comment cannot exceed 2000 characters");
   }
 
   if (parentComment) {

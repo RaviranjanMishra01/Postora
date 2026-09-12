@@ -7,43 +7,156 @@ const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 const calculateReadingTime = require("../utils/readingTime");
 const slugify = require("slugify");
-const { isValidObjectId, sanitizeRichText } = require("../middleware/validate");
+const { isValidObjectId, sanitizeRichText, escapeRegex } = require("../middleware/validate");
 const { uploadToCloudinary, deleteFromCloudinary } = require("../utils/cloudinary");
+
+// Helper to normalize and find/create tags & topics
+const processTopicsAndTags = async (rawTopics) => {
+  let topicStrings = [];
+  if (Array.isArray(rawTopics)) {
+    topicStrings = rawTopics;
+  } else if (typeof rawTopics === "string") {
+    try {
+      topicStrings = JSON.parse(rawTopics);
+    } catch {
+      topicStrings = [rawTopics];
+    }
+  }
+
+  const cleanTopicNames = [];
+  const seenLower = new Set();
+
+  for (let t of topicStrings) {
+    if (!t) continue;
+    // If it's a tag ObjectId, resolve tag document first
+    if (isValidObjectId(t)) {
+      const existingTagDoc = await Tag.findById(t);
+      if (existingTagDoc) {
+        t = existingTagDoc.name;
+      }
+    }
+    if (typeof t !== "string") continue;
+    const trimmed = t.trim();
+    if (!trimmed) continue;
+    const lower = trimmed.toLowerCase();
+    if (!seenLower.has(lower) && cleanTopicNames.length < 10) {
+      seenLower.add(lower);
+      cleanTopicNames.push(trimmed.slice(0, 50));
+    }
+  }
+
+  const tagObjectIds = [];
+  for (let topicName of cleanTopicNames) {
+    const tagSlug = slugify(topicName, { lower: true, strict: true }) || topicName.toLowerCase().replace(/\s+/g, "-");
+    let tagDoc = await Tag.findOne({
+      $or: [{ slug: tagSlug }, { name: new RegExp("^" + escapeRegex(topicName) + "$", "i") }],
+    });
+    if (!tagDoc) {
+      try {
+        tagDoc = await Tag.create({ name: topicName, slug: tagSlug });
+      } catch (err) {
+        tagDoc = await Tag.findOne({ slug: tagSlug });
+      }
+    }
+    if (tagDoc) {
+      tagObjectIds.push(tagDoc._id);
+    }
+  }
+
+  return { tagObjectIds, cleanTopicNames };
+};
+
+// Helper to process Category & customCategory
+const processCategoryAndCustom = async (categoryInput, customCategoryInput) => {
+  let isOther = false;
+  let catObj = null;
+
+  if (categoryInput === "Other" || categoryInput === "other") {
+    isOther = true;
+  } else if (isValidObjectId(categoryInput)) {
+    catObj = await Category.findById(categoryInput);
+    if (catObj && catObj.name.toLowerCase() === "other") {
+      isOther = true;
+    }
+  }
+
+  if (isOther) {
+    if (!customCategoryInput || !customCategoryInput.trim()) {
+      throw new ApiError(400, "Please enter your category for 'Other'");
+    }
+    // Ensure "Other" category document exists in MongoDB
+    let otherCatDoc = await Category.findOne({ slug: "other" });
+    if (!otherCatDoc) {
+      otherCatDoc = await Category.create({
+        name: "Other",
+        slug: "other",
+        description: "User defined categories",
+      });
+    }
+    return {
+      categoryId: otherCatDoc._id,
+      customCategory: customCategoryInput.trim().slice(0, 50),
+    };
+  }
+
+  // Standard category
+  if (!catObj && isValidObjectId(categoryInput)) {
+    catObj = await Category.findById(categoryInput);
+  }
+  if (!catObj) {
+    throw new ApiError(404, "Category not found");
+  }
+
+  return {
+    categoryId: catObj._id,
+    customCategory: "",
+  };
+};
 
 // @desc Create a Post
 // @route POST /api/v1/posts
 const createPost = asyncHandler(async (req, res) => {
-  const { title, excerpt, content, featuredImage, category, tags, status, seoTitle, seoDescription, canonicalUrl, scheduledAt } = req.body;
+  const {
+    title,
+    excerpt,
+    featuredImage,
+    category,
+    customCategory,
+    tags,
+    topics,
+    status,
+    seoTitle,
+    seoDescription,
+    canonicalUrl,
+    scheduledAt,
+  } = req.body;
 
-  if (!title || !content || !category) {
-    throw new ApiError(400, "Please provide title, content, and category");
+  if (!title || !category) {
+    throw new ApiError(400, "Please provide title, and category");
   }
 
   if (title.trim().length > 200) {
     throw new ApiError(400, "Post title cannot exceed 200 characters");
   }
 
-  if (!isValidObjectId(category)) {
-    throw new ApiError(400, "Invalid category ID format");
-  }
+  // Process Category and Custom Category
+  const { categoryId, customCategory: finalCustomCategory } = await processCategoryAndCustom(
+    category,
+    customCategory
+  );
 
-  const categoryExists = await Category.findById(category);
-  if (!categoryExists) {
-    throw new ApiError(404, "Category not found");
-  }
+  // Process Topics & Tags
+  const rawTopicsInput = topics || tags || [];
+  const { tagObjectIds, cleanTopicNames } = await processTopicsAndTags(rawTopicsInput);
 
-  let cleanTags = [];
-  if (Array.isArray(tags)) {
-    cleanTags = tags.filter((t) => isValidObjectId(t));
-  }
-
-  const cleanContent = sanitizeRichText(content);
   const generatedSlug = slugify(title, { lower: true, strict: true }) + "-" + Date.now().toString().slice(-4);
-  const calculatedReadingTime = calculateReadingTime(cleanContent || content);
 
   let postFeaturedImage = featuredImage;
   if (req.file) {
-    const uploadRes = await uploadToCloudinary(req.file.path, "posts", { protocol: req.protocol, host: req.get("host") });
+    const uploadRes = await uploadToCloudinary(req.file.path, "posts", {
+      protocol: req.protocol,
+      host: req.get("host"),
+    });
     postFeaturedImage = uploadRes?.secure_url || postFeaturedImage;
   }
 
@@ -51,12 +164,13 @@ const createPost = asyncHandler(async (req, res) => {
     title: title.trim(),
     slug: generatedSlug,
     excerpt: excerpt ? excerpt.trim().slice(0, 500) : title.trim(),
-    content: cleanContent || content,
     featuredImage: postFeaturedImage,
-    readingTime: calculatedReadingTime,
+    readingTime: calculateReadingTime(excerpt || title),
     author: req.user.id,
-    category,
-    tags: cleanTags,
+    category: categoryId,
+    customCategory: finalCustomCategory,
+    topics: cleanTopicNames,
+    tags: tagObjectIds,
     status: ["published", "draft", "scheduled"].includes(status) ? status : "draft",
     seoTitle: seoTitle ? seoTitle.trim().slice(0, 100) : title.trim(),
     seoDescription: seoDescription ? seoDescription.trim().slice(0, 200) : (excerpt || title).trim(),
@@ -65,10 +179,10 @@ const createPost = asyncHandler(async (req, res) => {
     publishedAt: status === "published" ? new Date() : null,
   });
 
-  // Update Category postCount
-  await Category.findByIdAndUpdate(category, { $inc: { postCount: 1 } });
-  if (tags && tags.length > 0) {
-    await Tag.updateMany({ _id: { $in: tags } }, { $inc: { postCount: 1 } });
+  // Update Category & Tag post counts
+  await Category.findByIdAndUpdate(categoryId, { $inc: { postCount: 1 } });
+  if (tagObjectIds.length > 0) {
+    await Tag.updateMany({ _id: { $in: tagObjectIds } }, { $inc: { postCount: 1 } });
   }
 
   const populatedPost = await Post.findById(post._id)
@@ -90,7 +204,6 @@ const getPosts = asyncHandler(async (req, res) => {
 
   const query = {};
 
-  // Default to published unless requested otherwise by author/admin
   if (status) {
     query.status = status;
   } else {
@@ -102,13 +215,33 @@ const getPosts = asyncHandler(async (req, res) => {
   }
 
   if (category) {
-    const catObj = await Category.findOne({ slug: category });
-    if (catObj) query.category = catObj._id;
+    const safeCat = escapeRegex(category);
+    const catObj = await Category.findOne({
+      $or: [{ slug: category }, { name: new RegExp("^" + safeCat + "$", "i") }],
+    });
+    if (catObj) {
+      query.$or = [
+        { category: catObj._id },
+        { customCategory: { $regex: new RegExp("^" + safeCat + "$", "i") } },
+      ];
+    } else {
+      query.customCategory = { $regex: new RegExp("^" + safeCat + "$", "i") };
+    }
   }
 
   if (tag) {
-    const tagObj = await Tag.findOne({ slug: tag });
-    if (tagObj) query.tags = tagObj._id;
+    const safeTag = escapeRegex(tag);
+    const tagObj = await Tag.findOne({
+      $or: [{ slug: tag }, { name: new RegExp("^" + safeTag + "$", "i") }],
+    });
+    if (tagObj) {
+      query.$or = [
+        { tags: tagObj._id },
+        { topics: { $regex: new RegExp("^" + safeTag + "$", "i") } },
+      ];
+    } else {
+      query.topics = { $regex: new RegExp("^" + safeTag + "$", "i") };
+    }
   }
 
   if (author) {
@@ -116,10 +249,13 @@ const getPosts = asyncHandler(async (req, res) => {
   }
 
   if (search) {
+    const safeSearch = escapeRegex(search);
+    const searchRegex = new RegExp(safeSearch, "i");
     query.$or = [
-      { title: { $regex: search, $options: "i" } },
-      { excerpt: { $regex: search, $options: "i" } },
-      { content: { $regex: search, $options: "i" } },
+      { title: searchRegex },
+      { excerpt: searchRegex },
+      { customCategory: searchRegex },
+      { topics: searchRegex },
     ];
   }
 
@@ -200,7 +336,20 @@ const updatePost = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Not authorized to update this post");
   }
 
-  const { title, excerpt, content, featuredImage, category, tags, status, seoTitle, seoDescription, canonicalUrl, isFeatured } = req.body;
+  const {
+    title,
+    excerpt,
+    featuredImage,
+    category,
+    customCategory,
+    tags,
+    topics,
+    status,
+    seoTitle,
+    seoDescription,
+    canonicalUrl,
+    isFeatured,
+  } = req.body;
 
   if (title && title !== post.title) {
     if (title.trim().length > 200) {
@@ -210,23 +359,21 @@ const updatePost = asyncHandler(async (req, res) => {
     post.slug = slugify(title, { lower: true, strict: true }) + "-" + Date.now().toString().slice(-4);
   }
 
-  if (content) {
-    const cleanContent = sanitizeRichText(content);
-    post.content = cleanContent || content;
-    post.readingTime = calculateReadingTime(post.content);
-  }
 
   if (category) {
-    if (!isValidObjectId(category)) {
-      throw new ApiError(400, "Invalid category ID format");
-    }
-    const catObj = await Category.findById(category);
-    if (!catObj) throw new ApiError(404, "Category not found");
-    post.category = category;
+    const { categoryId, customCategory: finalCustomCategory } = await processCategoryAndCustom(
+      category,
+      customCategory
+    );
+    post.category = categoryId;
+    post.customCategory = finalCustomCategory;
   }
 
-  if (Array.isArray(tags)) {
-    post.tags = tags.filter((t) => isValidObjectId(t));
+  if (topics || tags) {
+    const rawTopicsInput = topics || tags || [];
+    const { tagObjectIds, cleanTopicNames } = await processTopicsAndTags(rawTopicsInput);
+    post.tags = tagObjectIds;
+    post.topics = cleanTopicNames;
   }
 
   if (excerpt !== undefined) post.excerpt = String(excerpt).trim().slice(0, 500);
@@ -235,7 +382,10 @@ const updatePost = asyncHandler(async (req, res) => {
     if (post.featuredImage) {
       await deleteFromCloudinary(post.featuredImage);
     }
-    const uploadRes = await uploadToCloudinary(req.file.path, "posts", { protocol: req.protocol, host: req.get("host") });
+    const uploadRes = await uploadToCloudinary(req.file.path, "posts", {
+      protocol: req.protocol,
+      host: req.get("host"),
+    });
     post.featuredImage = uploadRes?.secure_url || post.featuredImage;
   } else if (featuredImage && featuredImage !== post.featuredImage) {
     if (post.featuredImage) {
@@ -279,14 +429,12 @@ const deletePost = asyncHandler(async (req, res) => {
   }
 
   if (post.status === "trash") {
-    // Permanent deletion from database & real-time Cloudinary removal
     if (post.featuredImage) {
       await deleteFromCloudinary(post.featuredImage);
     }
     await post.deleteOne();
     res.status(200).json(new ApiResponse(200, {}, "Post permanently deleted"));
   } else {
-    // Soft delete to trash
     post.status = "trash";
     await post.save();
     res.status(200).json(new ApiResponse(200, { post }, "Post moved to trash"));
@@ -324,11 +472,12 @@ const duplicatePost = asyncHandler(async (req, res) => {
     title: newTitle,
     slug: newSlug,
     excerpt: post.excerpt,
-    content: post.content,
     featuredImage: post.featuredImage,
     readingTime: post.readingTime,
     author: req.user.id,
     category: post.category,
+    customCategory: post.customCategory,
+    topics: post.topics,
     tags: post.tags,
     status: "draft",
     seoTitle: post.seoTitle,

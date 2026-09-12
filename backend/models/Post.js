@@ -22,7 +22,7 @@ const postSchema = new mongoose.Schema(
     },
     content: {
       type: String,
-      required: [true, "Post content is required"],
+      default: "",
     },
     featuredImage: {
       type: String,
@@ -44,6 +44,19 @@ const postSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    customCategory: {
+      type: String,
+      default: "",
+      trim: true,
+      maxLength: [50, "Custom category cannot exceed 50 characters"],
+    },
+    topics: [
+      {
+        type: String,
+        trim: true,
+        maxLength: [50, "Topic cannot exceed 50 characters"],
+      },
+    ],
     tags: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -98,7 +111,7 @@ const postSchema = new mongoose.Schema(
 );
 
 // Compound text index for fast search queries
-postSchema.index({ title: "text", excerpt: "text", content: "text" });
+postSchema.index({ title: "text", excerpt: "text", content: "text", customCategory: "text", topics: "text" });
 
 const Post = mongoose.models.Post || mongoose.model("Post", postSchema);
 module.exports = Post;
